@@ -1,7 +1,7 @@
 {
   "version": 3,
   "targets": {
-    ".NETFramework,Version=v4.7": {
+    ".NETFramework,Version=v4.8": {
       "MilestoneSystems.VideoOS.Platform/25.3.2": {
         "type": "package",
         "compile": {
@@ -117,7 +117,7 @@
         }
       }
     },
-    ".NETFramework,Version=v4.7/win": {
+    ".NETFramework,Version=v4.8/win": {
       "MilestoneSystems.VideoOS.Platform/25.3.2": {
         "type": "package",
         "compile": {
@@ -233,7 +233,7 @@
         }
       }
     },
-    ".NETFramework,Version=v4.7/win-arm64": {
+    ".NETFramework,Version=v4.8/win-arm64": {
       "MilestoneSystems.VideoOS.Platform/25.3.2": {
         "type": "package",
         "compile": {
@@ -349,7 +349,7 @@
         }
       }
     },
-    ".NETFramework,Version=v4.7/win-x64": {
+    ".NETFramework,Version=v4.8/win-x64": {
       "MilestoneSystems.VideoOS.Platform/25.3.2": {
         "type": "package",
         "compile": {
@@ -465,7 +465,7 @@
         }
       }
     },
-    ".NETFramework,Version=v4.7/win-x86": {
+    ".NETFramework,Version=v4.8/win-x86": {
       "MilestoneSystems.VideoOS.Platform/25.3.2": {
         "type": "package",
         "compile": {
@@ -633,7 +633,7 @@
     }
   },
   "projectFileDependencyGroups": {
-    ".NETFramework,Version=v4.7": [
+    ".NETFramework,Version=v4.8": [
       "MilestoneSystems.VideoOS.Platform >= 25.3.2"
     ]
   },
@@ -661,14 +661,14 @@
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "net47"
+        "net48"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net47": {
+        "net48": {
           "projectReferences": {}
         }
       },
@@ -679,7 +679,7 @@
       }
     },
     "frameworks": {
-      "net47": {
+      "net48": {
         "dependencies": {
           "MilestoneSystems.VideoOS.Platform": {
             "target": "Package",

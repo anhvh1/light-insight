@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LightInsight.BUS")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f158d83b31f04e22165056d7d6d9707108e1cd8d")]
 [assembly: System.Reflection.AssemblyProductAttribute("LightInsight.BUS")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LightInsight.BUS")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

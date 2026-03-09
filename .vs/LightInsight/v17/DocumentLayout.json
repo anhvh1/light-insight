@@ -11,7 +11,7 @@
       "RelativeMoniker": "D:0:0:{4C64ECDC-3B35-49CF-AF70-C075DD71CB3C}|LightInsight.BUS\\LightInsight.BUS.csproj|solutionrelative:lightinsight.bus\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{EF3D62FE-404E-4DF0-B584-4E19F24AE897}|LightInsight\\LightInsight.csproj|d:\\phinv\\light-insight\\lightinsight\\lightinsight\\lightinsightdefinition.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{EF3D62FE-404E-4DF0-B584-4E19F24AE897}|LightInsight\\LightInsight.csproj|D:\\PhiNV\\light-insight\\LightInsight\\lightinsight\\lightinsightdefinition.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{EF3D62FE-404E-4DF0-B584-4E19F24AE897}|LightInsight\\LightInsight.csproj|solutionrelative:lightinsight\\lightinsightdefinition.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -82,8 +82,7 @@
               "RelativeToolTip": "LightInsight.DAL\\Class1.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-09T04:50:30.595Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-09T04:50:30.595Z"
             },
             {
               "$type": "Document",
@@ -95,8 +94,7 @@
               "RelativeToolTip": "LightInsight.BUS\\Class1.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-09T04:50:11.15Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-09T04:50:11.15Z"
             },
             {
               "$type": "Document",
@@ -108,8 +106,7 @@
               "RelativeToolTip": "LightInsight\\LightInsightDefinition.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAABHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-09T04:48:35.85Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-09T04:48:35.85Z"
             }
           ]
         },
