@@ -1,0 +1,129 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\PhiNV\\light-insight\\LightInsight\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{ED0EF7DC-8128-4A0E-B214-92FB9498C5E3}|LightInsight.DAL\\LightInsight.DAL.csproj|d:\\phinv\\light-insight\\lightinsight\\lightinsight.dal\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ED0EF7DC-8128-4A0E-B214-92FB9498C5E3}|LightInsight.DAL\\LightInsight.DAL.csproj|solutionrelative:lightinsight.dal\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C64ECDC-3B35-49CF-AF70-C075DD71CB3C}|LightInsight.BUS\\LightInsight.BUS.csproj|d:\\phinv\\light-insight\\lightinsight\\lightinsight.bus\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4C64ECDC-3B35-49CF-AF70-C075DD71CB3C}|LightInsight.BUS\\LightInsight.BUS.csproj|solutionrelative:lightinsight.bus\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EF3D62FE-404E-4DF0-B584-4E19F24AE897}|LightInsight\\LightInsight.csproj|d:\\phinv\\light-insight\\lightinsight\\lightinsight\\lightinsightdefinition.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EF3D62FE-404E-4DF0-B584-4E19F24AE897}|LightInsight\\LightInsight.csproj|solutionrelative:lightinsight\\lightinsightdefinition.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 12,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{6d4078d1-5951-4ed1-ac0e-0a8099c1cce5}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:133:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:134:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:136:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:137:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "D:\\PhiNV\\light-insight\\LightInsight\\LightInsight.DAL\\Class1.cs",
+              "RelativeDocumentMoniker": "LightInsight.DAL\\Class1.cs",
+              "ToolTip": "D:\\PhiNV\\light-insight\\LightInsight\\LightInsight.DAL\\Class1.cs",
+              "RelativeToolTip": "LightInsight.DAL\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-09T04:50:30.595Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "D:\\PhiNV\\light-insight\\LightInsight\\LightInsight.BUS\\Class1.cs",
+              "RelativeDocumentMoniker": "LightInsight.BUS\\Class1.cs",
+              "ToolTip": "D:\\PhiNV\\light-insight\\LightInsight\\LightInsight.BUS\\Class1.cs",
+              "RelativeToolTip": "LightInsight.BUS\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-09T04:50:11.15Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "LightInsightDefinition.cs",
+              "DocumentMoniker": "D:\\PhiNV\\light-insight\\LightInsight\\LightInsight\\LightInsightDefinition.cs",
+              "RelativeDocumentMoniker": "LightInsight\\LightInsightDefinition.cs",
+              "ToolTip": "D:\\PhiNV\\light-insight\\LightInsight\\LightInsight\\LightInsightDefinition.cs",
+              "RelativeToolTip": "LightInsight\\LightInsightDefinition.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAABHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-09T04:48:35.85Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 1873,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

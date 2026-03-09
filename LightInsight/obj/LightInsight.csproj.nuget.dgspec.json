@@ -1,0 +1,70 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\PhiNV\\light-insight\\LightInsight\\LightInsight\\LightInsight.csproj": {}
+  },
+  "projects": {
+    "D:\\PhiNV\\light-insight\\LightInsight\\LightInsight\\LightInsight.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\PhiNV\\light-insight\\LightInsight\\LightInsight\\LightInsight.csproj",
+        "projectName": "LightInsight",
+        "projectPath": "D:\\PhiNV\\light-insight\\LightInsight\\LightInsight\\LightInsight.csproj",
+        "packagesPath": "C:\\Users\\PhiNV\\.nuget\\packages\\",
+        "outputPath": "D:\\PhiNV\\light-insight\\LightInsight\\LightInsight\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "UsingMicrosoftNETSdk": false,
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\PhiNV\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net47"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net47": {
+            "projectReferences": {}
+          }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net47": {
+          "dependencies": {
+            "MilestoneSystems.VideoOS.Platform": {
+              "target": "Package",
+              "version": "[25.3.2, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-arm64": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    }
+  }
+}
