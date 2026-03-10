@@ -39,6 +39,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="System.Text.Json">
+      <Version>10.0.3</Version>
+    </PackageReference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -60,6 +63,16 @@
     <PackageReference Include="MilestoneSystems.VideoOS.Platform" Version="25.3.2" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dashboard\Camera\Client\CameraOnlineWidget.xaml.cs">
+      <DependentUpon>CameraOnlineWidget.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Dashboard\DashboardView.xaml.cs">
+      <DependentUpon>DashboardView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Dashboard\DashboardViewItem.cs" />
+    <Compile Include="Dashboard\Dashboard\DashboardViewItemManager.cs" />
+    <Compile Include="Dashboard\Dashboard\DashboardViewItemWpfUserControl.cs" />
+    <Compile Include="Dashboard\Dashboard\LightInsightWorkSpacePlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -83,6 +96,17 @@
     </Content>
     <Resource Include="Resources\DummyItem.png" />
     <Resource Include="Resources\WorkSpaceIcon.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Page Include="Dashboard\Camera\Client\CameraOnlineWidget.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\Dashboard\DashboardView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
