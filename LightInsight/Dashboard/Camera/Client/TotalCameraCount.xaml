@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="LightInsight.Dashboard.Camera.Client.CameraOnlineWidget"
+<UserControl x:Class="LightInsight.Dashboard.Camera.Client.TotalCameraCount"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Height="130"
@@ -12,20 +12,16 @@
 
         <Grid>
             <Button x:Name="DeleteButton"
-                Content="X"
-                Width="15" 
-                Height="15"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-        
-                HorizontalContentAlignment="Center" 
-                VerticalContentAlignment="Center"
-        
-                Padding="0" 
-        
-                FontSize="10"
-        
-                Click="DeleteWidget_Click"/>
+                    Content="X"
+                    Width="15" 
+                    Height="15"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    HorizontalContentAlignment="Center" 
+                    VerticalContentAlignment="Center"
+                    Padding="0" 
+                    FontSize="10"
+                    Click="DeleteWidget_Click"/>
 
             <StackPanel Margin="0 10 0 0">
 
@@ -39,23 +35,19 @@
                     <TextBlock FontFamily="Segoe MDL2 Assets" 
                                Text="&#xE722;" 
                                FontSize="24" 
-                               Foreground="LimeGreen"
+                               Foreground="#7DB8FF"
                                VerticalAlignment="Center"
                                Margin="0 0 10 0"/>
 
-                    <TextBlock Text="142"
+                    <TextBlock Text="150"
                                FontSize="32"
                                FontWeight="Bold"
-                               Foreground="LimeGreen"
+                               Foreground="#7DB8FF"
                                VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <TextBlock Text="Cameras Online"
+                <TextBlock Text="Cameras"
                            Foreground="LightGray"/>
-
-                <TextBlock Text="↗ 2.3% vs last period"
-                           Foreground="LimeGreen"
-                           FontSize="11"/>
 
             </StackPanel>
         </Grid>

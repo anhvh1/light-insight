@@ -63,8 +63,14 @@
     <PackageReference Include="MilestoneSystems.VideoOS.Platform" Version="25.3.2" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dashboard\Camera\Client\CameraOfflineWidget.xaml.cs">
+      <DependentUpon>CameraOfflineWidget.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\Camera\Client\CameraOnlineWidget.xaml.cs">
       <DependentUpon>CameraOnlineWidget.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Camera\Client\TotalCameraCount.xaml.cs">
+      <DependentUpon>TotalCameraCount.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dashboard\Dashboard\DashboardView.xaml.cs">
       <DependentUpon>DashboardView.xaml</DependentUpon>
@@ -99,8 +105,14 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Page Include="Dashboard\Camera\Client\CameraOfflineWidget.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dashboard\Camera\Client\CameraOnlineWidget.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\Camera\Client\TotalCameraCount.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dashboard\Dashboard\DashboardView.xaml">
