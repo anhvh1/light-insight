@@ -91,6 +91,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Dashboard\Asset\logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Content Include="plugin.def">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -117,7 +120,6 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetDir)*.*" "C:\Program Files\Milestone\XProtect Smart Client\MIPPlugins\LightInsight\" /Y /I /E</PostBuildEvent>
   </PropertyGroup>
 </Project>
