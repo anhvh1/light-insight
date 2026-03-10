@@ -66,8 +66,17 @@
     <Compile Include="Dashboard\Camera\Client\CameraOfflineWidget.xaml.cs">
       <DependentUpon>CameraOfflineWidget.xaml</DependentUpon>
     </Compile>
+    <Page Include="Dashboard\Camera\Client\CameraOnlineNOffline.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Compile Include="Dashboard\Camera\Client\CameraOnlineNOffline.xaml.cs">
+      <DependentUpon>CameraOnlineNOffline.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\Camera\Client\CameraOnlineWidget.xaml.cs">
       <DependentUpon>CameraOnlineWidget.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Camera\Client\CameraStatusDonut.xaml.cs">
+      <DependentUpon>CameraStatusDonut.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dashboard\Camera\Client\TotalCameraCount.xaml.cs">
       <DependentUpon>TotalCameraCount.xaml</DependentUpon>
@@ -112,6 +121,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dashboard\Camera\Client\CameraStatusDonut.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dashboard\Camera\Client\TotalCameraCount.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -129,7 +141,10 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetDir)*.*" "C:\Program Files\Milestone\XProtect Smart Client\MIPPlugins\LightInsight\" /Y /I /E</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
 </Project>
