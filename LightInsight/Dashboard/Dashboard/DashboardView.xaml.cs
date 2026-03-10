@@ -28,17 +28,64 @@ namespace LightInsight.Dashboard.Dashboard
         private Point startPoint;
         Button currentMenu = null;
         string currentDashboard = "Operations";
+        bool sidebarCollapsed = false;
+        FrameworkElement selectedWidget = null;
+        bool isDraggingWidget = false;
+        bool isDark = true;
         public DashboardView()
         {
             InitializeComponent();
             SelectMenu(OperationsBtn);
+            TimeRangeCombo.SelectedIndex = 0;
+            LanguageCombo.SelectedIndex = 0;
+            ThemeBtn.Content = "🌙";
             LoadLayout();
+        }
+        void ThemeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            isDark = !isDark;
+
+            if (!isDark)
+            {
+                ThemeBtn.Content = "🌙";
+                //this.Background = new SolidColorBrush(Color.FromRgb(30, 30, 30));
+            }
+            else
+            {
+                ThemeBtn.Content = "☀";
+                //this.Background = Brushes.White;
+            }
+        }
+        void RefreshBtn_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Refreshing dashboard...");
+        }
+        void LanguageCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBoxItem item = (ComboBoxItem)LanguageCombo.SelectedItem;
+
+            if (item.Content.ToString() == "VI")
+            {
+                OperationsText.Text = " Vận hành";
+                AlarmMonitorText.Text = " Giám sát cảnh báo";
+            }
+            else
+            {
+                OperationsText.Text = " Operations";
+                AlarmMonitorText.Text = " Alarm Monitor";
+            }
         }
         private void Menu_Click(object sender, RoutedEventArgs e)
         {
             Button btn = sender as Button;
+
             SelectMenu(btn);
-            currentDashboard = btn.Content.ToString();
+
+            currentDashboard = btn.Tag.ToString();
+
+            string parent = DashboardExpander.Header.ToString();
+            string child = btn.Tag.ToString().Trim();
+            BreadcrumbText.Text = $"{parent} > {child}";
             LoadLayout();
         }
         void SelectMenu(Button btn)
@@ -121,34 +168,50 @@ namespace LightInsight.Dashboard.Dashboard
             e.Effects = DragDropEffects.Copy;
             e.Handled = true;
         }
-        private void Widget_MouseMove(object sender, MouseEventArgs e)
+        
+        void Widget_MouseMove(object sender, MouseEventArgs e)
         {
-            Point mousePos = e.GetPosition(null);
-            Vector diff = startPoint - mousePos;
+            if (!editMode) return;
 
-            if (e.LeftButton == MouseButtonState.Pressed &&
-                (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
-                 Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
-            {
-                Button widget = sender as Button;
+            if (!isDraggingWidget || selectedWidget == null)
+                return;
 
-                if (widget == null) return;
+            Point currentPoint = e.GetPosition(DashboardGrid);
 
-                DragDrop.DoDragDrop(widget,
-                    widget.Content.ToString(),
-                    DragDropEffects.Copy);
-            }
+            double dx = currentPoint.X - startPoint.X;
+            double dy = currentPoint.Y - startPoint.Y;
+
+            double left = Canvas.GetLeft(selectedWidget);
+            double top = Canvas.GetTop(selectedWidget);
+
+            double newLeft = left + dx;
+            double newTop = top + dy;
+
+            // ===== GIỚI HẠN TRONG CANVAS =====
+
+            double maxX = DashboardGrid.ActualWidth - selectedWidget.ActualWidth;
+            double maxY = DashboardGrid.ActualHeight - selectedWidget.ActualHeight;
+
+            newLeft = Math.Max(0, Math.Min(newLeft, maxX));
+            newTop = Math.Max(0, Math.Min(newTop, maxY));
+
+            Canvas.SetLeft(selectedWidget, newLeft);
+            Canvas.SetTop(selectedWidget, newTop);
+
+            startPoint = currentPoint;
         }
         private void DashboardGrid_Drop(object sender, DragEventArgs e)
         {
-            if (!e.Data.GetDataPresent(typeof(string)))
+            if (!editMode)
                 return;
 
-            string widgetName = e.Data.GetData(typeof(string)) as string;
+            if (!e.Data.GetDataPresent(DataFormats.StringFormat))
+                return;
+
+            string widgetName = e.Data.GetData(DataFormats.StringFormat) as string;
 
             if (widgetName == "Camera Online Count")
             {
-                // kiểm tra đã tồn tại chưa
                 bool exists = DashboardGrid.Children
                     .OfType<CameraOnlineWidget>()
                     .Any();
@@ -160,27 +223,73 @@ namespace LightInsight.Dashboard.Dashboard
                 }
 
                 var widget = new CameraOnlineWidget();
-                widget.SetEditMode(editMode);
+
+                // cho phép drag widget sau khi thả
+                widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
+                widget.MouseMove += Widget_MouseMove;
+                widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
+
+                // delete widget
                 widget.DeleteRequested += Widget_DeleteRequested;
+                widget.SetEditMode(true);
+
                 Point position = e.GetPosition(DashboardGrid);
 
                 Canvas.SetLeft(widget, position.X);
                 Canvas.SetTop(widget, position.Y);
 
+                Panel.SetZIndex(widget, DashboardGrid.Children.Count);
+
                 DashboardGrid.Children.Add(widget);
             }
         }
-        private void Widget_DeleteRequested(object sender, EventArgs e)
+        private void WidgetLibrary_MouseMove(object sender, MouseEventArgs e)
         {
-            if (!editMode)
-                return;
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                Button btn = sender as Button;
 
+                DragDrop.DoDragDrop(btn,
+                    btn.Content.ToString(),
+                    DragDropEffects.Copy);
+            }
+        }
+        void Widget_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (!editMode) return;
+
+            selectedWidget = sender as FrameworkElement;
+
+            startPoint = e.GetPosition(DashboardGrid);
+
+            isDraggingWidget = true;
+
+            selectedWidget.CaptureMouse();
+        }
+
+
+
+        void Widget_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (selectedWidget != null)
+            {
+                selectedWidget.ReleaseMouseCapture();
+            }
+
+            isDraggingWidget = false;
+            selectedWidget = null;
+        }
+        void Widget_DeleteRequested(object sender, EventArgs e)
+        {
             if (sender is FrameworkElement widget)
             {
                 DashboardGrid.Children.Remove(widget);
             }
         }
-       
+        /// <summary>
+        /// Lưu layout của dashboard vào file JSON để có thể load lại sau này
+        /// </summary>
+        /// <param name="newLayouts"></param>
         void SaveLayout(List<WidgetLayout> newLayouts)
         {
             string folder = Path.Combine(
@@ -222,12 +331,15 @@ namespace LightInsight.Dashboard.Dashboard
 
             File.WriteAllText(filePath, json);
         }
+        /// <summary>
+        /// Load layout từ file JSON và hiển thị trên dashboard
+        /// </summary>
         void LoadLayout()
         {
             DashboardGrid.Children.Clear();
 
             string folder = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
                 "LightInsight");
 
             string filePath = Path.Combine(folder, "dashboard_layout.json");
@@ -256,23 +368,73 @@ namespace LightInsight.Dashboard.Dashboard
 
             foreach (var layout in layouts)
             {
-                // chỉ load layout của dashboard hiện tại
                 if (layout.Dashboard != currentDashboard)
                     continue;
 
-                FrameworkElement widget = null;
+                FrameworkElement widget = CreateWidget(layout.Type);
 
-                if (layout.Type == "CameraOnlineWidget")
-                    widget = new CameraOnlineWidget();
+                if (widget == null)
+                    continue;
 
-                if (widget != null)
-                {
-                    Canvas.SetLeft(widget, layout.X);
-                    Canvas.SetTop(widget, layout.Y);
+                SetupWidget(widget);
 
-                    DashboardGrid.Children.Add(widget);
-                }
+                Canvas.SetLeft(widget, layout.X);
+                Canvas.SetTop(widget, layout.Y);
+
+                Panel.SetZIndex(widget, DashboardGrid.Children.Count);
+
+                DashboardGrid.Children.Add(widget);
             }
+        }
+        FrameworkElement CreateWidget(string type)
+        {
+            switch (type)
+            {
+                case "CameraOnlineWidget":
+                    return new CameraOnlineWidget();
+
+                // ví dụ widget tương lai
+                // case "AlarmWidget":
+                //     return new AlarmWidget();
+
+                default:
+                    return null;
+            }
+        }
+        void SetupWidget(FrameworkElement widget)
+        {
+            widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
+            widget.MouseMove += Widget_MouseMove;
+            widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
+
+            if (widget is CameraOnlineWidget cameraWidget)
+                cameraWidget.DeleteRequested += Widget_DeleteRequested;
+        }
+        /// <summary>
+        /// Xử lý sự kiện click để thu gọn/hiện sidebar
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ToggleSidebar_Click(object sender, RoutedEventArgs e)
+        {
+            if (sidebarCollapsed)
+            {
+                SidebarColumn.Width = new GridLength(220);
+
+                OperationsText.Visibility = Visibility.Visible;
+                AlarmMonitorText.Visibility = Visibility.Visible;
+                DashboardExpander.Header = "Dashboard";
+            }
+            else
+            {
+                SidebarColumn.Width = new GridLength(80);
+
+                OperationsText.Visibility = Visibility.Collapsed;
+                AlarmMonitorText.Visibility = Visibility.Collapsed;
+                DashboardExpander.Header = "";
+            }
+
+            sidebarCollapsed = !sidebarCollapsed;
         }
     }
     public class WidgetLayout
