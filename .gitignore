@@ -30,3 +30,11 @@
 /LightInsight/obj/LightInsight.csproj.nuget.g.targets
 /LightInsight/obj/project.assets.json
 /LightInsight/obj/project.nuget.cache
+/.vs/LightInsight/v17/.suo
+/.vs/LightInsight/v17/DocumentLayout.backup.json
+/.vs/LightInsight/v17/DocumentLayout.json
+*.force
+/LightInsight.BUS/obj/Debug/net8.0/LightInsight.BUS.AssemblyInfo.cs
+/LightInsight.BUS/obj/Debug/net8.0/LightInsight.BUS.AssemblyInfoInputs.cache
+/LightInsight.DAL/obj/Debug/net8.0/LightInsight.DAL.AssemblyInfo.cs
+/LightInsight.DAL/obj/Debug/net8.0/LightInsight.DAL.AssemblyInfoInputs.cache
