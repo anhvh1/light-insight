@@ -1,0 +1,47 @@
+﻿<UserControl x:Class="LightInsight.Dashboard.Camera.Client.CameraOnlineWidget"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Height="130"
+             Width="200">
+
+    <Border Background="#2D2D30"
+            BorderBrush="#444"
+            BorderThickness="1"
+            CornerRadius="6"
+            Padding="10">
+
+        <Grid>
+
+            <!-- Nút X -->
+            <Button x:Name="DeleteButton"
+                    Content="X"
+                    Width="10"
+                    Height="10"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Click="DeleteWidget_Click"/>    
+
+            <StackPanel Margin="0 10 0 0">
+
+                <TextBlock Text="Camera Online Count"
+                           Foreground="White"
+                           FontSize="14"/>
+
+                <TextBlock Text="142"
+                           FontSize="32"
+                           FontWeight="Bold"
+                           Foreground="LimeGreen"/>
+
+                <TextBlock Text="Cameras Online"
+                           Foreground="LightGray"/>
+
+                <TextBlock Text="↗ 2.3% vs last period"
+                           Foreground="LimeGreen"
+                           FontSize="11"/>
+
+            </StackPanel>
+
+        </Grid>
+
+    </Border>
+</UserControl>
