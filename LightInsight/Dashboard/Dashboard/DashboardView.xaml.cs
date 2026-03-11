@@ -34,13 +34,15 @@ namespace LightInsight.Dashboard.Dashboard
         bool isDraggingWidget = false;
         bool isDark = true;
         string currentFilter = null;
+
+        // khai báo widget mẫu để hiển thị trong thư viện widget library
         List<WidgetItem> allWidgets = new List<WidgetItem>()
         {
-            new WidgetItem{ Name="Camera Online Count", Category="KPI"},
-            new WidgetItem{ Name="Camera Offline Count", Category="KPI"},
-            new WidgetItem{ Name="Camera Total Count", Category="KPI"},
-            new WidgetItem{ Name="Camera Status Donut", Category="Charts"},
-            new WidgetItem{ Name="Camera List", Category="Tables"},
+            new WidgetItem{ Name="Camera Online Count", Category="KPI", WidgetType = typeof(CameraOnlineWidget)},
+            new WidgetItem{ Name="Camera Offline Count", Category="KPI",WidgetType = typeof(CameraOfflineWidget)},
+            new WidgetItem{ Name="Camera Total Count", Category="KPI",WidgetType = typeof(TotalCameraCount)},
+            new WidgetItem{ Name="Camera Status Donut", Category="Charts",WidgetType = typeof(CameraStatusDonut)},
+            new WidgetItem{ Name="Camera Duration top 10", Category="Tables",WidgetType = typeof(CameraOfflineDurationTop10)},
         };
         public DashboardView()
         {
@@ -93,13 +95,16 @@ namespace LightInsight.Dashboard.Dashboard
             Button btn = sender as Button;
             WidgetItem widget = btn.Tag as WidgetItem;
 
-            FrameworkElement newWidget = null;
+            if (widget == null)
+                return;
 
-            if (widget.Name == "Camera Online Count")
-                newWidget = new CameraOnlineWidget();
+            FrameworkElement newWidget =
+                Activator.CreateInstance(widget.WidgetType) as FrameworkElement;
 
             if (newWidget == null)
                 return;
+
+            SetupWidget(newWidget);
 
             Point pos = GetGridPosition();
 
@@ -204,7 +209,7 @@ namespace LightInsight.Dashboard.Dashboard
             SaveBtn.Visibility = Visibility.Visible;
             CancelBtn.Visibility = Visibility.Visible;
 
-            foreach (var widget in DashboardGrid.Children.OfType<CameraOnlineWidget>())
+            foreach (var widget in DashboardGrid.Children.OfType<IDashboardWidget>())
             {
                 widget.SetEditMode(true);
             }
@@ -249,7 +254,7 @@ namespace LightInsight.Dashboard.Dashboard
             SaveBtn.Visibility = Visibility.Collapsed;
             CancelBtn.Visibility = Visibility.Collapsed;
 
-            foreach (var widget in DashboardGrid.Children.OfType<CameraOnlineWidget>())
+            foreach (var widget in DashboardGrid.Children.OfType<IDashboardWidget>())
             {
                 widget.SetEditMode(false);
             }
@@ -291,59 +296,105 @@ namespace LightInsight.Dashboard.Dashboard
 
             startPoint = currentPoint;
         }
+        //private void DashboardGrid_Drop(object sender, DragEventArgs e)
+        //{
+        //    if (!editMode)
+        //        return;
+
+        //    if (!e.Data.GetDataPresent(DataFormats.StringFormat))
+        //        return;
+
+        //    string widgetName = e.Data.GetData(DataFormats.StringFormat) as string;
+
+        //    if (widgetName == "Camera Online Count")
+        //    {
+        //        bool exists = DashboardGrid.Children
+        //            .OfType<CameraOnlineWidget>()
+        //            .Any();
+
+        //        if (exists)
+        //        {
+        //            MessageBox.Show("Widget này đã tồn tại trên dashboard!");
+        //            return;
+        //        }
+
+        //        var widget = new CameraOnlineWidget();
+
+        //        // cho phép drag widget sau khi thả
+        //        widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
+        //        widget.MouseMove += Widget_MouseMove;
+        //        widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
+
+        //        // delete widget
+        //        widget.DeleteRequested += Widget_DeleteRequested;
+        //        widget.SetEditMode(true);
+
+        //        Point position = e.GetPosition(DashboardGrid);
+
+        //        Canvas.SetLeft(widget, position.X);
+        //        Canvas.SetTop(widget, position.Y);
+
+        //        Panel.SetZIndex(widget, DashboardGrid.Children.Count);
+
+        //        DashboardGrid.Children.Add(widget);
+        //    }
+        //}
         private void DashboardGrid_Drop(object sender, DragEventArgs e)
         {
             if (!editMode)
                 return;
 
-            if (!e.Data.GetDataPresent(DataFormats.StringFormat))
+            if (!e.Data.GetDataPresent(typeof(WidgetItem)))
                 return;
 
-            string widgetName = e.Data.GetData(DataFormats.StringFormat) as string;
+            WidgetItem widgetItem = e.Data.GetData(typeof(WidgetItem)) as WidgetItem;
 
-            if (widgetName == "Camera Online Count")
+            if (widgetItem == null)
+                return;
+
+            FrameworkElement widget =
+                Activator.CreateInstance(widgetItem.WidgetType) as FrameworkElement;
+
+            if (widget == null)
+                return;
+
+            // giữ nguyên logic drag
+            widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
+            widget.MouseMove += Widget_MouseMove;
+            widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
+
+            // delete
+            if (widget is IDashboardWidget dashboardWidget)
             {
-                bool exists = DashboardGrid.Children
-                    .OfType<CameraOnlineWidget>()
-                    .Any();
-
-                if (exists)
-                {
-                    MessageBox.Show("Widget này đã tồn tại trên dashboard!");
-                    return;
-                }
-
-                var widget = new CameraOnlineWidget();
-
-                // cho phép drag widget sau khi thả
-                widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
-                widget.MouseMove += Widget_MouseMove;
-                widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
-
-                // delete widget
-                widget.DeleteRequested += Widget_DeleteRequested;
-                widget.SetEditMode(true);
-
-                Point position = e.GetPosition(DashboardGrid);
-
-                Canvas.SetLeft(widget, position.X);
-                Canvas.SetTop(widget, position.Y);
-
-                Panel.SetZIndex(widget, DashboardGrid.Children.Count);
-
-                DashboardGrid.Children.Add(widget);
+                dashboardWidget.DeleteRequested += Widget_DeleteRequested;
+                dashboardWidget.SetEditMode(true);
             }
+
+            Point position = e.GetPosition(DashboardGrid);
+
+            Canvas.SetLeft(widget, position.X);
+            Canvas.SetTop(widget, position.Y);
+
+            Panel.SetZIndex(widget, DashboardGrid.Children.Count);
+
+            DashboardGrid.Children.Add(widget);
         }
         private void WidgetLibrary_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                Button btn = sender as Button;
+            if (e.LeftButton != MouseButtonState.Pressed)
+                return;
 
-                DragDrop.DoDragDrop(btn,
-                    btn.Content.ToString(),
-                    DragDropEffects.Copy);
-            }
+            Border border = sender as Border;
+
+            if (border == null)
+                return;
+
+            WidgetItem widget = border.DataContext as WidgetItem;
+
+            if (widget == null)
+                return;
+
+            DragDrop.DoDragDrop(border, widget, DragDropEffects.Copy);
         }
         void Widget_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -477,20 +528,17 @@ namespace LightInsight.Dashboard.Dashboard
                 DashboardGrid.Children.Add(widget);
             }
         }
-        FrameworkElement CreateWidget(string type)
+        FrameworkElement CreateWidget(string typeName)
         {
-            switch (type)
-            {
-                case "CameraOnlineWidget":
-                    return new CameraOnlineWidget();
+            var widgetType = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .FirstOrDefault(t => t.Name == typeName);
 
-                // ví dụ widget tương lai
-                // case "AlarmWidget":
-                //     return new AlarmWidget();
+            if (widgetType == null)
+                return null;
 
-                default:
-                    return null;
-            }
+            return Activator.CreateInstance(widgetType) as FrameworkElement;
         }
         void SetupWidget(FrameworkElement widget)
         {
@@ -498,8 +546,11 @@ namespace LightInsight.Dashboard.Dashboard
             widget.MouseMove += Widget_MouseMove;
             widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
 
-            if (widget is CameraOnlineWidget cameraWidget)
-                cameraWidget.DeleteRequested += Widget_DeleteRequested;
+            if (widget is IDashboardWidget dashboardWidget)
+            {
+                dashboardWidget.DeleteRequested += Widget_DeleteRequested;
+                dashboardWidget.SetEditMode(editMode);
+            }
         }
         /// <summary>
         /// Xử lý sự kiện click để thu gọn/hiện sidebar
@@ -528,11 +579,5 @@ namespace LightInsight.Dashboard.Dashboard
             sidebarCollapsed = !sidebarCollapsed;
         }
     }
-    public class WidgetLayout
-    {
-        public string Dashboard { get; set; }
-        public string Type { get; set; }
-        public double X { get; set; }
-        public double Y { get; set; }
-    }
+    
 }

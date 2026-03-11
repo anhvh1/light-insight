@@ -10,5 +10,13 @@ namespace LightInsight.Dashboard.Dashboard
     {
         public string Name { get; set; }
         public string Category { get; set; }
+        public Type WidgetType { get; set; }
+    }
+    public class WidgetLayout
+    {
+        public string Dashboard { get; set; }
+        public string Type { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
     }
 }

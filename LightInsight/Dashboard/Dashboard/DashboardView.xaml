@@ -290,9 +290,10 @@ Background="#1E1E1E">
                                 <Border Background="#3C3C3C"
                                         Margin="0 4"
                                         Padding="8"
-                                        CornerRadius="4">
+                                        CornerRadius="4"
+                                        MouseMove="WidgetLibrary_MouseMove">
 
-                                    <DockPanel LastChildFill="True">
+                                    <DockPanel LastChildFill="False">
                                         <Button Content="Add"
                                                 MinHeight="0"
                                                 MinWidth="0"

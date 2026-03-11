@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LightInsight.Dashboard.Dashboard;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -7,8 +8,8 @@ namespace LightInsight.Dashboard.Camera.Client
 	/// <summary>
 	/// Interaction logic for CameraOnlineOffline.xaml
 	/// </summary>
-	public partial class CameraOnlineNOffline : UserControl
-	{
+	public partial class CameraOnlineNOffline : UserControl, IDashboardWidget
+    {
 		public event EventHandler DeleteRequested;
 
 		public CameraOnlineNOffline()

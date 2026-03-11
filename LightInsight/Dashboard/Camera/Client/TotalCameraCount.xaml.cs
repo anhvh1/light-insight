@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LightInsight.Dashboard.Dashboard;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,7 +19,7 @@ namespace LightInsight.Dashboard.Camera.Client
     /// <summary>
     /// Interaction logic for TotalCameraCount.xaml
     /// </summary>
-    public partial class TotalCameraCount : UserControl
+    public partial class TotalCameraCount : UserControl, IDashboardWidget
     {
         public event EventHandler DeleteRequested;
 

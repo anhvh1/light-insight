@@ -99,6 +99,7 @@
     <Compile Include="Dashboard\Dashboard\DashboardViewItem.cs" />
     <Compile Include="Dashboard\Dashboard\DashboardViewItemManager.cs" />
     <Compile Include="Dashboard\Dashboard\DashboardViewItemWpfUserControl.cs" />
+    <Compile Include="Dashboard\Dashboard\IDashboardWidget.cs" />
     <Compile Include="Dashboard\Dashboard\LightInsightWorkSpacePlugin.cs" />
     <Compile Include="Dashboard\Dashboard\WidgetItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
