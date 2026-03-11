@@ -70,4 +70,10 @@ namespace LightInsight.Dashboard.Data.AlarmsAndEvents
             }
         }
     }
+
+    public class DailyCountData
+    {
+        public string Day { get; set; }
+        public int Count { get; set; }
+    }
 }

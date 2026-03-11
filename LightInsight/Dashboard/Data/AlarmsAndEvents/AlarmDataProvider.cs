@@ -37,6 +37,19 @@ namespace LightInsight.Dashboard.Data.AlarmsAndEvents
                         new SeverityData { Title = "Major", Count = 27 },
                         new SeverityData { Title = "Critical", Count = 12 }
                     };
+
+                case WigetType.AlarmsDailyCountWidget:
+                    return new List<DailyCountData>
+                    {
+                        new DailyCountData { Day = "Mon", Count = 34 },
+                        new DailyCountData { Day = "Tue", Count = 28 },
+                        new DailyCountData { Day = "Wed", Count = 45 },
+                        new DailyCountData { Day = "Thu", Count = 53 },
+                        new DailyCountData { Day = "Fri", Count = 38 },
+                        new DailyCountData { Day = "Sat", Count = 15 },
+                        new DailyCountData { Day = "Sun", Count = 12 }
+                    };
+                    
                 default:
                     return null;
             }

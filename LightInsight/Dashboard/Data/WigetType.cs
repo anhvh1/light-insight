@@ -13,6 +13,7 @@ namespace LightInsight.Dashboard.Data
         //Alarms and Events
         LiveAlarmsFeedWidget,
         AlarmsBySeverityWidget,
+        AlarmsDailyCountWidget,
 
 
         //Them kieu o day
