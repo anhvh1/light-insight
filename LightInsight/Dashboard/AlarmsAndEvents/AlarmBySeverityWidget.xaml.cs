@@ -8,6 +8,7 @@ using LightInsight.Dashboard.Data.AlarmsAndEvents;
 using LightInsight.Dashboard.Data;
 using LiveCharts;
 using LiveCharts.Wpf;
+using LightInsight.Dashboard.Dashboard;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {

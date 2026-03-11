@@ -7,10 +7,11 @@ using LightInsight.Dashboard.Data.AlarmsAndEvents;
 using LightInsight.Dashboard.Data;
 using LiveCharts.Wpf;
 using LiveCharts;
+using LightInsight.Dashboard.Dashboard;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {
-    public partial class AlarmDailyCountWidget : UserControl
+    public partial class AlarmDailyCountWidget : UserControl,IDashboardWidget
     {
         public event EventHandler DeleteRequested;
 

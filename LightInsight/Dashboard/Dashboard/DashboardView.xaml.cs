@@ -1,4 +1,5 @@
-﻿using LightInsight.Dashboard.Camera.Client;
+﻿using LightInsight.Dashboard.AlarmsAndEvents;
+using LightInsight.Dashboard.Camera.Client;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -43,6 +44,11 @@ namespace LightInsight.Dashboard.Dashboard
             new WidgetItem{ Name="Camera Total Count", Category="KPI",WidgetType = typeof(TotalCameraCount)},
             new WidgetItem{ Name="Camera Status Donut", Category="Charts",WidgetType = typeof(CameraStatusDonut)},
             new WidgetItem{ Name="Camera Duration top 10", Category="Tables",WidgetType = typeof(CameraOfflineDurationTop10)},
+
+            //new WidgetItem{ Name="Live Alarm Feed", Category="Lists", WidgetType = typeof(LiveAlarmsFeedWidget)},
+            //new WidgetItem{ Name="Alarm by Severity", Category="Lists", WidgetType = typeof(AlarmBySeverityWidget)},
+            //new WidgetItem{ Name="Alarm Daily Count", Category="Lists", WidgetType = typeof(AlarmDailyCountWidget)},
+
         };
         public DashboardView()
         {

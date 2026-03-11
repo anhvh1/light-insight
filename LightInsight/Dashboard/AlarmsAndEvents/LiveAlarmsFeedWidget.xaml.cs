@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LightInsight.Dashboard.Dashboard;
 using LightInsight.Dashboard.Data;
 using LightInsight.Dashboard.Data.AlarmsAndEvents;
 
@@ -20,7 +21,7 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
     /// <summary>
     /// Interaction logic for LiveAlarmsFeed.xaml
     /// </summary>
-    public partial class LiveAlarmsFeedWidget : UserControl
+    public partial class LiveAlarmsFeedWidget : UserControl, IDashboardWidget
     {
         public event EventHandler DeleteRequested;
 
