@@ -17,13 +17,13 @@ using System.Windows.Shapes;
 namespace LightInsight.Dashboard.Camera.Client
 {
     /// <summary>
-    /// Interaction logic for CameraOnlineWidget.xaml
+    /// Interaction logic for TotalCameraCount.xaml
     /// </summary>
-    public partial class CameraOnlineWidget : UserControl, IDashboardWidget
+    public partial class TotalCameraCount : UserControl, IDashboardWidget
     {
         public event EventHandler DeleteRequested;
 
-        public CameraOnlineWidget()
+        public TotalCameraCount()
         {
             InitializeComponent();
             DeleteButton.Visibility = Visibility.Collapsed;
