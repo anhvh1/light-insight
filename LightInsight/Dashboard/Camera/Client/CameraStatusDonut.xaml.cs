@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LightInsight.Dashboard.Dashboard;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -6,7 +7,7 @@ using System.Windows.Shapes;
 
 namespace LightInsight.Dashboard.Camera.Client
 {
-	public partial class CameraStatusDonut : UserControl
+	public partial class CameraStatusDonut : UserControl, IDashboardWidget
 	{
 		public event EventHandler DeleteRequested;
 
@@ -16,7 +17,7 @@ namespace LightInsight.Dashboard.Camera.Client
 			DeleteButton.Visibility = Visibility.Collapsed;
 
 			// Tự động cập nhật khi UI đã sẵn sàng
-			this.Loaded += (s, e) => UpdateChart(0, 1);
+			this.Loaded += (s, e) => UpdateChart(142, 8);
 		}
 
 		public void SetEditMode(bool isEdit)
