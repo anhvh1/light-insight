@@ -63,8 +63,35 @@
     <PackageReference Include="MilestoneSystems.VideoOS.Platform" Version="25.3.2" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dashboard\Camera\Client\CameraDisconnectionTrend.xaml.cs">
+      <DependentUpon>CameraDisconnectionTrend.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Camera\Client\CameraOfflineDurationTop10.xaml.cs">
+      <DependentUpon>CameraOfflineDurationTop10.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Camera\Client\CameraOfflineWidget.xaml.cs">
+      <DependentUpon>CameraOfflineWidget.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Dashboard\Camera\Client\CameraDisconnectionTrend.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\Camera\Client\CameraOfflineDurationTop10.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\Camera\Client\CameraOnlineNOffline.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Compile Include="Dashboard\Camera\Client\CameraOnlineNOffline.xaml.cs">
+      <DependentUpon>CameraOnlineNOffline.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\Camera\Client\CameraOnlineWidget.xaml.cs">
       <DependentUpon>CameraOnlineWidget.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Camera\Client\CameraStatusDonut.xaml.cs">
+      <DependentUpon>CameraStatusDonut.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Camera\Client\TotalCameraCount.xaml.cs">
+      <DependentUpon>TotalCameraCount.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dashboard\Dashboard\DashboardView.xaml.cs">
       <DependentUpon>DashboardView.xaml</DependentUpon>
@@ -94,6 +121,7 @@
     <Resource Include="Dashboard\Asset\logo.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Content Include="Dashboard\Camera\Client\temp.txt" />
     <Content Include="plugin.def">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -102,8 +130,17 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Page Include="Dashboard\Camera\Client\CameraOfflineWidget.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dashboard\Camera\Client\CameraOnlineWidget.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\Camera\Client\CameraStatusDonut.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\Camera\Client\TotalCameraCount.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dashboard\Dashboard\DashboardView.xaml">
@@ -121,5 +158,9 @@
   -->
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(TargetDir)*.*" "C:\Program Files\Milestone\XProtect Smart Client\MIPPlugins\LightInsight\" /Y /I /E</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
 </Project>
