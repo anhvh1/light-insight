@@ -11,7 +11,7 @@ using LiveCharts.Wpf;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {
-    public partial class AlarmBySeverityWidget : UserControl
+    public partial class AlarmBySeverityWidget : UserControl, IDashboardWidget
     {
         public event EventHandler DeleteRequested;
         public SeriesCollection ChartSeries { get; set; } = new SeriesCollection();
