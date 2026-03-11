@@ -47,7 +47,7 @@ namespace LightInsight.Dashboard.Dashboard
         public DashboardView()
         {
             InitializeComponent();
-            SelectMenu(OperationsBtn);
+            OpenDashboard(OperationsBtn);
             TimeRangeCombo.SelectedIndex = 0;
             LanguageCombo.SelectedIndex = 0;
             ThemeBtn.Content = "🌙";
@@ -173,8 +173,10 @@ namespace LightInsight.Dashboard.Dashboard
         }
         private void Menu_Click(object sender, RoutedEventArgs e)
         {
-            Button btn = sender as Button;
-
+            OpenDashboard(sender as Button);
+        }
+        void OpenDashboard(Button btn)
+        {
             SelectMenu(btn);
 
             currentDashboard = btn.Tag.ToString();
@@ -182,6 +184,7 @@ namespace LightInsight.Dashboard.Dashboard
             string parent = DashboardExpander.Header.ToString();
             string child = btn.Tag.ToString().Trim();
             BreadcrumbText.Text = $"{parent} > {child}";
+
             LoadLayout();
         }
         void SelectMenu(Button btn)

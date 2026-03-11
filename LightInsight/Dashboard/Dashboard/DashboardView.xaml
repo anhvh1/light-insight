@@ -195,14 +195,30 @@ Background="#1E1E1E">
 
             <Grid ClipToBounds="True">
 
-                <Canvas x:Name="DashboardGrid"
-                    Background="Transparent"
-                    AllowDrop="True"
-                    ClipToBounds="True"
-                    Drop="DashboardGrid_Drop"
-                    DragOver="DashboardGrid_DragOver"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"/>
+                <Grid x:Name="DashboardGrid"
+                      Background="Transparent"
+                      AllowDrop="True"
+                      ClipToBounds="True"
+                      Drop="DashboardGrid_Drop"
+                      DragOver="DashboardGrid_DragOver">
+
+                    <!-- ROWS -->
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- COLUMNS -->
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                </Grid>
 
             </Grid>
 
