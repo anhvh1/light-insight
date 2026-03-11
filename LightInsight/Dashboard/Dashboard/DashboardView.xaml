@@ -15,11 +15,15 @@ Background="#1E1E1E">
     <Grid>
         <!-- ================= MAIN LAYOUT ================= -->
         <Grid.ColumnDefinitions>
+            <!-- Sidebar -->
             <ColumnDefinition x:Name="SidebarColumn" Width="220"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="300"/>
-        </Grid.ColumnDefinitions>
 
+            <!-- Dashboard -->
+            <ColumnDefinition Width="*"/>
+
+            <!-- Widget Library -->
+            <ColumnDefinition x:Name="WidgetLibraryColumn" Width="0"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>

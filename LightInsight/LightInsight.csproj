@@ -90,6 +90,9 @@
     <Compile Include="Dashboard\Camera\Client\CameraStatusDonut.xaml.cs">
       <DependentUpon>CameraStatusDonut.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dashboard\Camera\Client\temp.xaml.cs">
+      <DependentUpon>temp.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\Camera\Client\TotalCameraCount.xaml.cs">
       <DependentUpon>TotalCameraCount.xaml</DependentUpon>
     </Compile>
@@ -123,7 +126,10 @@
     <Resource Include="Dashboard\Asset\logo.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Content Include="Dashboard\Camera\Client\temp.txt" />
+    <Page Include="Dashboard\Camera\Client\temp.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Content Include="plugin.def">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

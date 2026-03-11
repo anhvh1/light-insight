@@ -202,7 +202,8 @@ namespace LightInsight.Dashboard.Dashboard
         private void EditLayoutBtn_Click(object sender, RoutedEventArgs e)
         {
             editMode = true;
-
+            // mở widget library
+            WidgetLibraryColumn.Width = new GridLength(280);
             WidgetLibrary.Visibility = Visibility.Visible;
 
             EditLayoutBtn.Visibility = Visibility.Collapsed;
@@ -241,6 +242,8 @@ namespace LightInsight.Dashboard.Dashboard
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
         {
+            // đóng widget library
+            WidgetLibraryColumn.Width = new GridLength(0);
             ExitEditMode();
         }
 
@@ -351,6 +354,17 @@ namespace LightInsight.Dashboard.Dashboard
 
             if (widgetItem == null)
                 return;
+            // ===== KIỂM TRA WIDGET ĐÃ TỒN TẠI =====
+            bool exists = DashboardGrid.Children
+                .OfType<FrameworkElement>()
+                .Any(x => x.GetType() == widgetItem.WidgetType);
+
+            if (exists)
+            {
+                MessageBox.Show("Widget này đã tồn tại trên dashboard!");
+                return;
+            }
+
 
             FrameworkElement widget =
                 Activator.CreateInstance(widgetItem.WidgetType) as FrameworkElement;
