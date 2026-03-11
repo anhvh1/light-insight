@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -32,6 +33,15 @@ namespace LightInsight.Dashboard.Dashboard
         FrameworkElement selectedWidget = null;
         bool isDraggingWidget = false;
         bool isDark = true;
+        string currentFilter = null;
+        List<WidgetItem> allWidgets = new List<WidgetItem>()
+        {
+            new WidgetItem{ Name="Camera Online Count", Category="KPI"},
+            new WidgetItem{ Name="Camera Offline Count", Category="KPI"},
+            new WidgetItem{ Name="Camera Total Count", Category="KPI"},
+            new WidgetItem{ Name="Camera Status Donut", Category="Charts"},
+            new WidgetItem{ Name="Camera List", Category="Tables"},
+        };
         public DashboardView()
         {
             InitializeComponent();
@@ -39,7 +49,88 @@ namespace LightInsight.Dashboard.Dashboard
             TimeRangeCombo.SelectedIndex = 0;
             LanguageCombo.SelectedIndex = 0;
             ThemeBtn.Content = "🌙";
+            WidgetList.ItemsSource = allWidgets;
             LoadLayout();
+        }
+        private void Filter_Click(object sender, RoutedEventArgs e)
+        {
+            ToggleButton clickedBtn = sender as ToggleButton;
+
+            // lấy tất cả ToggleButton trong container (StackPanel chứa filter)
+            var buttons = FilterPanel.Children.OfType<ToggleButton>();
+
+            // nếu button vừa click đang bật -> tắt các button khác
+            if (clickedBtn.IsChecked == true)
+            {
+                foreach (var btn in buttons)
+                {
+                    if (btn != clickedBtn)
+                        btn.IsChecked = false;
+                }
+            }
+
+            // tìm button đang được chọn
+            var activeBtn = buttons.FirstOrDefault(b => b.IsChecked == true);
+
+            if (activeBtn == null)
+            {
+                // không có filter nào -> show tất cả
+                WidgetList.ItemsSource = allWidgets;
+            }
+            else
+            {
+                string filter = activeBtn.Tag.ToString();
+
+                var result = allWidgets
+                    .Where(x => x.Category == filter)
+                    .ToList();
+
+                WidgetList.ItemsSource = result;
+            }
+        }
+        private void AddWidget_Click(object sender, RoutedEventArgs e)
+        {
+            Button btn = sender as Button;
+            WidgetItem widget = btn.Tag as WidgetItem;
+
+            FrameworkElement newWidget = null;
+
+            if (widget.Name == "Camera Online Count")
+                newWidget = new CameraOnlineWidget();
+
+            if (newWidget == null)
+                return;
+
+            Point pos = GetGridPosition();
+
+            Canvas.SetLeft(newWidget, pos.X);
+            Canvas.SetTop(newWidget, pos.Y);
+
+            DashboardGrid.Children.Add(newWidget);
+        }
+        private Point GetGridPosition()
+        {
+            int count = DashboardGrid.Children.Count;
+
+            int columns = 3;
+
+            double widgetWidth = 320;
+            double widgetHeight = 200;
+
+            double x = (count % columns) * widgetWidth;
+            double y = (count / columns) * widgetHeight;
+
+            return new Point(x, y);
+        }
+        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string keyword = SearchBox.Text.ToLower();
+
+            var result = allWidgets
+                .Where(x => x.Name.ToLower().Contains(keyword))
+                .ToList();
+
+            WidgetList.ItemsSource = result;
         }
         void ThemeBtn_Click(object sender, RoutedEventArgs e)
         {
