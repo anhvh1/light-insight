@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LightInsight.Dashboard.Dashboard;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -8,7 +9,7 @@ using LiveCharts.Wpf;
 
 namespace LightInsight.Dashboard.Camera.Client
 {
-	public partial class CameraStatusDonut : UserControl
+	public partial class CameraStatusDonut : UserControl, IDashboardWidget
 	{
 		public event EventHandler DeleteRequested;
 
