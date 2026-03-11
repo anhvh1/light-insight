@@ -115,3 +115,32 @@ namespace LightInsight.Dashboard.Camera.Client
 		</Grid>
 	</Border>
 </UserControl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="100" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+
+				<TextBlock x:Name="TxtOnline" Text="Online: 0" Foreground="Gray" 
+                           FontSize="13" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+
+				<lvc:PieChart x:Name="StatusChart" Grid.Column="1" InnerRadius="20" 
+                              LegendLocation="None" Hoverable="True" Margin="5"/>
+
+				<TextBlock x:Name="TxtOffline" Text="Offline: 0" Foreground="Gray" 
+                           FontSize="13" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="2"/>

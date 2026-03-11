@@ -2,7 +2,9 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Shapes;
+using System.Windows.Media.Media3D;
+using LiveCharts;
+using LiveCharts.Wpf;
 
 namespace LightInsight.Dashboard.Camera.Client
 {
@@ -14,9 +16,67 @@ namespace LightInsight.Dashboard.Camera.Client
 		{
 			InitializeComponent();
 			DeleteButton.Visibility = Visibility.Collapsed;
+			UpdateStatus(142, 8);
+		}
 
-			// Tự động cập nhật khi UI đã sẵn sàng
-			this.Loaded += (s, e) => UpdateChart(0, 1);
+		public void UpdateStatus(int online, int offline)
+		{
+			var series = new SeriesCollection();
+
+			// Hàm định dạng: Chỉ hiện "Tên: Số" (Ví dụ: Online: 142)
+			Func<ChartPoint, string> labelPoint = chartPoint =>
+				string.Format("{0}: {1}", chartPoint.SeriesView.Title, chartPoint.Y);
+
+			if (online == 0 && offline == 0)
+			{
+				series.Add(new PieSeries
+				{
+					Values = new ChartValues<double> { 1 },
+					Fill = new SolidColorBrush(Color.FromRgb(68, 68, 68)),
+					StrokeThickness = 0,
+					Title = "No Camera"
+				});
+			}
+			else
+			{
+				if (online > 0)
+				{
+					series.Add(new PieSeries
+					{
+						Title = "Online",
+						Values = new ChartValues<double> { online },
+						Fill = new SolidColorBrush(Color.FromRgb(46, 204, 113)),
+						Stroke = new SolidColorBrush(Color.FromRgb(255, 255, 255)),
+						StrokeThickness = 1,
+						DataLabels = true,
+						LabelPosition = PieLabelPosition.OutsideSlice, // Đẩy chữ ra ngoài vòng
+						LabelPoint = labelPoint,
+						Foreground = Brushes.White,
+						FontSize = 12,
+						FontWeight = FontWeights.SemiBold
+					});
+				}
+
+				if (offline > 0)
+				{
+					series.Add(new PieSeries
+					{
+						Title = "Offline",
+						Values = new ChartValues<double> { offline },
+						Fill = new SolidColorBrush(Color.FromRgb(231, 76, 60)),
+						Stroke = new SolidColorBrush(Color.FromRgb(255, 255, 255)),
+						StrokeThickness = 1,
+						DataLabels = true,
+						LabelPosition = PieLabelPosition.OutsideSlice, // Đẩy chữ ra ngoài vòng
+						LabelPoint = labelPoint,
+						Foreground = Brushes.White,
+						FontSize = 12,
+						FontWeight = FontWeights.SemiBold
+					});
+				}
+			}
+
+			StatusChart.Series = series;
 		}
 
 		public void SetEditMode(bool isEdit)
@@ -27,59 +87,6 @@ namespace LightInsight.Dashboard.Camera.Client
 		private void DeleteWidget_Click(object sender, RoutedEventArgs e)
 		{
 			DeleteRequested?.Invoke(this, EventArgs.Empty);
-		}
-
-		/// <summary>
-		/// Cập nhật biểu đồ Donut dựa trên số lượng Online/Offline
-		/// </summary>
-		public void UpdateChart(int online, int offline)
-		{
-			TxtOnline.Text = online.ToString();
-			TxtOffline.Text = offline.ToString();
-
-			// Đổi màu text Offline nếu bằng 0
-			if (offline == 0)
-			{
-				var grayBrush = new SolidColorBrush(Color.FromRgb(128, 128, 128));
-				LblOffline.Foreground = grayBrush;
-				TxtOffline.Foreground = grayBrush;
-			}
-			else
-			{
-				var redBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F44336"));
-				LblOffline.Foreground = redBrush;
-				TxtOffline.Foreground = redBrush;
-			}
-
-			int total = online + offline;
-
-			if (total == 0)
-			{
-				BackgroundCircle.Stroke = new SolidColorBrush(Color.FromRgb(80, 80, 80));
-				OnlineSlice.StrokeDashArray = new DoubleCollection(new double[] { 0, 1000 });
-				return;
-			}
-
-			BackgroundCircle.Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F44336"));
-
-			// Chu vi tính theo đường kính tâm (70-12=58)
-			double circumference = Math.PI * 58;
-			double ratio = (double)online / total;
-			double dashLength = (ratio * circumference) / OnlineSlice.StrokeThickness;
-
-			if (online == 0)
-			{
-				OnlineSlice.StrokeDashArray = new DoubleCollection(new double[] { 0, 1000 });
-			}
-			else if (offline == 0)
-			{
-				double fullDash = circumference / OnlineSlice.StrokeThickness;
-				OnlineSlice.StrokeDashArray = new DoubleCollection(new double[] { fullDash, 1000 });
-			}
-			else
-			{
-				OnlineSlice.StrokeDashArray = new DoubleCollection(new double[] { dashLength, 1000 });
-			}
 		}
 	}
 }
