@@ -66,8 +66,14 @@
     <PackageReference Include="MilestoneSystems.VideoOS.Platform" Version="25.3.2" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dashboard\Camera\Client\CameraAnalyticsSummaryWidget.xaml.cs">
+      <DependentUpon>CameraAnalyticsSummaryWidget.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\Camera\Client\CameraDisconnectionTrend.xaml.cs">
       <DependentUpon>CameraDisconnectionTrend.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Camera\Client\CameraListWidget.xaml.cs">
+      <DependentUpon>CameraListWidget.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dashboard\Camera\Client\CameraOfflineDurationTop10.xaml.cs">
       <DependentUpon>CameraOfflineDurationTop10.xaml</DependentUpon>
@@ -75,7 +81,13 @@
     <Compile Include="Dashboard\Camera\Client\CameraOfflineWidget.xaml.cs">
       <DependentUpon>CameraOfflineWidget.xaml</DependentUpon>
     </Compile>
+    <Page Include="Dashboard\Camera\Client\CameraAnalyticsSummaryWidget.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dashboard\Camera\Client\CameraDisconnectionTrend.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\Camera\Client\CameraListWidget.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dashboard\Camera\Client\CameraOfflineDurationTop10.xaml">
