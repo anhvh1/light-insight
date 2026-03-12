@@ -188,39 +188,65 @@ Background="#1E1E1E">
         <!-- ================= DASHBOARD AREA ================= -->
 
         <Border Grid.Row="1"
-            Grid.Column="1"
-            Background="#1E1E1E"
-            Margin="5"
-            ClipToBounds="True">
+        Grid.Column="1"
+        Background="#1E1E1E"
+        Margin="5"
+        ClipToBounds="True">
 
-            <Grid ClipToBounds="True">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
 
-                <Grid x:Name="DashboardGrid"
-                      Background="Transparent"
-                      AllowDrop="True"
-                      ClipToBounds="True"
-                      Drop="DashboardGrid_Drop"
-                      DragOver="DashboardGrid_DragOver">
+                <Grid>
 
-                    <!-- ROWS -->
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                    <!-- DASHBOARD GRID -->
+                    <Grid x:Name="DashboardGrid"
+                          Background="Transparent"
+                          AllowDrop="True"
+                          Drop="DashboardGrid_Drop"
+                          DragOver="DashboardGrid_DragOver">
 
-                    <!-- COLUMNS -->
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                        <!-- 12 COLUMN -->
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+
+                    </Grid>
+
+                    <!-- GRID OVERLAY -->
+                    <Grid x:Name="GridOverlay"
+                          Visibility="Collapsed"
+                          IsHitTestVisible="False">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+
+                    </Grid>
 
                 </Grid>
 
-            </Grid>
+            </ScrollViewer>
 
         </Border>
 
