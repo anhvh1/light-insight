@@ -72,6 +72,9 @@
     <Compile Include="Dashboard\Camera\Client\CameraDisconnectionTrend.xaml.cs">
       <DependentUpon>CameraDisconnectionTrend.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dashboard\Camera\Client\CameraHealthScoreWidget.xaml.cs">
+      <DependentUpon>CameraHealthScoreWidget.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\Camera\Client\CameraListWidget.xaml.cs">
       <DependentUpon>CameraListWidget.xaml</DependentUpon>
     </Compile>
@@ -85,6 +88,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dashboard\Camera\Client\CameraDisconnectionTrend.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\Camera\Client\CameraHealthScoreWidget.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dashboard\Camera\Client\CameraListWidget.xaml">
