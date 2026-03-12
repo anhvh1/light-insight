@@ -37,7 +37,16 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
 
         private void LoadChartData()
         {
-            var rawData = AlarmDataProvider.GetData(WigetType.AlarmsDailyCountWidget) as List<DailyCountData>;
+            var rawData = new List<DailyCountData>
+            {
+                new DailyCountData { Day = "Mon", Count = 34 },
+                new DailyCountData { Day = "Tue", Count = 28 },
+                new DailyCountData { Day = "Wed", Count = 45 },
+                new DailyCountData { Day = "Thu", Count = 53 },
+                new DailyCountData { Day = "Fri", Count = 38 },
+                new DailyCountData { Day = "Sat", Count = 15 },
+                new DailyCountData { Day = "Sun", Count = 12 }
+            };
 
             // Kiểm tra xem DataProvider có thực sự trả về data không
             if (rawData != null && rawData.Count > 0)
@@ -55,7 +64,7 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
                     Values = values,
                     Fill = _defaultColor,
                     MaxColumnWidth = 55,
-                    ColumnPadding = 10,
+                    ColumnPadding = 2,
                     StrokeThickness = 0
                 });
             }
