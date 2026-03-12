@@ -69,8 +69,20 @@
     <Compile Include="Dashboard\AlarmsAndEvents\AlarmBySeverityWidget.xaml.cs">
       <DependentUpon>AlarmBySeverityWidget.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dashboard\AlarmsAndEvents\AlarmBySourceWidget.xaml.cs">
+      <DependentUpon>AlarmBySourceWidget.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\AlarmsAndEvents\AlarmByTypeWidget.xaml.cs">
+      <DependentUpon>AlarmByTypeWidget.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\AlarmsAndEvents\AlarmDailyCountWidget.xaml.cs">
       <DependentUpon>AlarmDailyCountWidget.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\AlarmsAndEvents\AlarmSLABreachWidget.xaml.cs">
+      <DependentUpon>AlarmSLABreachWidget.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\AlarmsAndEvents\EventTrendChartWidget.xaml.cs">
+      <DependentUpon>EventTrendChartWidget.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dashboard\AlarmsAndEvents\LiveAlarmsFeedWidget.xaml.cs">
       <DependentUpon>LiveAlarmsFeedWidget.xaml</DependentUpon>
@@ -88,9 +100,25 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Dashboard\AlarmsAndEvents\AlarmBySourceWidget.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\AlarmsAndEvents\AlarmByTypeWidget.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dashboard\AlarmsAndEvents\AlarmDailyCountWidget.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dashboard\AlarmsAndEvents\AlarmSLABreachWidget.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\AlarmsAndEvents\EventTrendChartWidget.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dashboard\AlarmsAndEvents\LiveAlarmsFeedWidget.xaml">
       <Generator>MSBuild:Compile</Generator>
