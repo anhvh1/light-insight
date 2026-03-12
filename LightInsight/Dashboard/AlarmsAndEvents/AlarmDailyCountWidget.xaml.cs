@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using LightInsight.Dashboard.Data.AlarmsAndEvents;
-using LightInsight.Dashboard.Data;
 using LiveCharts.Wpf;
 using LiveCharts;
 using LightInsight.Dashboard.Dashboard;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {
+    public class DailyCountData
+    {
+        public string Day { get; set; }
+        public int Count { get; set; }
+    }
+
     public partial class AlarmDailyCountWidget : UserControl,IDashboardWidget
     {
         public event EventHandler DeleteRequested;
