@@ -54,6 +54,22 @@ namespace LightInsight.Dashboard.Dashboard
             WidgetList.ItemsSource = allWidgets;
             LoadLayout();
         }
+        private (int colSpan, int rowSpan) CalculateWidgetSpan(FrameworkElement widget)
+        {
+            double cellWidth = DashboardGrid.ActualWidth / 12;
+            double cellHeight = 80;
+
+            double widgetWidth = widget.Width;
+            double widgetHeight = widget.Height;
+
+            int colSpan = (int)Math.Round(widgetWidth / cellWidth);
+            int rowSpan = (int)Math.Ceiling(widgetHeight / cellHeight);
+
+            if (colSpan < 1) colSpan = 1;
+            if (rowSpan < 1) rowSpan = 1;
+
+            return (colSpan, rowSpan);
+        }
         private void Filter_Click(object sender, RoutedEventArgs e)
         {
             ToggleButton clickedBtn = sender as ToggleButton;
@@ -108,8 +124,21 @@ namespace LightInsight.Dashboard.Dashboard
 
             var pos = GetGridPosition();
 
+            // kích thước cell
+            double cellWidth = DashboardGrid.ActualWidth / 12;
+            double cellHeight = 80;
+
+            // tính span
+            int colSpan = Math.Max(1, (int)Math.Ceiling(newWidget.MinWidth / cellWidth));
+            int rowSpan = Math.Max(1, (int)Math.Ceiling(newWidget.MinHeight / cellHeight));
+
+            EnsureRow(pos.Row + rowSpan);
+
             Grid.SetRow(newWidget, pos.Row);
             Grid.SetColumn(newWidget, pos.Column);
+
+            Grid.SetColumnSpan(newWidget, colSpan);
+            Grid.SetRowSpan(newWidget, rowSpan);
 
             DashboardGrid.Children.Add(newWidget);
         }
@@ -117,7 +146,7 @@ namespace LightInsight.Dashboard.Dashboard
         {
             int count = DashboardGrid.Children.Count;
 
-            int columns = 3;
+            int columns = DashboardGrid.ColumnDefinitions.Count;
 
             int row = count / columns;
             int column = count % columns;
@@ -248,17 +277,15 @@ namespace LightInsight.Dashboard.Dashboard
             // đóng widget library
             ExitEditMode();
         }
-        void EnsureRow(int row)
+        private void EnsureRow(int rowIndex)
         {
-            while (DashboardGrid.RowDefinitions.Count <= row)
+            while (DashboardGrid.RowDefinitions.Count <= rowIndex)
             {
                 DashboardGrid.RowDefinitions.Add(
-                    new RowDefinition { Height = new GridLength(180) }
-                );
-
-                GridOverlay.RowDefinitions.Add(
-                    new RowDefinition { Height = new GridLength(180) }
-                );
+                    new RowDefinition
+                    {
+                        Height = new GridLength(80)   // chiều cao 1 ô
+                    });
             }
         }
         private void ExitEditMode()
@@ -294,8 +321,10 @@ namespace LightInsight.Dashboard.Dashboard
 
             Point pos = e.GetPosition(DashboardGrid);
 
-            double cellWidth = DashboardGrid.ActualWidth / 12;
-            double cellHeight = 120;
+            int columnCount = 12;
+
+            double cellWidth = DashboardGrid.ActualWidth / columnCount;
+            double cellHeight = 80;
 
             int column = (int)(pos.X / cellWidth);
             int row = (int)(pos.Y / cellHeight);
@@ -303,10 +332,7 @@ namespace LightInsight.Dashboard.Dashboard
             int colSpan = Grid.GetColumnSpan(widget);
             int rowSpan = Grid.GetRowSpan(widget);
 
-            // giới hạn column
-            column = Math.Max(0, Math.Min(column, 12 - colSpan));
-
-            // giới hạn row nếu cần
+            column = Math.Max(0, Math.Min(column, columnCount - colSpan));
             row = Math.Max(0, row);
 
             Grid.SetColumn(widget, column);
@@ -336,46 +362,43 @@ namespace LightInsight.Dashboard.Dashboard
                 return;
             }
 
-            FrameworkElement widget =
+            FrameworkElement newWidget =
                 Activator.CreateInstance(widgetItem.WidgetType) as FrameworkElement;
 
-            if (widget == null)
+            if (newWidget == null)
                 return;
 
-            widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
-            widget.MouseMove += Widget_MouseMove;
-            widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
+            SetupWidget(newWidget);
 
-            if (widget is IDashboardWidget dashboardWidget)
-            {
-                dashboardWidget.DeleteRequested += Widget_DeleteRequested;
-                dashboardWidget.SetEditMode(true);
-            }
-
+            // vị trí drop
             Point position = e.GetPosition(DashboardGrid);
 
-            int columnCount = 12;
-
-            double cellWidth = DashboardGrid.ActualWidth / columnCount;
-            double cellHeight = 120;
+            double cellWidth = DashboardGrid.ActualWidth / 12;
+            double cellHeight = 80;
 
             int column = (int)(position.X / cellWidth);
             int row = (int)(position.Y / cellHeight);
 
-            int colSpan = Grid.GetColumnSpan(widget);
-            if (colSpan == 0) colSpan = 1;
+            // gọi hàm tính span
+            var span = CalculateWidgetSpan(newWidget);
 
-            int rowSpan = Grid.GetRowSpan(widget);
-            if (rowSpan == 0) rowSpan = 1;
+            int colSpan = span.colSpan;
+            int rowSpan = span.rowSpan;
 
-            // 🔴 GIỚI HẠN KHÔNG CHO VƯỢT GRID
-            column = Math.Max(0, Math.Min(column, columnCount - colSpan));
-            row = Math.Max(0, row);
+            // tránh vượt quá 12 column
+            if (column + colSpan > 12)
+                column = 12 - colSpan;
 
-            Grid.SetColumn(widget, column);
-            Grid.SetRow(widget, row);
+            // đảm bảo đủ row
+            EnsureRow(row + rowSpan);
 
-            DashboardGrid.Children.Add(widget);
+            Grid.SetColumn(newWidget, column);
+            Grid.SetRow(newWidget, row);
+
+            Grid.SetColumnSpan(newWidget, colSpan);
+            Grid.SetRowSpan(newWidget, rowSpan);
+
+            DashboardGrid.Children.Add(newWidget);
         }
 
         private void WidgetLibrary_MouseMove(object sender, MouseEventArgs e)
@@ -548,10 +571,16 @@ namespace LightInsight.Dashboard.Dashboard
             GridOverlay.RowDefinitions.Clear();
             GridOverlay.ColumnDefinitions.Clear();
 
+            DashboardGrid.RowDefinitions.Clear();
+            DashboardGrid.ColumnDefinitions.Clear();
+
             // 12 column
             for (int i = 0; i < 12; i++)
             {
                 GridOverlay.ColumnDefinitions.Add(
+                    new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+                DashboardGrid.ColumnDefinitions.Add(
                     new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             }
 
@@ -559,8 +588,12 @@ namespace LightInsight.Dashboard.Dashboard
             for (int i = 0; i < 10; i++)
             {
                 GridOverlay.RowDefinitions.Add(
-                    new RowDefinition { Height = new GridLength(120) });
+                    new RowDefinition { Height = new GridLength(80) });
+
+                DashboardGrid.RowDefinitions.Add(
+                    new RowDefinition { Height = new GridLength(80) });
             }
+
             CreateGrid();
         }
         void CreateGrid()
@@ -602,6 +635,9 @@ namespace LightInsight.Dashboard.Dashboard
         }
         void SetupWidget(FrameworkElement widget)
         {
+            widget.Margin = new Thickness(1, 1, 5, 5);
+            widget.HorizontalAlignment = HorizontalAlignment.Stretch;
+            widget.VerticalAlignment = VerticalAlignment.Stretch;
             widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
             widget.MouseMove += Widget_MouseMove;
             widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;

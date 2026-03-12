@@ -1,7 +1,9 @@
 ﻿<UserControl x:Class="LightInsight.Dashboard.Dashboard.DashboardView"
 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-Background="#1E1E1E">
+Background="#1E1E1E"
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch">
     <UserControl.Resources>
         <Style x:Key="FilterButton" TargetType="ToggleButton">
             <Setter Property="Margin" Value="2"/>
@@ -200,6 +202,7 @@ Background="#1E1E1E">
                     <!-- DASHBOARD GRID -->
                     <Grid x:Name="DashboardGrid"
                           Background="Transparent"
+                          MinHeight="1000"
                           AllowDrop="True"
                           Drop="DashboardGrid_Drop"
                           DragOver="DashboardGrid_DragOver">
