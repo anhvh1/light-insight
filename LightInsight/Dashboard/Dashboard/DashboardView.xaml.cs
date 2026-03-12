@@ -46,8 +46,12 @@ namespace LightInsight.Dashboard.Dashboard
             new WidgetItem{ Name="Camera Duration top 10", Category="Tables",WidgetType = typeof(CameraOfflineDurationTop10)},
 
             new WidgetItem{ Name="Live Alarm Feed", Category="Lists", WidgetType = typeof(LiveAlarmsFeedWidget)},
-            new WidgetItem{ Name="Alarm by Severity", Category="Lists", WidgetType = typeof(AlarmBySeverityWidget)},
-            new WidgetItem{ Name="Alarm Daily Count", Category="Lists", WidgetType = typeof(AlarmDailyCountWidget)},
+            new WidgetItem{ Name="Alarm by Severity", Category="Charts", WidgetType = typeof(AlarmBySeverityWidget)},
+            new WidgetItem{ Name="Alarm Daily Count", Category="Charts", WidgetType = typeof(AlarmDailyCountWidget)},
+            new WidgetItem{ Name="Alarm by Source", Category="Charts", WidgetType = typeof(AlarmBySourceWidget)},
+            new WidgetItem{ Name="Alarm by Type", Category="Charts", WidgetType = typeof(AlarmByTypeWidget)},
+            new WidgetItem{ Name="Alarm SLA Breach", Category="KPI", WidgetType = typeof(AlarmSLABreachWidget)},
+            new WidgetItem{ Name="Event Trend Chart", Category="Charts", WidgetType = typeof(EventTrendChartWidget)},
 
         };
         public DashboardView()
