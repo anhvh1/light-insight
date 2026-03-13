@@ -54,23 +54,42 @@ namespace LightInsight.Dashboard.Dashboard
             WidgetList.ItemsSource = allWidgets;
             LoadLayout();
         }
-        private (int colSpan, int rowSpan) CalculateWidgetSpan(FrameworkElement widget)
-        {
-            double cellWidth = DashboardGrid.ActualWidth / 12;
-            double cellHeight = 80;
+		//private (int colSpan, int rowSpan) CalculateWidgetSpan(FrameworkElement widget)
+		//{
+  //          double cellWidth = DashboardGrid.ActualWidth / 12;
+  //          double cellHeight = 80;
 
-            double widgetWidth = widget.Width;
-            double widgetHeight = widget.Height;
+  //          double widgetWidth = widget.Width;
+  //          double widgetHeight = widget.Height;
 
-            int colSpan = (int)Math.Round(widgetWidth / cellWidth);
-            int rowSpan = (int)Math.Ceiling(widgetHeight / cellHeight);
+  //          int colSpan = (int)Math.Round(widgetWidth / cellWidth);
+  //          int rowSpan = (int)Math.Ceiling(widgetHeight / cellHeight);
 
-            if (colSpan < 1) colSpan = 1;
-            if (rowSpan < 1) rowSpan = 1;
+  //          if (colSpan < 1) colSpan = 1;
+  //          if (rowSpan < 1) rowSpan = 1;
 
-            return (colSpan, rowSpan);
-        }
-        private void Filter_Click(object sender, RoutedEventArgs e)
+  //          return (colSpan, rowSpan);
+		//}
+
+		private (int colSpan, int rowSpan) CalculateWidgetSpan(FrameworkElement widget)
+		{
+			// Đọc cấu hình từ Tag (ví dụ "2x2", "4x3")
+			string config = widget.Tag as string;
+
+			if (!string.IsNullOrEmpty(config) && config.Contains("x"))
+			{
+				var parts = config.Split('x');
+				if (parts.Length == 2)
+				{
+					int cols = int.Parse(parts[0]);
+					int rows = int.Parse(parts[1]);
+					return (cols, rows);
+				}
+			}
+
+			return (2, 2); // Mặc định nếu không có cấu hình
+		}
+		private void Filter_Click(object sender, RoutedEventArgs e)
         {
             ToggleButton clickedBtn = sender as ToggleButton;
 
@@ -647,7 +666,38 @@ namespace LightInsight.Dashboard.Dashboard
                 dashboardWidget.DeleteRequested += Widget_DeleteRequested;
                 dashboardWidget.SetEditMode(editMode);
             }
-        }
+			// Tìm nút ResizeThumb trong Widget
+			var thumb = FindVisualChild<Thumb>(widget, "ResizeThumb");
+			if (thumb != null)
+			{
+				thumb.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
+
+				thumb.DragDelta += (s, e) => {
+					if (!editMode) return;
+
+					double cellWidth = DashboardGrid.ActualWidth / 12;
+					double cellHeight = 80;
+
+					// --- PHẦN DEBUG ---
+					System.Diagnostics.Debug.WriteLine($"--- RESIZING {widget.GetType().Name} ---");
+					System.Diagnostics.Debug.WriteLine($"Delta X: {e.HorizontalChange:F2}, Delta Y: {e.VerticalChange:F2}");
+					System.Diagnostics.Debug.WriteLine($"Actual Size: {widget.ActualWidth:F2}x{widget.ActualHeight:F2}");
+					System.Diagnostics.Debug.WriteLine($"Cell Size: {cellWidth:F2}x{cellHeight:F2}");
+
+					// Tính toán Span mới
+					int newColSpan = (int)Math.Max(1, Math.Round((widget.ActualWidth + e.HorizontalChange) / cellWidth));
+					int newRowSpan = (int)Math.Max(1, Math.Round((widget.ActualHeight + e.VerticalChange) / cellHeight));
+
+					System.Diagnostics.Debug.WriteLine($"Calculated Span: {newColSpan}x{newRowSpan}");
+
+					// Cập nhật giao diện
+					Grid.SetColumnSpan(widget, newColSpan);
+					Grid.SetRowSpan(widget, newRowSpan);
+
+					widget.Tag = $"{newColSpan}x{newRowSpan}";
+				};
+			}
+		}
         /// <summary>
         /// Xử lý sự kiện click để thu gọn/hiện sidebar
         /// </summary>
@@ -674,6 +724,20 @@ namespace LightInsight.Dashboard.Dashboard
 
             sidebarCollapsed = !sidebarCollapsed;
         }
-    }
+		private T FindVisualChild<T>(DependencyObject obj, string name) where T : DependencyObject
+		{
+			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+			{
+				DependencyObject child = VisualTreeHelper.GetChild(obj, i);
+				if (child != null && child is T t && (child as FrameworkElement).Name == name)
+					return t;
+
+				T childOfChild = FindVisualChild<T>(child, name);
+				if (childOfChild != null)
+					return childOfChild;
+			}
+			return null;
+		}
+	}
     
 }
