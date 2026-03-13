@@ -75,7 +75,7 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
 
                     DataLabels = true,
                     LabelPosition = PieLabelPosition.OutsideSlice,
-                    LabelPoint = chartPoint => $"\n\n {item.Title} {chartPoint.Participation:P0} \n\n",
+                    LabelPoint = chartPoint => $" {item.Title} {chartPoint.Participation:P0} ",
 
                     Fill = sliceColor,
                     Foreground = sliceColor,
