@@ -1,4 +1,6 @@
-﻿using LightInsight.Dashboard.Camera.Client;
+﻿using LightInsight.Dashboard.AlarmsAndEvents;
+using LightInsight.Dashboard.Camera.Client;
+using LightInsight.Dashboard.RecordingServer;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -43,6 +45,22 @@ namespace LightInsight.Dashboard.Dashboard
             new WidgetItem{ Name="Camera Total Count", Category="KPI",WidgetType = typeof(TotalCameraCount)},
             new WidgetItem{ Name="Camera Status Donut", Category="Charts",WidgetType = typeof(CameraStatusDonut)},
             new WidgetItem{ Name="Camera Duration top 10", Category="Tables",WidgetType = typeof(CameraOfflineDurationTop10)},
+
+            new WidgetItem{ Name="Live Alarm Feed", Category="Lists", WidgetType = typeof(LiveAlarmsFeedWidget)},
+            new WidgetItem{ Name="Alarm by Severity", Category="Charts", WidgetType = typeof(AlarmBySeverityWidget)},
+            new WidgetItem{ Name="Alarm Daily Count", Category="Charts", WidgetType = typeof(AlarmDailyCountWidget)},
+            new WidgetItem{ Name="Alarm by Source", Category="Charts", WidgetType = typeof(AlarmBySourceWidget)},
+            new WidgetItem{ Name="Alarm by Type", Category="Charts", WidgetType = typeof(AlarmByTypeWidget)},
+            new WidgetItem{ Name="Alarm SLA Breach", Category="KPI", WidgetType = typeof(AlarmSLABreachWidget)},
+            new WidgetItem{ Name="Event Trend Chart", Category="Charts", WidgetType = typeof(EventTrendChartWidget)},
+
+
+            new WidgetItem{ Name="Servers Online Count", Category="KPI", WidgetType = typeof(ServersOnlineCountWidget)},
+            new WidgetItem{ Name="Servers Offline Count", Category="KPI",WidgetType = typeof(ServersOfflineCountWidget)},
+            new WidgetItem{ Name="Servers Total", Category="KPI",WidgetType = typeof(TotalServersWidget)},
+            new WidgetItem{ Name="Storage Usage by Server", Category="KPI",WidgetType = typeof(StorageUsageWidget)},
+
+
         };
         public DashboardView()
         {
@@ -54,42 +72,42 @@ namespace LightInsight.Dashboard.Dashboard
             WidgetList.ItemsSource = allWidgets;
             LoadLayout();
         }
-		//private (int colSpan, int rowSpan) CalculateWidgetSpan(FrameworkElement widget)
-		//{
-  //          double cellWidth = DashboardGrid.ActualWidth / 12;
-  //          double cellHeight = 80;
+        private (int colSpan, int rowSpan) CalculateWidgetSpan(FrameworkElement widget)
+        {
+            double cellWidth = DashboardGrid.ActualWidth / 12;
+            double cellHeight = 80;
 
-  //          double widgetWidth = widget.Width;
-  //          double widgetHeight = widget.Height;
+            double widgetWidth = widget.Width;
+            double widgetHeight = widget.Height;
 
-  //          int colSpan = (int)Math.Round(widgetWidth / cellWidth);
-  //          int rowSpan = (int)Math.Ceiling(widgetHeight / cellHeight);
+            int colSpan = (int)Math.Round(widgetWidth / cellWidth);
+            int rowSpan = (int)Math.Ceiling(widgetHeight / cellHeight);
 
-  //          if (colSpan < 1) colSpan = 1;
-  //          if (rowSpan < 1) rowSpan = 1;
+            if (colSpan < 1) colSpan = 1;
+            if (rowSpan < 1) rowSpan = 1;
 
-  //          return (colSpan, rowSpan);
-		//}
+            return (colSpan, rowSpan);
+        }
 
-		private (int colSpan, int rowSpan) CalculateWidgetSpan(FrameworkElement widget)
-		{
-			// Đọc cấu hình từ Tag (ví dụ "2x2", "4x3")
-			string config = widget.Tag as string;
+        //private (int colSpan, int rowSpan) CalculateWidgetSpan(FrameworkElement widget)
+        //{
+        //	// Đọc cấu hình từ Tag (ví dụ "2x2", "4x3")
+        //	string config = widget.Tag as string;
 
-			if (!string.IsNullOrEmpty(config) && config.Contains("x"))
-			{
-				var parts = config.Split('x');
-				if (parts.Length == 2)
-				{
-					int cols = int.Parse(parts[0]);
-					int rows = int.Parse(parts[1]);
-					return (cols, rows);
-				}
-			}
+        //	if (!string.IsNullOrEmpty(config) && config.Contains("x"))
+        //	{
+        //		var parts = config.Split('x');
+        //		if (parts.Length == 2)
+        //		{
+        //			int cols = int.Parse(parts[0]);
+        //			int rows = int.Parse(parts[1]);
+        //			return (cols, rows);
+        //		}
+        //	}
 
-			return (2, 2); // Mặc định nếu không có cấu hình
-		}
-		private void Filter_Click(object sender, RoutedEventArgs e)
+        //	return (2, 2); // Mặc định nếu không có cấu hình
+        //}
+        private void Filter_Click(object sender, RoutedEventArgs e)
         {
             ToggleButton clickedBtn = sender as ToggleButton;
 
