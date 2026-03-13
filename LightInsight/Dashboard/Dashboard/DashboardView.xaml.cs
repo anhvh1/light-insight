@@ -505,12 +505,11 @@ namespace LightInsight.Dashboard.Dashboard
             selectedWidget.CaptureMouse();
         }
 
-
-
         void Widget_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (selectedWidget != null)
             {
+                SmartCascadePush(selectedWidget);
                 selectedWidget.ReleaseMouseCapture();
             }
 
@@ -723,7 +722,7 @@ namespace LightInsight.Dashboard.Dashboard
                 }
             }
         }
-        
+
         FrameworkElement CreateWidget(string typeName)
         {
             var widgetType = AppDomain.CurrentDomain
@@ -739,7 +738,7 @@ namespace LightInsight.Dashboard.Dashboard
         void SetupWidget(FrameworkElement widget)
         {
             widget.Margin = new Thickness(1, 1, 5, 5);
-           
+
             widget.HorizontalAlignment = HorizontalAlignment.Stretch;
             widget.VerticalAlignment = VerticalAlignment.Stretch;
             widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
@@ -751,38 +750,39 @@ namespace LightInsight.Dashboard.Dashboard
                 dashboardWidget.DeleteRequested += Widget_DeleteRequested;
                 dashboardWidget.SetEditMode(editMode);
             }
-			// Tìm nút ResizeThumb trong Widget
-			var thumb = FindVisualChild<Thumb>(widget, "ResizeThumb");
-			if (thumb != null)
-			{
-				thumb.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
+            // Tìm nút ResizeThumb trong Widget
+            var thumb = FindVisualChild<Thumb>(widget, "ResizeThumb");
+            if (thumb != null)
+            {
+                thumb.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
 
-				thumb.DragDelta += (s, e) => {
-					if (!editMode) return;
+                thumb.DragDelta += (s, e) =>
+                {
+                    if (!editMode) return;
 
-					double cellWidth = DashboardGrid.ActualWidth / 12;
-					double cellHeight = 80;
+                    double cellWidth = DashboardGrid.ActualWidth / 12;
+                    double cellHeight = 80;
 
-					// --- PHẦN DEBUG ---
-					System.Diagnostics.Debug.WriteLine($"--- RESIZING {widget.GetType().Name} ---");
-					System.Diagnostics.Debug.WriteLine($"Delta X: {e.HorizontalChange:F2}, Delta Y: {e.VerticalChange:F2}");
-					System.Diagnostics.Debug.WriteLine($"Actual Size: {widget.ActualWidth:F2}x{widget.ActualHeight:F2}");
-					System.Diagnostics.Debug.WriteLine($"Cell Size: {cellWidth:F2}x{cellHeight:F2}");
+                    // --- PHẦN DEBUG ---
+                    System.Diagnostics.Debug.WriteLine($"--- RESIZING {widget.GetType().Name} ---");
+                    System.Diagnostics.Debug.WriteLine($"Delta X: {e.HorizontalChange:F2}, Delta Y: {e.VerticalChange:F2}");
+                    System.Diagnostics.Debug.WriteLine($"Actual Size: {widget.ActualWidth:F2}x{widget.ActualHeight:F2}");
+                    System.Diagnostics.Debug.WriteLine($"Cell Size: {cellWidth:F2}x{cellHeight:F2}");
 
-					// Tính toán Span mới
-					int newColSpan = (int)Math.Max(1, Math.Round((widget.ActualWidth + e.HorizontalChange) / cellWidth));
-					int newRowSpan = (int)Math.Max(1, Math.Round((widget.ActualHeight + e.VerticalChange) / cellHeight));
+                    // Tính toán Span mới
+                    int newColSpan = (int)Math.Max(1, Math.Round((widget.ActualWidth + e.HorizontalChange) / cellWidth));
+                    int newRowSpan = (int)Math.Max(1, Math.Round((widget.ActualHeight + e.VerticalChange) / cellHeight));
 
-					System.Diagnostics.Debug.WriteLine($"Calculated Span: {newColSpan}x{newRowSpan}");
+                    System.Diagnostics.Debug.WriteLine($"Calculated Span: {newColSpan}x{newRowSpan}");
 
-					// Cập nhật giao diện
-					Grid.SetColumnSpan(widget, newColSpan);
-					Grid.SetRowSpan(widget, newRowSpan);
+                    // Cập nhật giao diện
+                    Grid.SetColumnSpan(widget, newColSpan);
+                    Grid.SetRowSpan(widget, newRowSpan);
 
-					widget.Tag = $"{newColSpan}x{newRowSpan}";
-				};
-			}
-		}
+                    widget.Tag = $"{newColSpan}x{newRowSpan}";
+                };
+            }
+        }
         /// <summary>
         /// Xử lý sự kiện click để thu gọn/hiện sidebar
         /// </summary>
@@ -809,20 +809,154 @@ namespace LightInsight.Dashboard.Dashboard
 
             sidebarCollapsed = !sidebarCollapsed;
         }
-		private T FindVisualChild<T>(DependencyObject obj, string name) where T : DependencyObject
-		{
-			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-			{
-				DependencyObject child = VisualTreeHelper.GetChild(obj, i);
-				if (child != null && child is T t && (child as FrameworkElement).Name == name)
-					return t;
+        private T FindVisualChild<T>(DependencyObject obj, string name) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(obj, i);
+                if (child != null && child is T t && (child as FrameworkElement).Name == name)
+                    return t;
 
-				T childOfChild = FindVisualChild<T>(child, name);
-				if (childOfChild != null)
-					return childOfChild;
-			}
-			return null;
-		}
-	}
-    
+                T childOfChild = FindVisualChild<T>(child, name);
+                if (childOfChild != null)
+                    return childOfChild;
+            }
+            return null;
+        }
+        bool IsOverlap(FrameworkElement a, FrameworkElement b)
+        {
+            int r1 = Grid.GetRow(a);
+            int c1 = Grid.GetColumn(a);
+            int rs1 = Grid.GetRowSpan(a);
+            int cs1 = Grid.GetColumnSpan(a);
+
+            int r2 = Grid.GetRow(b);
+            int c2 = Grid.GetColumn(b);
+            int rs2 = Grid.GetRowSpan(b);
+            int cs2 = Grid.GetColumnSpan(b);
+
+            return r1 < r2 + rs2 &&
+                   r1 + rs1 > r2 &&
+                   c1 < c2 + cs2 &&
+                   c1 + cs1 > c2;
+        }
+        // hàm xử lý việc đè widget khi kéo thả, sẽ tự động tìm vị trí mới cho widget bị đè
+        (bool found, int row, int col) FindNearestPosition(int startRow, int startCol, int rowSpan, int colSpan)
+        {
+            int maxCols = 12;
+
+            // 1. thử sang phải
+            for (int col = startCol + 1; col <= maxCols - colSpan; col++)
+            {
+                if (IsAreaFree(startRow, col, rowSpan, colSpan))
+                    return (true, startRow, col);
+            }
+
+            // 2. thử sang trái
+            for (int col = startCol - 1; col >= 0; col--)
+            {
+                if (IsAreaFree(startRow, col, rowSpan, colSpan))
+                    return (true, startRow, col);
+            }
+
+            // 3. tìm xuống dưới nhiều row
+            for (int row = startRow + 1; row < 200; row++)
+            {
+                for (int col = 0; col <= maxCols - colSpan; col++)
+                {
+                    if (IsAreaFree(row, col, rowSpan, colSpan))
+                        return (true, row, col);
+                }
+            }
+
+            return (false, startRow, startCol);
+        }
+        bool IsAreaFree(int row, int col, int rowSpan, int colSpan)
+        {
+            foreach (FrameworkElement widget in DashboardGrid.Children.OfType<FrameworkElement>())
+            {
+                int r = Grid.GetRow(widget);
+                int c = Grid.GetColumn(widget);
+                int rs = Grid.GetRowSpan(widget);
+                int cs = Grid.GetColumnSpan(widget);
+
+                bool overlap =
+                    r < row + rowSpan &&
+                    r + rs > row &&
+                    c < col + colSpan &&
+                    c + cs > col;
+
+                if (overlap)
+                    return false;
+            }
+
+            return true;
+        }
+        void SmartCascadePush(FrameworkElement movedWidget)
+        {
+            Queue<FrameworkElement> queue = new Queue<FrameworkElement>();
+            queue.Enqueue(movedWidget);
+
+            while (queue.Count > 0)
+            {
+                var current = queue.Dequeue();
+
+                foreach (FrameworkElement widget in DashboardGrid.Children.OfType<FrameworkElement>().OrderBy(x => Grid.GetRow(x)))
+                {
+                    if (widget == current)
+                        continue;
+
+                    if (IsOverlap(current, widget))
+                    {
+                        int r = Grid.GetRow(widget);
+                        int c = Grid.GetColumn(widget);
+                        int rs = Grid.GetRowSpan(widget);
+                        int cs = Grid.GetColumnSpan(widget);
+
+                        var pos = FindNearestPosition(r, c, rs, cs);
+
+                        if (pos.found)
+                        {
+                            EnsureRow(pos.row + rs);
+
+                            Grid.SetRow(widget, pos.row);
+                            Grid.SetColumn(widget, pos.col);
+
+                            queue.Enqueue(widget);
+                        }
+                    }
+                }
+            }
+        }
+        void AddMoreRows(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                DashboardGrid.RowDefinitions.Add(
+                    new RowDefinition
+                    {
+                        Height = new GridLength(80)
+                    });
+
+                GridOverlay.RowDefinitions.Add(
+                    new RowDefinition
+                    {
+                        Height = new GridLength(80)
+                    });
+            }
+
+            CreateGrid();
+        }
+        private void DashboardScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            ScrollViewer sv = sender as ScrollViewer;
+
+            if (sv.VerticalOffset + sv.ViewportHeight >= sv.ExtentHeight - 5)
+            {
+                AddMoreRows(10);
+            }
+        }
+
+    }
+
 }
