@@ -1,5 +1,4 @@
-﻿using LightInsight.Dashboard.Dashboard;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,13 +16,13 @@ using System.Windows.Shapes;
 namespace LightInsight.Dashboard.Camera.Client
 {
 	/// <summary>
-	/// Interaction logic for CameraOnlineWidget.xaml
+	/// Interaction logic for CameraAnalyticsSummaryWidget.xaml
 	/// </summary>
-	public partial class Temp : UserControl, IDashboardWidget
+	public partial class CameraAnalyticsSummaryWidget : UserControl
 	{
 		public event EventHandler DeleteRequested;
 
-		public Temp()
+		public CameraAnalyticsSummaryWidget()
 		{
 			InitializeComponent();
 			DeleteButton.Visibility = Visibility.Collapsed;

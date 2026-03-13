@@ -39,6 +39,12 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="LiveCharts.Wpf">
+      <Version>0.9.7</Version>
+    </PackageReference>
+    <PackageReference Include="MaterialDesignThemes">
+      <Version>5.3.0</Version>
+    </PackageReference>
     <PackageReference Include="System.Text.Json">
       <Version>10.0.3</Version>
     </PackageReference>
@@ -63,8 +69,17 @@
     <PackageReference Include="MilestoneSystems.VideoOS.Platform" Version="25.3.2" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dashboard\Camera\Client\CameraAnalyticsSummaryWidget.xaml.cs">
+      <DependentUpon>CameraAnalyticsSummaryWidget.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\Camera\Client\CameraDisconnectionTrend.xaml.cs">
       <DependentUpon>CameraDisconnectionTrend.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Camera\Client\CameraHealthScoreWidget.xaml.cs">
+      <DependentUpon>CameraHealthScoreWidget.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Camera\Client\CameraListWidget.xaml.cs">
+      <DependentUpon>CameraListWidget.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dashboard\Camera\Client\CameraOfflineDurationTop10.xaml.cs">
       <DependentUpon>CameraOfflineDurationTop10.xaml</DependentUpon>
@@ -72,7 +87,16 @@
     <Compile Include="Dashboard\Camera\Client\CameraOfflineWidget.xaml.cs">
       <DependentUpon>CameraOfflineWidget.xaml</DependentUpon>
     </Compile>
+    <Page Include="Dashboard\Camera\Client\CameraAnalyticsSummaryWidget.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dashboard\Camera\Client\CameraDisconnectionTrend.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\Camera\Client\CameraHealthScoreWidget.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\Camera\Client\CameraListWidget.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dashboard\Camera\Client\CameraOfflineDurationTop10.xaml">
@@ -105,6 +129,18 @@
     <Compile Include="Dashboard\Dashboard\IDashboardWidget.cs" />
     <Compile Include="Dashboard\Dashboard\LightInsightWorkSpacePlugin.cs" />
     <Compile Include="Dashboard\Dashboard\WidgetItem.cs" />
+    <Compile Include="Dashboard\RecordingServer\ServersOfflineCountWidget.xaml.cs">
+      <DependentUpon>ServersOfflineCountWidget.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\RecordingServer\ServersOnlineCountWidget.xaml.cs">
+      <DependentUpon>ServersOnlineCountWidget.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\RecordingServer\StorageUsageWidget.xaml.cs">
+      <DependentUpon>StorageUsageWidget.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\RecordingServer\TotalServersWidget.xaml.cs">
+      <DependentUpon>TotalServersWidget.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -112,6 +148,22 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="LightInsightDefinition.cs" />
+    <Page Include="Dashboard\RecordingServer\ServersOfflineCountWidget.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\RecordingServer\ServersOnlineCountWidget.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\RecordingServer\StorageUsageWidget.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\RecordingServer\TotalServersWidget.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Server.png" />
@@ -126,10 +178,6 @@
     <Resource Include="Dashboard\Asset\logo.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Page Include="Dashboard\Camera\Client\temp.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Content Include="plugin.def">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -146,6 +194,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dashboard\Camera\Client\CameraStatusDonut.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\Camera\Client\temp.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dashboard\Camera\Client\TotalCameraCount.xaml">
@@ -165,7 +216,8 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetDir)*.*" "C:\Program Files\Milestone\XProtect Smart Client\MIPPlugins\LightInsight\" /Y /I /E</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>
