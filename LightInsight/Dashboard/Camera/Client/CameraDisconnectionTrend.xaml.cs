@@ -3,16 +3,17 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using LightInsight.Dashboard.Dashboard;
 using LiveCharts; // Thêm namespace này
 using LiveCharts.Wpf; // Thêm namespace này
 
 namespace LightInsight.Dashboard.Camera.Client
 {
-    public partial class CameraDisconncetionTrend : UserControl
+    public partial class CameraDisconnectionTrend : UserControl, IDashboardWidget
     {
         public event EventHandler DeleteRequested;
 
-        public CameraDisconncetionTrend()
+        public CameraDisconnectionTrend()
         {
             InitializeComponent();
             DeleteButton.Visibility = Visibility.Collapsed;

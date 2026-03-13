@@ -29,7 +29,7 @@
                     VerticalAlignment="Top"
                     Padding="10,0,0,0"
                     CornerRadius="6,6,0,0">
-				<TextBlock Text="Camera Online + Offline"
+				<TextBlock Text="Camera Offline"
                            Foreground="White"
                            FontSize="14"
                            VerticalAlignment="Center"/>
