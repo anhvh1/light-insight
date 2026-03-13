@@ -1,8 +1,8 @@
 <UserControl x:Class="LightInsight.Dashboard.Camera.Client.CameraAnalyticsSummaryWidget"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Height="200"
-             Width="550">
+             Height="230"
+             Width="570">
 
 	<Border Background="#2D2D30"
             BorderThickness="1"

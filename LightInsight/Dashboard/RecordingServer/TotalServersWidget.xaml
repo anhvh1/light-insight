@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:LightInsight.Dashboard.RecordingServer"
              Height="150"
-             Width="300">
+             Width="320">
 
     <Border Background="#2D2D30"
             BorderThickness="1"
