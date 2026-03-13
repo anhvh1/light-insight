@@ -6,7 +6,7 @@
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{EF3D62FE-404E-4DF0-B584-4E19F24AE897}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LightInsight</RootNamespace>
     <AssemblyName>LightInsight</AssemblyName>
@@ -37,6 +37,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="LiveCharts.Wpf">
@@ -89,7 +92,7 @@
     </Compile>
     <Compile Include="Dashboard\AlarmsAndEvents\LiveAlarmsFeedWidget.xaml.cs">
       <DependentUpon>LiveAlarmsFeedWidget.xaml</DependentUpon>
-	</Compile>
+    </Compile>
     <Compile Include="Dashboard\Camera\Client\CameraAnalyticsSummaryWidget.xaml.cs">
       <DependentUpon>CameraAnalyticsSummaryWidget.xaml</DependentUpon>
     </Compile>
@@ -135,7 +138,7 @@
     <Page Include="Dashboard\AlarmsAndEvents\LiveAlarmsFeedWidget.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-	</Page>
+    </Page>
     <Page Include="Dashboard\Camera\Client\CameraAnalyticsSummaryWidget.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -265,8 +268,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetDir)*.*" "C:\Program Files\Milestone\XProtect Smart Client\MIPPlugins\LightInsight\" /Y /I /E</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>
