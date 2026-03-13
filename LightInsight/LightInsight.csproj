@@ -114,6 +114,9 @@
     <Compile Include="Dashboard\Camera\Client\CameraStatusDonut.xaml.cs">
       <DependentUpon>CameraStatusDonut.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dashboard\Camera\Client\temp.xaml.cs">
+      <DependentUpon>temp.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\Camera\Client\TotalCameraCount.xaml.cs">
       <DependentUpon>TotalCameraCount.xaml</DependentUpon>
     </Compile>
@@ -163,6 +166,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dashboard\Camera\Client\CameraStatusDonut.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\Camera\Client\temp.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dashboard\Camera\Client\TotalCameraCount.xaml">

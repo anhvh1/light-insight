@@ -16,25 +16,25 @@ using System.Windows.Shapes;
 
 namespace LightInsight.Dashboard.Camera.Client
 {
-    /// <summary>
-    /// Interaction logic for CameraOnlineWidget.xaml
-    /// </summary>
-    public partial class Temp : UserControl, IDashboardWidget
-    {
-        public event EventHandler DeleteRequested;
+	/// <summary>
+	/// Interaction logic for CameraOnlineWidget.xaml
+	/// </summary>
+	public partial class Temp : UserControl, IDashboardWidget
+	{
+		public event EventHandler DeleteRequested;
 
-        public Temp()
-        {
-            InitializeComponent();
-            DeleteButton.Visibility = Visibility.Collapsed;
-        }
-        public void SetEditMode(bool isEdit)
-        {
-            DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
-        }
-        private void DeleteWidget_Click(object sender, RoutedEventArgs e)
-        {
-            DeleteRequested?.Invoke(this, EventArgs.Empty);
-        }
-    }
+		public Temp()
+		{
+			InitializeComponent();
+			DeleteButton.Visibility = Visibility.Collapsed;
+		}
+		public void SetEditMode(bool isEdit)
+		{
+			DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
+		}
+		private void DeleteWidget_Click(object sender, RoutedEventArgs e)
+		{
+			DeleteRequested?.Invoke(this, EventArgs.Empty);
+		}
+	}
 }
