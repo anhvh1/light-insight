@@ -2,6 +2,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace LightInsight.Dashboard.Camera.Client
 {
@@ -30,7 +31,8 @@ namespace LightInsight.Dashboard.Camera.Client
 		public void SetEditMode(bool isEdit)
 		{
 			DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
-		}
+            this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
+        }
 
 		private void DeleteWidget_Click(object sender, RoutedEventArgs e)
 		{

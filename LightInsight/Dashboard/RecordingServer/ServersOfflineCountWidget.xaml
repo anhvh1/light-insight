@@ -59,9 +59,7 @@
                                VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <TextBlock Text="Servers Offline"
-                           Foreground="LightGray"
-                           FontSize="16"/>
+                <TextBlock Text="Servers Offline" Foreground="#AAAAAA" FontSize="16" Margin="0,0,0,10"/>
 
                 <StackPanel Orientation="Horizontal">
                     <Path Data="M 2,8 L 6,14 L 10,10 L 16,16 M 12,16 L 16,16 L 16,12" 

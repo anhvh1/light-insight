@@ -6,6 +6,7 @@ using System.Windows.Media;
 using LiveCharts.Wpf;
 using LiveCharts;
 using LightInsight.Dashboard.Dashboard;
+using System.Windows.Input;
 
 namespace LightInsight.Dashboard.RecordingServer
 {
@@ -100,6 +101,7 @@ namespace LightInsight.Dashboard.RecordingServer
         public void SetEditMode(bool isEdit)
         {
             DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
+            this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
         }
 
         private void DeleteWidget_Click(object sender, RoutedEventArgs e)
