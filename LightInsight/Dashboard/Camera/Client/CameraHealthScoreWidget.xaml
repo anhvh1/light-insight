@@ -1,43 +1,42 @@
-﻿<UserControl x:Class="LightInsight.Dashboard.Camera.Client.CameraOnlineWidget"
+<UserControl x:Class="LightInsight.Dashboard.Camera.Client.CameraHealthScoreWidget"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              Height="150"
-             Width="240">
-    <Viewbox Stretch="Fill">
+             Width="300">
 
-        <Grid Width="240" Height="150">
-            <Border Background="#2D2D30"
+	<Border Background="#2D2D30"
             BorderThickness="1"
             CornerRadius="6"
             Padding="0">
-                <Border.BorderBrush>
-                    <VisualBrush>
-                        <VisualBrush.Visual>
-                            <Rectangle Stroke="#E8751A"
+		<Border.BorderBrush>
+			<VisualBrush>
+				<VisualBrush.Visual>
+					<Rectangle Stroke="#E8751A"
                                StrokeDashArray="4 2"
                                StrokeThickness="1"
                                RadiusX="6" RadiusY="6"
                                Width="{Binding RelativeSource={RelativeSource AncestorType=Border}, Path=ActualWidth}"
                                Height="{Binding RelativeSource={RelativeSource AncestorType=Border}, Path=ActualHeight}"/>
-                        </VisualBrush.Visual>
-                    </VisualBrush>
-                </Border.BorderBrush>
+				</VisualBrush.Visual>
+			</VisualBrush>
+		</Border.BorderBrush>
 
-                <Grid>
-                    <Border Background="#3E3E42"
+		<Grid>
+			<Border Background="#3E3E42"
                     BorderBrush="#33FFFFFF"
                     BorderThickness="0,0,0,1"
                     Height="25"
                     VerticalAlignment="Top"
                     Padding="10,0,0,0"
                     CornerRadius="6,6,0,0">
-                        <TextBlock Text="Camera Status Donut"
+				<TextBlock Text="Camera Health Score"
                            Foreground="White"
                            FontSize="14"
                            VerticalAlignment="Center"/>
-                    </Border>
+			</Border>
 
-                    <Button x:Name="DeleteButton"
+			<Button x:Name="DeleteButton"
                     Content="X"
                     Width="30" Height="23"
                     MinWidth="0" MinHeight="0"
@@ -47,35 +46,27 @@
                     FontSize="16"
                     Click="DeleteWidget_Click"/>
 
-                    <StackPanel Margin="4 40 0 0">
+			<StackPanel Margin="4 40 0 0">
 
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 
-                            <TextBlock FontFamily="Segoe MDL2 Assets" 
-                               Text="&#xE722;" 
-                               FontSize="24" 
-                               Foreground="LimeGreen"
-                               VerticalAlignment="Center"
-                               Margin="0 0 10 0"/>
-
-                            <TextBlock Text="142"
+					<materialDesign:PackIcon Kind="Pulse" Foreground="#4ade80" Width="40" Height="40"/>
+					<TextBlock Text="142"
                                FontSize="32"
                                FontWeight="Bold"
-                               Foreground="LimeGreen"
+                               Foreground="#4ade80"
                                VerticalAlignment="Center"/>
-                        </StackPanel>
+				</StackPanel>
 
-                        <TextBlock Text="Cameras Online"
+				<TextBlock Text="Health Score"
                            Foreground="LightGray"
                            FontSize="16"/>
 
-                        <TextBlock Text="↗ 2.3% vs last period"
+				<TextBlock Text="↗ 2.3% vs last period"
                            Foreground="LimeGreen"
                            FontSize="12"/>
 
-                    </StackPanel>
-                </Grid>
-            </Border>
-        </Grid>
-    </Viewbox>
+			</StackPanel>
+		</Grid>
+	</Border>
 </UserControl>
