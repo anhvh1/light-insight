@@ -28,7 +28,7 @@ namespace LightInsight.Dashboard.Camera.Client
             InitializeComponent();
             DeleteButton.Visibility = Visibility.Collapsed;
         }
-        public void SetEditMode(bool isEdit)
+        public void SetEditMode(bool isEdit) 
         {
             DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
             this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
