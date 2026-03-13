@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using LightInsight.Dashboard.Dashboard;
 using LiveCharts; // Thêm namespace này
@@ -44,6 +45,7 @@ namespace LightInsight.Dashboard.Camera.Client
         public void SetEditMode(bool isEdit)
         {
             DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
+            this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
         }
 
         private void DeleteWidget_Click(object sender, RoutedEventArgs e)

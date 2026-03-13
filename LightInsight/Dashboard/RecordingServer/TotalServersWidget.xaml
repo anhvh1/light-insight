@@ -4,18 +4,20 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:LightInsight.Dashboard.RecordingServer"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
-             
-             HorizontalAlignment="Stretch" 
-             VerticalAlignment="Stretch"
-             MinHeight="100" MinWidth="300">
+             Height="150"
+             Width="300">
 
-    <Border Background="#2D2D30" BorderThickness="1" CornerRadius="6" Padding="15">
+    <Border Background="#2D2D30"
+            BorderThickness="1"
+            CornerRadius="6"
+            Padding="0">
         <Border.BorderBrush>
             <VisualBrush>
                 <VisualBrush.Visual>
-                    <Rectangle Stroke="#E8751A" StrokeDashArray="4 2" StrokeThickness="1" RadiusX="6" RadiusY="6"
+                    <Rectangle Stroke="#E8751A"
+                               StrokeDashArray="4 2"
+                               StrokeThickness="1"
+                               RadiusX="6" RadiusY="6"
                                Width="{Binding RelativeSource={RelativeSource AncestorType=Border}, Path=ActualWidth}"
                                Height="{Binding RelativeSource={RelativeSource AncestorType=Border}, Path=ActualHeight}"/>
                 </VisualBrush.Visual>
@@ -23,35 +25,46 @@
         </Border.BorderBrush>
 
         <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+            <Border Background="#3E3E42"
+                    BorderBrush="#33FFFFFF"
+                    BorderThickness="0,0,0,1"
+                    Height="25"
+                    VerticalAlignment="Top"
+                    Padding="10,0,0,0"
+                    CornerRadius="6,6,0,0">
+                <TextBlock Text="Total Servers"
+                           Foreground="White"
+                           FontSize="14"
+                           VerticalAlignment="Center"/>
+            </Border>
 
-            <Grid Grid.Row="0" Margin="0,0,0,15">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+            <Button x:Name="DeleteButton"
+                    Content="X"
+                    Width="30" Height="23"
+                    MinWidth="0" MinHeight="0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Margin="0,2,2,0"
+                    FontSize="16"
+                    Click="DeleteWidget_Click"/>
 
-                <TextBlock Grid.Column="0" Text="Total Servers" Foreground="White" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+            <StackPanel Margin="4 40 0 0">
 
-                <Button Grid.Column="1" x:Name="DeleteButton" Content="✕" Width="20" Height="20" FontSize="12" Padding="0"
-                        Background="Transparent" Foreground="#888888" BorderThickness="0" Cursor="Hand"
-                        VerticalAlignment="Center" Click="DeleteWidget_Click" Margin="10,0,0,0" MinWidth="0" MinHeight="0"/>
-            </Grid>
-
-            <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="5,0,0,0">
-
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <Path Data="M 3,4 H 21 A 2,2 0 0 1 23,6 V 10 A 2,2 0 0 1 21,12 H 3 A 2,2 0 0 1 1,10 V 6 A 2,2 0 0 1 3,4 Z M 3,14 H 21 A 2,2 0 0 1 23,16 V 20 A 2,2 0 0 1 21,22 H 3 A 2,2 0 0 1 1,20 V 16 A 2,2 0 0 1 3,14 Z M 17,8 H 19 M 17,18 H 19" 
                           Stroke="#75A9F9" StrokeThickness="2" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round" 
-                          Width="28" Height="28" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                          Width="24" Height="24" Stretch="Uniform" VerticalAlignment="Center" Margin="0 0 10 0"/>
 
-                    <TextBlock x:Name="CountText" Text="13" Foreground="#75A9F9" FontSize="42" FontWeight="Bold" VerticalAlignment="Center" Margin="0,-5,0,0"/>
+                    <TextBlock x:Name="CountText" Text="13"
+                               FontSize="32"
+                               FontWeight="Bold"
+                               Foreground="#75A9F9"
+                               VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <TextBlock Text="Total Servers" Foreground="#AAAAAA" FontSize="16" Margin="0,0,0,10"/>
+                <TextBlock Text="Total Servers"
+                           Foreground="LightGray"
+                           FontSize="16"/>
 
             </StackPanel>
         </Grid>
