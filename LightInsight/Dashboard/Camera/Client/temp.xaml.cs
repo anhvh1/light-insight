@@ -19,11 +19,11 @@ namespace LightInsight.Dashboard.Camera.Client
     /// <summary>
     /// Interaction logic for CameraOnlineWidget.xaml
     /// </summary>
-    public partial class CameraOnlineWidget : UserControl, IDashboardWidget
+    public partial class Temp : UserControl, IDashboardWidget
     {
         public event EventHandler DeleteRequested;
 
-        public CameraOnlineWidget()
+        public Temp()
         {
             InitializeComponent();
             DeleteButton.Visibility = Visibility.Collapsed;
@@ -31,7 +31,6 @@ namespace LightInsight.Dashboard.Camera.Client
         public void SetEditMode(bool isEdit)
         {
             DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
-            this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
         }
         private void DeleteWidget_Click(object sender, RoutedEventArgs e)
         {

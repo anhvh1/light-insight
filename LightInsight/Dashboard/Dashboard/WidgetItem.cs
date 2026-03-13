@@ -16,7 +16,10 @@ namespace LightInsight.Dashboard.Dashboard
     {
         public string Dashboard { get; set; }
         public string Type { get; set; }
-        public double X { get; set; }
-        public double Y { get; set; }
+
+        public int Row { get; set; }
+        public int Column { get; set; }
+        public int RowSpan { get; set; }
+        public int ColumnSpan { get; set; }
     }
 }
