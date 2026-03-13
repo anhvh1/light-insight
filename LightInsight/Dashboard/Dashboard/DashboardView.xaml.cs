@@ -43,10 +43,15 @@ namespace LightInsight.Dashboard.Dashboard
             new WidgetItem{ Name="Camera Online Count", Category="KPI", WidgetType = typeof(CameraOnlineWidget)},
             new WidgetItem{ Name="Camera Offline Count", Category="KPI",WidgetType = typeof(CameraOfflineWidget)},
             new WidgetItem{ Name="Camera Total Count", Category="KPI",WidgetType = typeof(TotalCameraCount)},
-            new WidgetItem{ Name="Camera Status Donut", Category="Charts",WidgetType = typeof(CameraStatusDonut)},
-            new WidgetItem{ Name="Camera Duration top 10", Category="Tables",WidgetType = typeof(CameraOfflineDurationTop10)},
+            new WidgetItem{ Name="Camera Online + Offline", Category="KPI",WidgetType = typeof(CameraOnlineNOffline)},
+			new WidgetItem{ Name="Camera Status Donut", Category="Charts",WidgetType = typeof(CameraStatusDonut)},
+			new WidgetItem{ Name="Camera Offline Duration top 10", Category="Tables",WidgetType = typeof(CameraOfflineDurationTop10)},
+			new WidgetItem{ Name="Camera Disconnection Trend", Category="Tables",WidgetType = typeof(CameraDisconnectionTrend)},
+			new WidgetItem{ Name="Camera Analytics Summary",WidgetType = typeof(CameraAnalyticsSummaryWidget)},
+			new WidgetItem{ Name="Camera List",WidgetType = typeof(CameraListWidget)},
+			new WidgetItem{ Name="Camera Health Score",WidgetType = typeof(CameraHealthScoreWidget)},
 
-            new WidgetItem{ Name="Live Alarm Feed", Category="Lists", WidgetType = typeof(LiveAlarmsFeedWidget)},
+			new WidgetItem{ Name="Live Alarm Feed", Category="Lists", WidgetType = typeof(LiveAlarmsFeedWidget)},
             new WidgetItem{ Name="Alarm by Severity", Category="Charts", WidgetType = typeof(AlarmBySeverityWidget)},
             new WidgetItem{ Name="Alarm Daily Count", Category="Charts", WidgetType = typeof(AlarmDailyCountWidget)},
             new WidgetItem{ Name="Alarm by Source", Category="Charts", WidgetType = typeof(AlarmBySourceWidget)},
@@ -59,7 +64,7 @@ namespace LightInsight.Dashboard.Dashboard
             new WidgetItem{ Name="Servers Offline Count", Category="KPI",WidgetType = typeof(ServersOfflineCountWidget)},
             new WidgetItem{ Name="Servers Total", Category="KPI",WidgetType = typeof(TotalServersWidget)},
             new WidgetItem{ Name="Storage Usage by Server", Category="KPI",WidgetType = typeof(StorageUsageWidget)},
-            new WidgetItem{ Name="Temp", Category="Tables",WidgetType = typeof(Temp)},
+            //new WidgetItem{ Name="Temp", Category="Tables",WidgetType = typeof(Temp)},
 		};
         public DashboardView()
         {
