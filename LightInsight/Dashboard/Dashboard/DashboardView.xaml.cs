@@ -119,28 +119,80 @@ namespace LightInsight.Dashboard.Dashboard
 
             if (newWidget == null)
                 return;
+            bool exists = DashboardGrid.Children
+                .OfType<FrameworkElement>()
+                .Any(x => x.GetType() == widget.WidgetType);
+
+            if (exists)
+            {
+                MessageBox.Show("Widget này đã tồn tại trên dashboard!");
+                return;
+            }
 
             SetupWidget(newWidget);
 
-            var pos = GetGridPosition();
 
-            // kích thước cell
-            double cellWidth = DashboardGrid.ActualWidth / 12;
-            double cellHeight = 80;
+            var span = CalculateWidgetSpan(newWidget);
+            var pos = FindFreePosition(span.rowSpan, span.colSpan);
 
-            // tính span
-            int colSpan = Math.Max(1, (int)Math.Ceiling(newWidget.MinWidth / cellWidth));
-            int rowSpan = Math.Max(1, (int)Math.Ceiling(newWidget.MinHeight / cellHeight));
-
-            EnsureRow(pos.Row + rowSpan);
+            EnsureRow(pos.Row + span.rowSpan);
 
             Grid.SetRow(newWidget, pos.Row);
             Grid.SetColumn(newWidget, pos.Column);
 
-            Grid.SetColumnSpan(newWidget, colSpan);
-            Grid.SetRowSpan(newWidget, rowSpan);
+            Grid.SetColumnSpan(newWidget, span.colSpan);
+            Grid.SetRowSpan(newWidget, span.rowSpan);
 
             DashboardGrid.Children.Add(newWidget);
+        }
+        private (int Row, int Column) FindFreePosition(int rowSpan, int colSpan)
+        {
+            int maxCols = 12;
+
+            HashSet<string> used = new HashSet<string>();
+
+            foreach (UIElement child in DashboardGrid.Children)
+            {
+                int r = Grid.GetRow(child);
+                int c = Grid.GetColumn(child);
+                int rs = Grid.GetRowSpan(child);
+                int cs = Grid.GetColumnSpan(child);
+
+                for (int i = r; i < r + rs; i++)
+                {
+                    for (int j = c; j < c + cs; j++)
+                    {
+                        used.Add($"{i}-{j}");
+                    }
+                }
+            }
+
+            for (int row = 0; row < 100; row++)
+            {
+                for (int col = 0; col <= maxCols - colSpan; col++)
+                {
+                    bool free = true;
+
+                    for (int r = row; r < row + rowSpan; r++)
+                    {
+                        for (int c = col; c < col + colSpan; c++)
+                        {
+                            if (used.Contains($"{r}-{c}"))
+                            {
+                                free = false;
+                                break;
+                            }
+                        }
+
+                        if (!free) break;
+                    }
+
+                    if (free)
+                        return (row, col);
+                }
+            }
+
+            return (0, 0);
         }
         private (int Row, int Column) GetGridPosition()
         {
@@ -261,7 +313,9 @@ namespace LightInsight.Dashboard.Dashboard
                         Dashboard = currentDashboard,
                         Type = widget.GetType().Name,
                         Row = Grid.GetRow(widget),
-                        Column = Grid.GetColumn(widget)
+                        Column = Grid.GetColumn(widget),
+                        RowSpan = Grid.GetRowSpan(widget),
+                        ColumnSpan = Grid.GetColumnSpan(widget)
                     };
 
                     layouts.Add(layout);
@@ -274,6 +328,7 @@ namespace LightInsight.Dashboard.Dashboard
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
         {
+            LoadLayout();
             // đóng widget library
             ExitEditMode();
         }
@@ -530,7 +585,7 @@ namespace LightInsight.Dashboard.Dashboard
             if (layouts == null)
                 return;
 
-            // lưu vị trí đã dùng để tránh trùng
+            // lưu tất cả cell đã dùng
             HashSet<string> usedCells = new HashSet<string>();
 
             foreach (var layout in layouts)
@@ -538,32 +593,60 @@ namespace LightInsight.Dashboard.Dashboard
                 if (layout.Dashboard != currentDashboard)
                     continue;
 
-                // kiểm tra grid bounds
-                if (layout.Row >= DashboardGrid.RowDefinitions.Count ||
-                    layout.Column >= DashboardGrid.ColumnDefinitions.Count)
-                    continue;
-
-                string key = $"{layout.Row}-{layout.Column}";
-
-                // nếu vị trí đã có widget thì bỏ qua
-                if (usedCells.Contains(key))
-                    continue;
-
                 FrameworkElement widget = CreateWidget(layout.Type);
 
                 if (widget == null)
                     continue;
 
+                int row = layout.Row;
+                int col = layout.Column;
+
+                int rowSpan = layout.RowSpan <= 0 ? 1 : layout.RowSpan;
+                int colSpan = layout.ColumnSpan <= 0 ? 1 : layout.ColumnSpan;
+
+                // đảm bảo grid đủ hàng
+                EnsureRow(row + rowSpan);
+
+                // kiểm tra toàn bộ vùng widget chiếm
+                bool isOverlap = false;
+
+                for (int r = row; r < row + rowSpan; r++)
+                {
+                    for (int c = col; c < col + colSpan; c++)
+                    {
+                        string key = $"{r}-{c}";
+                        if (usedCells.Contains(key))
+                        {
+                            isOverlap = true;
+                            break;
+                        }
+                    }
+                    if (isOverlap)
+                        break;
+                }
+
+                if (isOverlap)
+                    continue;
+
                 SetupWidget(widget);
-                EnsureRow(layout.Row);
-                Grid.SetRow(widget, layout.Row);
-                Grid.SetColumn(widget, layout.Column);
+
+                Grid.SetRow(widget, row);
+                Grid.SetColumn(widget, col);
+                Grid.SetRowSpan(widget, rowSpan);
+                Grid.SetColumnSpan(widget, colSpan);
 
                 Panel.SetZIndex(widget, DashboardGrid.Children.Count);
 
                 DashboardGrid.Children.Add(widget);
 
-                usedCells.Add(key);
+                // đánh dấu tất cả cell đã dùng
+                for (int r = row; r < row + rowSpan; r++)
+                {
+                    for (int c = col; c < col + colSpan; c++)
+                    {
+                        usedCells.Add($"{r}-{c}");
+                    }
+                }
             }
         }
         void InitGrid()
@@ -621,6 +704,7 @@ namespace LightInsight.Dashboard.Dashboard
                 }
             }
         }
+        
         FrameworkElement CreateWidget(string typeName)
         {
             var widgetType = AppDomain.CurrentDomain
@@ -636,6 +720,7 @@ namespace LightInsight.Dashboard.Dashboard
         void SetupWidget(FrameworkElement widget)
         {
             widget.Margin = new Thickness(1, 1, 5, 5);
+           
             widget.HorizontalAlignment = HorizontalAlignment.Stretch;
             widget.VerticalAlignment = VerticalAlignment.Stretch;
             widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
