@@ -43,7 +43,8 @@ namespace LightInsight.Dashboard.Dashboard
             new WidgetItem{ Name="Camera Total Count", Category="KPI",WidgetType = typeof(TotalCameraCount)},
             new WidgetItem{ Name="Camera Status Donut", Category="Charts",WidgetType = typeof(CameraStatusDonut)},
             new WidgetItem{ Name="Camera Duration top 10", Category="Tables",WidgetType = typeof(CameraOfflineDurationTop10)},
-        };
+            new WidgetItem{ Name="Temp", Category="Tables",WidgetType = typeof(Temp)},
+		};
         public DashboardView()
         {
             InitializeComponent();
@@ -742,53 +743,69 @@ namespace LightInsight.Dashboard.Dashboard
            
             widget.HorizontalAlignment = HorizontalAlignment.Stretch;
             widget.VerticalAlignment = VerticalAlignment.Stretch;
-            widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
+			// Đăng ký sự kiện Loaded: Đợi Widget vẽ xong hoàn toàn mới đi tìm Thumb
+			widget.Loaded += (s, e) =>
+			{
+				var thumb = FindVisualChild<Thumb>(widget, "ResizeThumb");
+				if (thumb != null)
+				{
+					System.Diagnostics.Debug.WriteLine($"SUCCESS: Found ResizeThumb on {widget.GetType().Name}");
+					thumb.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
+
+					// Xóa sự kiện cũ (nếu có) để tránh lặp và đăng ký mới
+					thumb.DragDelta -= Thumb_DragDelta;
+					thumb.DragDelta += Thumb_DragDelta;
+				}
+				else
+				{
+					System.Diagnostics.Debug.WriteLine($"ERROR: Still cannot find ResizeThumb on {widget.GetType().Name}");
+				}
+			};
+			widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
             widget.MouseMove += Widget_MouseMove;
             widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
-
-            if (widget is IDashboardWidget dashboardWidget)
-            {
-                dashboardWidget.DeleteRequested += Widget_DeleteRequested;
-                dashboardWidget.SetEditMode(editMode);
-            }
-			// Tìm nút ResizeThumb trong Widget
-			var thumb = FindVisualChild<Thumb>(widget, "ResizeThumb");
-			if (thumb != null)
+			if (widget is IDashboardWidget dashboardWidget)
 			{
-				thumb.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
-
-				thumb.DragDelta += (s, e) => {
-					if (!editMode) return;
-
-					double cellWidth = DashboardGrid.ActualWidth / 12;
-					double cellHeight = 80;
-
-					// --- PHẦN DEBUG ---
-					System.Diagnostics.Debug.WriteLine($"--- RESIZING {widget.GetType().Name} ---");
-					System.Diagnostics.Debug.WriteLine($"Delta X: {e.HorizontalChange:F2}, Delta Y: {e.VerticalChange:F2}");
-					System.Diagnostics.Debug.WriteLine($"Actual Size: {widget.ActualWidth:F2}x{widget.ActualHeight:F2}");
-					System.Diagnostics.Debug.WriteLine($"Cell Size: {cellWidth:F2}x{cellHeight:F2}");
-
-					// Tính toán Span mới
-					int newColSpan = (int)Math.Max(1, Math.Round((widget.ActualWidth + e.HorizontalChange) / cellWidth));
-					int newRowSpan = (int)Math.Max(1, Math.Round((widget.ActualHeight + e.VerticalChange) / cellHeight));
-
-					System.Diagnostics.Debug.WriteLine($"Calculated Span: {newColSpan}x{newRowSpan}");
-
-					// Cập nhật giao diện
-					Grid.SetColumnSpan(widget, newColSpan);
-					Grid.SetRowSpan(widget, newRowSpan);
-
-					widget.Tag = $"{newColSpan}x{newRowSpan}";
-				};
+				dashboardWidget.DeleteRequested += Widget_DeleteRequested;
+				dashboardWidget.SetEditMode(editMode);
 			}
 		}
-        /// <summary>
-        /// Xử lý sự kiện click để thu gọn/hiện sidebar
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ToggleSidebar_Click(object sender, RoutedEventArgs e)
+
+		private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
+		{
+			if (!editMode) return;
+			Thumb thumb = sender as Thumb;
+			FrameworkElement widget = FindParentWidget(thumb);
+			if (widget != null)
+			{
+				double cellWidth = DashboardGrid.ActualWidth / 12;
+				double cellHeight = 80;
+
+				// Tính toán số ô dựa trên kích thước hiện tại + lượng di chuyển chuột
+				int newColSpan = (int)Math.Max(1, Math.Round((widget.ActualWidth + e.HorizontalChange) / cellWidth));
+				int newRowSpan = (int)Math.Max(1, Math.Round((widget.ActualHeight + e.VerticalChange) / cellHeight));
+
+				Grid.SetColumnSpan(widget, newColSpan);
+				Grid.SetRowSpan(widget, newRowSpan);
+
+				widget.Tag = $"{newColSpan}x{newRowSpan}";
+
+				System.Diagnostics.Debug.WriteLine($"Resizing: {newColSpan}x{newRowSpan}");
+			}
+		}
+
+		// Hàm bổ trợ để tìm ngược từ Thumb lên Widget cha
+		private FrameworkElement FindParentWidget(DependencyObject child)
+		{
+			DependencyObject parentObject = VisualTreeHelper.GetParent(child);
+			if (parentObject == null) return null;
+
+			if (parentObject is UserControl || (parentObject is FrameworkElement fe && DashboardGrid.Children.Contains(fe)))
+				return parentObject as FrameworkElement;
+
+			return FindParentWidget(parentObject);
+		}
+		private void ToggleSidebar_Click(object sender, RoutedEventArgs e)
         {
             if (sidebarCollapsed)
             {
