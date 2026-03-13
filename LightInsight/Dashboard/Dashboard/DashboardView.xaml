@@ -195,7 +195,9 @@ Background="#1E1E1E"
         Margin="5"
         ClipToBounds="True">
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ScrollViewer x:Name="DashboardScroll"
+              VerticalScrollBarVisibility="Auto"
+              ScrollChanged="DashboardScroll_ScrollChanged">
 
                 <Grid>
 
