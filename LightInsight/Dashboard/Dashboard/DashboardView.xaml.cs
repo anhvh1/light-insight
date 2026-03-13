@@ -53,6 +53,9 @@ namespace LightInsight.Dashboard.Dashboard
             new WidgetItem{ Name="Alarm SLA Breach", Category="KPI", WidgetType = typeof(AlarmSLABreachWidget)},
             new WidgetItem{ Name="Event Trend Chart", Category="Charts", WidgetType = typeof(EventTrendChartWidget)},
 
+
+
+
         };
         public DashboardView()
         {
