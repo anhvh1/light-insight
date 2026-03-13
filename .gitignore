@@ -216,3 +216,4 @@ node_modules/
 /LightInsight.BUS/obj/Debug/net8.0/LightInsight.BUS.AssemblyInfoInputs.cache
 /LightInsight.DAL/obj/Debug/net8.0/LightInsight.DAL.AssemblyInfo.cs
 /LightInsight.DAL/obj/Debug/net8.0/LightInsight.DAL.AssemblyInfoInputs.cache
+/LightInsight/LightInsight.csproj.user
