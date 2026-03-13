@@ -12,13 +12,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LightInsight.Dashboard.Dashboard;
 
 namespace LightInsight.Dashboard.Camera.Client
 {
 	/// <summary>
 	/// Interaction logic for CameraAnalyticsSummaryWidget.xaml
 	/// </summary>
-	public partial class CameraAnalyticsSummaryWidget : UserControl
+	public partial class CameraAnalyticsSummaryWidget : UserControl, IDashboardWidget
 	{
 		public event EventHandler DeleteRequested;
 

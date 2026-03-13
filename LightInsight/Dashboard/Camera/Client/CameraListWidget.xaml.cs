@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LightInsight.Dashboard.Dashboard;
 
 namespace LightInsight.Dashboard.Camera.Client
 {
@@ -29,7 +30,7 @@ namespace LightInsight.Dashboard.Camera.Client
 		public string Uptime { get; set; }
 	}
 
-	public partial class CameraListWidget : UserControl
+	public partial class CameraListWidget : UserControl, IDashboardWidget
 	{
 		public event EventHandler DeleteRequested;
 		private List<CameraInfo> _allCameras;

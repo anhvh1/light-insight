@@ -27,6 +27,16 @@ namespace LightInsight.Dashboard.Camera.Client
 		{
 			InitializeComponent();
 			DeleteButton.Visibility = Visibility.Collapsed;
+			this.Loaded += (s, e) => {
+				if (ResizeThumb != null)
+				{
+					System.Diagnostics.Debug.WriteLine("DEBUG: ResizeThumb found in Widget!");
+				}
+				else
+				{
+					System.Diagnostics.Debug.WriteLine("DEBUG: ResizeThumb NOT found!");
+				}
+			};
 		}
 		public void SetEditMode(bool isEdit)
 		{
