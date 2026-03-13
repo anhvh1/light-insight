@@ -1,4 +1,5 @@
 ﻿using LightInsight.Dashboard.Camera.Client;
+using LightInsight.Dashboard.RecordingServer;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -43,6 +44,13 @@ namespace LightInsight.Dashboard.Dashboard
             new WidgetItem{ Name="Camera Total Count", Category="KPI",WidgetType = typeof(TotalCameraCount)},
             new WidgetItem{ Name="Camera Status Donut", Category="Charts",WidgetType = typeof(CameraStatusDonut)},
             new WidgetItem{ Name="Camera Duration top 10", Category="Tables",WidgetType = typeof(CameraOfflineDurationTop10)},
+
+            new WidgetItem{ Name="Servers Online Count", Category="KPI", WidgetType = typeof(ServersOnlineCountWidget)},
+            new WidgetItem{ Name="Servers Offline Count", Category="KPI",WidgetType = typeof(ServersOfflineCountWidget)},
+            new WidgetItem{ Name="Servers Total", Category="KPI",WidgetType = typeof(TotalServersWidget)},
+            new WidgetItem{ Name="Storage Usage by Server", Category="KPI",WidgetType = typeof(StorageUsageWidget)},
+
+
         };
         public DashboardView()
         {
