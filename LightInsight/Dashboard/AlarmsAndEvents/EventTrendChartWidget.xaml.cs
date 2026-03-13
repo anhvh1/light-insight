@@ -122,6 +122,7 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         public void SetEditMode(bool isEdit)
         {
             DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
+            this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
         }
 
         private void DeleteWidget_Click(object sender, RoutedEventArgs e)
