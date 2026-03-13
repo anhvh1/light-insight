@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 namespace LightInsight.Dashboard.Camera.Client
 {
 	/// <summary>
-	/// Interaction logic for CameraOfflineDurationTop10.xaml
+	/// Interaction logic for CameraAnalyticsSummaryWidget.xaml
 	/// </summary>
 	public partial class CameraAnalyticsSummaryWidget : UserControl
 	{
