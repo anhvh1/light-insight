@@ -39,7 +39,8 @@
                         Foreground="White"
                         BorderThickness="0"
                         HorizontalContentAlignment="Center"
-                        VerticalContentAlignment="Center">
+                        VerticalContentAlignment="Center"
+                        Click="DeleteWidget_Click">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="2"/>
