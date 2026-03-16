@@ -1,9 +1,9 @@
-﻿using LightInsight.Dashboard.Dashboard;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-
+using LightInsight.Dashboard.Dashboard;
+using System.Windows.Controls.Primitives;
 namespace LightInsight.Dashboard.Camera.Client
 {
 	/// <summary>
@@ -16,6 +16,8 @@ namespace LightInsight.Dashboard.Camera.Client
 		// default size can be set by the Tag attribute of the UserControl
 		public int MinCol => 2;
 		public int MinRow => 2;
+
+		public Thumb ResizeThumb => this.InternalResizeThumb;
 		public Temp()
 		{
 			InitializeComponent();

@@ -80,7 +80,7 @@
                     </StackPanel>
                 </Viewbox>
 
-                <Thumb x:Name="ResizeThumb" Width="12" Height="12" Cursor="SizeNWSE" VerticalAlignment="Bottom" HorizontalAlignment="Right" Background="Transparent">
+                <Thumb x:Name="InternalResizeThumb" Width="12" Height="12" Cursor="SizeNWSE" VerticalAlignment="Bottom" HorizontalAlignment="Right" Background="Transparent">
                     <Thumb.Template>
                         <ControlTemplate>
                             <Path Data="M 12,0 L 12,12 L 0,12 Z" Fill="#888" Opacity="0.5"/>

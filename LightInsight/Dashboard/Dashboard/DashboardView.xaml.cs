@@ -757,45 +757,80 @@ namespace LightInsight.Dashboard.Dashboard
 
             return Activator.CreateInstance(widgetType) as FrameworkElement;
         }
-        void SetupWidget(FrameworkElement widget)
-        {
-            widget.Margin = new Thickness(1, 1, 5, 5);
+		//void SetupWidget(FrameworkElement widget)  // old
+		//{
+		//    widget.Margin = new Thickness(1, 1, 5, 5);
 
-            widget.HorizontalAlignment = HorizontalAlignment.Stretch;
-            widget.VerticalAlignment = VerticalAlignment.Stretch;
-            widget.Loaded += (s, e) => 
-            {
-                var thumb = FindVisualChild<Thumb>(widget, "ResizeThumb");
-                if (thumb != null)
-                {
-                    System.Diagnostics.Debug.WriteLine($"SUCCESS: Found ResizeThumb on {widget.GetType().Name}");
-                    thumb.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
+		//    widget.HorizontalAlignment = HorizontalAlignment.Stretch;
+		//    widget.VerticalAlignment = VerticalAlignment.Stretch;
+		//    widget.Loaded += (s, e) => 
+		//    {
+		//        var thumb = FindVisualChild<Thumb>(widget, "ResizeThumb");
+		//        if (thumb != null)
+		//        {
+		//            System.Diagnostics.Debug.WriteLine($"SUCCESS: Found ResizeThumb on {widget.GetType().Name}");
+		//            thumb.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
 
-                    // Xóa sự kiện cũ (nếu có) để tránh lặp và đăng ký mới
-                    thumb.DragDelta -= Thumb_DragDelta; 
-                    thumb.DragDelta += Thumb_DragDelta;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine($"ERROR: Still cannot find ResizeThumb on {widget.GetType().Name}");
-                }
-            };
-            widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
-            widget.MouseMove += Widget_MouseMove;
-            widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
+		//            // Xóa sự kiện cũ (nếu có) để tránh lặp và đăng ký mới
+		//            thumb.DragDelta -= Thumb_DragDelta; 
+		//            thumb.DragDelta += Thumb_DragDelta;
+		//        }
+		//        else
+		//        {
+		//            System.Diagnostics.Debug.WriteLine($"ERROR: Still cannot find ResizeThumb on {widget.GetType().Name}");
+		//        }
+		//    };
+		//    widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
+		//    widget.MouseMove += Widget_MouseMove;
+		//    widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
 
-            if (widget is IDashboardWidget dashboardWidget)
-            {
-                dashboardWidget.DeleteRequested += Widget_DeleteRequested;
-                dashboardWidget.SetEditMode(editMode);
-            }
-        }
-        /// <summary>
-        /// Xử lý sự kiện click để thu gọn/hiện sidebar
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ToggleSidebar_Click(object sender, RoutedEventArgs e)
+		//    if (widget is IDashboardWidget dashboardWidget)
+		//    {
+		//        dashboardWidget.DeleteRequested += Widget_DeleteRequested;
+		//        dashboardWidget.SetEditMode(editMode);
+		//    }
+		//}
+
+		void SetupWidget(FrameworkElement widget) // new
+		{
+			widget.Margin = new Thickness(1, 1, 5, 5);
+			widget.HorizontalAlignment = HorizontalAlignment.Stretch;
+			widget.VerticalAlignment = VerticalAlignment.Stretch;
+
+			widget.Loaded += (s, e) =>
+			{
+				Thumb thumb = null;
+
+				if (widget is IResizableWidget resizable)
+				{
+					thumb = resizable.ResizeThumb;
+				}
+
+				if (thumb != null)
+				{
+					System.Diagnostics.Debug.WriteLine($"SUCCESS: Found ResizeThumb on {widget.GetType().Name}");
+					thumb.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
+
+					thumb.DragDelta -= Thumb_DragDelta;
+					thumb.DragDelta += Thumb_DragDelta;
+				}
+				else
+				{
+					System.Diagnostics.Debug.WriteLine($"ERROR: Still cannot find ResizeThumb on {widget.GetType().Name}");
+				}
+			};
+
+			widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
+			widget.MouseMove += Widget_MouseMove;
+			widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
+
+			if (widget is IDashboardWidget dashboardWidget)
+			{
+				dashboardWidget.DeleteRequested += Widget_DeleteRequested;
+				dashboardWidget.SetEditMode(editMode);
+			}
+		}
+		private void ToggleSidebar_Click(object sender, RoutedEventArgs e)
         {
             if (sidebarCollapsed)
             {
@@ -869,23 +904,24 @@ namespace LightInsight.Dashboard.Dashboard
 
 			return FindParentWidget(parentObject);
 		}
-		private T FindVisualChild<T>(DependencyObject obj, string name) where T : DependencyObject
-        {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-            {
-                DependencyObject child = VisualTreeHelper.GetChild(obj, i);
-                if (child != null && child is T t && (child as FrameworkElement).Name == name)
-                    return t;
+		// old
+		//private T FindVisualChild<T>(DependencyObject obj, string name) where T : DependencyObject 
+		//      {
+		//          for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+		//          {
+		//              DependencyObject child = VisualTreeHelper.GetChild(obj, i);
+		//              if (child != null && child is T t && (child as FrameworkElement).Name == name)
+		//                  return t;
 
-                T childOfChild = FindVisualChild<T>(child, name);
-                if (childOfChild != null)
-                    return childOfChild;
-            }
-            return null;
-        }
+		//              T childOfChild = FindVisualChild<T>(child, name);
+		//              if (childOfChild != null)
+		//                  return childOfChild;
+		//          }
+		//          return null;
+		//      }
 
 
-        bool IsOverlap(FrameworkElement a, FrameworkElement b)
+		bool IsOverlap(FrameworkElement a, FrameworkElement b)
         {
             int r1 = Grid.GetRow(a);
             int c1 = Grid.GetColumn(a);
