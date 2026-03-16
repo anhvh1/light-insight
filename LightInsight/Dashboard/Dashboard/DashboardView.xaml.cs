@@ -64,7 +64,7 @@ namespace LightInsight.Dashboard.Dashboard
             new WidgetItem{ Name="Servers Offline Count", Category="KPI",WidgetType = typeof(ServersOfflineCountWidget)},
             new WidgetItem{ Name="Servers Total", Category="KPI",WidgetType = typeof(TotalServersWidget)},
             new WidgetItem{ Name="Storage Usage by Server", Category="KPI",WidgetType = typeof(StorageUsageWidget)},
-            new WidgetItem{ Name="Temp", Category="Tables",WidgetType = typeof(Temp)},
+            new WidgetItem{ Name="Template", Category="Tables",WidgetType = typeof(Temp)},
         };
         public DashboardView()
         {

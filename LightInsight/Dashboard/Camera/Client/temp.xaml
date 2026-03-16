@@ -4,12 +4,14 @@
              Tag="1x1"             
              Width="Auto" Height="Auto" 
              HorizontalAlignment="Stretch" 
-             VerticalAlignment="Stretch">
+             VerticalAlignment="Stretch"
+             UseLayoutRounding="True"
+             SnapsToDevicePixels="True">
 
-	<Grid>
+	<Grid Margin="5,5,0,0">
         <Border Background="#2D2D30" BorderThickness="1" CornerRadius="6" x:Name="MainBorder">
             <Border.BorderBrush>
-                <VisualBrush>
+                <VisualBrush Stretch="None">
                     <VisualBrush.Visual>
                         <Rectangle Stroke="#E8751A" StrokeDashArray="4 2" StrokeThickness="1" RadiusX="6" RadiusY="6"
                                    Width="{Binding ElementName=MainBorder, Path=ActualWidth}"
@@ -19,7 +21,7 @@
             </Border.BorderBrush>
 
             <Grid>
-                <Border Background="#3E3E42" Height="25" VerticalAlignment="Top" CornerRadius="6,6,0,0">
+                <Border Background="#3E3E42" Height="25" VerticalAlignment="Top" CornerRadius="6,6,6,6">
                     <TextBlock Text="Camera Online Count" Foreground="White" FontSize="14" VerticalAlignment="Center" Margin="10,0"/>
                 </Border>
 
