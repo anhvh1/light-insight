@@ -179,6 +179,7 @@
     <Compile Include="Dashboard\Dashboard\DashboardViewItemManager.cs" />
     <Compile Include="Dashboard\Dashboard\DashboardViewItemWpfUserControl.cs" />
     <Compile Include="Dashboard\Dashboard\IDashboardWidget.cs" />
+    <Compile Include="Dashboard\Dashboard\IResizableWidget.cs" />
     <Compile Include="Dashboard\Dashboard\LightInsightWorkSpacePlugin.cs" />
     <Compile Include="Dashboard\Dashboard\WidgetItem.cs" />
     <Compile Include="Dashboard\RecordingServer\ServersOfflineCountWidget.xaml.cs">

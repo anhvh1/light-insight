@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace LightInsight.Dashboard.Dashboard
 {
-    public interface IDashboardWidget
-    {
-        event EventHandler DeleteRequested;
-
-        void SetEditMode(bool isEdit);
+	internal interface IResizableWidget : IDashboardWidget
+	{
+		int MinCol { get; }
+		int MinRow { get; }
 	}
 }

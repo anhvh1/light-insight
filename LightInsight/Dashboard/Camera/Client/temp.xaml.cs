@@ -19,24 +19,17 @@ namespace LightInsight.Dashboard.Camera.Client
 	/// <summary>
 	/// Interaction logic for CameraOnlineWidget.xaml
 	/// </summary>
-	public partial class Temp : UserControl, IDashboardWidget
+	public partial class Temp : UserControl, IResizableWidget
 	{
 		public event EventHandler DeleteRequested;
-
+		// Set minimum size of the Widget on the Dashboard Grid
+		// default size can be set by the Tag attribute of the UserControl
+		public int MinCol => 2;
+		public int MinRow => 2;
 		public Temp()
 		{
 			InitializeComponent();
 			DeleteButton.Visibility = Visibility.Collapsed;
-			this.Loaded += (s, e) => {
-				if (ResizeThumb != null)
-				{
-					System.Diagnostics.Debug.WriteLine("DEBUG: ResizeThumb found in Widget!");
-				}
-				else
-				{
-					System.Diagnostics.Debug.WriteLine("DEBUG: ResizeThumb NOT found!");
-				}
-			};
 		}
 		public void SetEditMode(bool isEdit)
 		{

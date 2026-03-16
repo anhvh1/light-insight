@@ -822,7 +822,6 @@ namespace LightInsight.Dashboard.Dashboard
 
 			// 'sender' ở đây chính là cái Thumb
 			Thumb thumb = sender as Thumb;
-			// Tìm cái Widget cha chứa cái Thumb này
 			FrameworkElement widget = FindParentWidget(thumb);
 
 			if (widget != null)
@@ -830,16 +829,32 @@ namespace LightInsight.Dashboard.Dashboard
 				double cellWidth = DashboardGrid.ActualWidth / 12;
 				double cellHeight = 80;
 
-				// Tính toán số ô dựa trên kích thước hiện tại + lượng di chuyển chuột
-				int newColSpan = (int)Math.Max(1, Math.Round((widget.ActualWidth + e.HorizontalChange) / cellWidth));
-				int newRowSpan = (int)Math.Max(1, Math.Round((widget.ActualHeight + e.VerticalChange) / cellHeight));
+				// 1. Tính toán Span mong muốn dựa trên vị trí chuột
+				int targetColSpan = (int)Math.Max(1, Math.Round((widget.ActualWidth + e.HorizontalChange) / cellWidth));
+				int targetRowSpan = (int)Math.Max(1, Math.Round((widget.ActualHeight + e.VerticalChange) / cellHeight));
 
-				Grid.SetColumnSpan(widget, newColSpan);
-				Grid.SetRowSpan(widget, newRowSpan);
+				// 2. Lấy giới hạn tối thiểu từ chính Widget đó
+				int finalColSpan = targetColSpan;
+				int finalRowSpan = targetRowSpan;
 
-				widget.Tag = $"{newColSpan}x{newRowSpan}";
+				// Mặc định là 1 cho các Widget cũ chỉ dùng IDashboardWidget
+				int minCol = 1;
+				int minRow = 1;
 
-				System.Diagnostics.Debug.WriteLine($"Resizing: {newColSpan}x{newRowSpan}");
+				// Kiểm tra xem Widget này có "đăng ký" tính năng giới hạn kích thước không
+				if (widget is IResizableWidget resizable)
+				{
+					minCol = resizable.MinCol;
+					minRow = resizable.MinRow;
+					finalColSpan = Math.Max(minCol, targetColSpan);
+					finalRowSpan = Math.Max(minRow, targetRowSpan);
+				}
+				// 3. Cập nhật Layout
+				Grid.SetColumnSpan(widget, finalColSpan);
+				Grid.SetRowSpan(widget, finalRowSpan);
+
+				// Cập nhật Tag để lưu trữ
+				widget.Tag = $"{finalColSpan}x{finalRowSpan}";
 			}
 		}
 
