@@ -1,29 +1,22 @@
 ﻿using LightInsight.Dashboard.Dashboard;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Controls.Primitives;
 
 namespace LightInsight.Dashboard.Camera.Client
 {
     /// <summary>
     /// Interaction logic for TotalCameraCount.xaml
     /// </summary>
-    public partial class TotalCameraCount : UserControl, IDashboardWidget
-    {
+    public partial class TotalCameraCount : UserControl, IResizableWidget
+	{
         public event EventHandler DeleteRequested;
-
-        public TotalCameraCount()
+		public int MinCol => 2;
+		public int MinRow => 2;
+		public Thumb ResizeThumb => this.InternalResizeThumb;
+		public TotalCameraCount()
         {
             InitializeComponent();
             DeleteButton.Visibility = Visibility.Collapsed;

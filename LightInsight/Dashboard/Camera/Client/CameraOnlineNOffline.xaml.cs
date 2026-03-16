@@ -3,16 +3,18 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-
+using System.Windows.Controls.Primitives;
 namespace LightInsight.Dashboard.Camera.Client
 {
 	/// <summary>
 	/// Interaction logic for CameraOnlineOffline.xaml
 	/// </summary>
-	public partial class CameraOnlineNOffline : UserControl, IDashboardWidget
-    {
+	public partial class CameraOnlineNOffline : UserControl, IResizableWidget
+	{
 		public event EventHandler DeleteRequested;
-
+		public int MinCol => 2;
+		public int MinRow => 2;
+		public Thumb ResizeThumb => this.InternalResizeThumb;
 		public CameraOnlineNOffline()
 		{
 			InitializeComponent();
