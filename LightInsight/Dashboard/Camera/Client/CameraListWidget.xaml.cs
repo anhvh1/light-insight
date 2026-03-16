@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using LightInsight.Dashboard.Dashboard;
+using System.Windows.Controls.Primitives;
+
 
 namespace LightInsight.Dashboard.Camera.Client
 {
@@ -29,23 +24,35 @@ namespace LightInsight.Dashboard.Camera.Client
 		public string Recording { get; set; }
 		public string Uptime { get; set; }
 	}
-
-	public partial class CameraListWidget : UserControl, IDashboardWidget
+	public class PageItem
 	{
+		public string Content { get; set; }
+		public bool IsSelected { get; set; }
+		// Ghi đè ToString để Button hiển thị đúng số
+		public override string ToString() => Content;
+	}
+
+	public partial class CameraListWidget : UserControl, IResizableWidget
+	{
+		public int MinCol => 6;
+		public int MinRow => 4;
+		public Thumb ResizeThumb => this.InternalResizeThumb;
+
 		public event EventHandler DeleteRequested;
 		private List<CameraInfo> _allCameras;
-		private int _currentPage = 1;
+		public int _currentPage = 1;
 		private const int MaxPages = 2;
 
 		public CameraListWidget()
 		{
 			InitializeComponent();
 			DeleteButton.Visibility = Visibility.Collapsed;
-			// Tạo dữ liệu mẫu
 			LoadMockData();
 
-			// Mặc định hiển thị trang 1
-			UpdateTable("1");
+			// Thay vì gọi trực tiếp, hãy đợi Widget load xong kích thước
+			this.Loaded += (s, e) => {
+				UpdateTable("1");
+			};
 		}
 		public void SetEditMode(bool isEdit)
 		{
@@ -60,7 +67,7 @@ namespace LightInsight.Dashboard.Camera.Client
 		private void LoadMockData()
 		{
 			_allCameras = new List<CameraInfo>();
-			for (int i = 1; i <= 8; i++)
+			for (int i = 1; i <= 30; i++)
 			{
 				_allCameras.Add(new CameraInfo
 				{
@@ -75,60 +82,83 @@ namespace LightInsight.Dashboard.Camera.Client
 			}
 		}
 
-		private void UpdateTable(string page)
+		private int _totalPages = 1; // Thay cho MaxPages
+
+		public void UpdateTable(string page)
 		{
-			if (page == ">") return; // Tạm thời bỏ qua nút chuyển nhanh
+			if (_allCameras == null) return;
 
-			int pageNum = int.Parse(page);
-			int pageSize = 4; // Mỗi trang hiện 4 dòng
+			// 1. Tính toán PageSize dựa trên chiều cao hiện tại
+			int pageSize = (int)Math.Max(1, Math.Floor((this.ActualHeight - 60) / 30));
 
-			// Lấy dữ liệu theo phân trang
+			// 2. Tính toán lại tổng số trang dựa trên PageSize mới
+			_totalPages = (int)Math.Ceiling((double)_allCameras.Count / pageSize);
+
+			// 3. Đảm bảo trang hiện tại không vượt quá tổng số trang mới
+			if (_currentPage > _totalPages) _currentPage = _totalPages;
+			if (_currentPage < 1) _currentPage = 1;
+
+			int pageNum = (page == ">") ? _currentPage : int.Parse(page);
+
+			// 4. Lấy dữ liệu
 			var pagedData = _allCameras.Skip((pageNum - 1) * pageSize).Take(pageSize).ToList();
-
-			// Đổ dữ liệu vào bảng
 			CameraDataGrid.ItemsSource = pagedData;
+
+			// 5. Cập nhật lại thanh điều hướng (Ẩn/hiện nút số tùy theo _totalPages)
+			UpdatePaginationUI();
 		}
 		private void PageButton_Click(object sender, RoutedEventArgs e)
 		{
 			Button clickedButton = sender as Button;
 			if (clickedButton == null) return;
 
+			// Lấy nội dung (có thể là chuỗi "<", ">" hoặc đối tượng PageItem)
 			string content = clickedButton.Content.ToString();
 
-			// Xử lý logic tính toán số trang
 			if (content == "<")
 			{
 				if (_currentPage > 1) _currentPage--;
 			}
 			else if (content == ">")
 			{
-				if (_currentPage < MaxPages) _currentPage++;
+				if (_currentPage < _totalPages) _currentPage++;
 			}
 			else
 			{
-				_currentPage = int.Parse(content);
+				// Nếu nhấn vào số trang
+				if (int.TryParse(content, out int targetPage))
+				{
+					_currentPage = targetPage;
+				}
 			}
 
-			// Sau khi có số trang mới, cập nhật UI
-			UpdatePaginationUI();
 			UpdateTable(_currentPage.ToString());
+			UpdatePaginationUI();
 		}
 
 		private void UpdatePaginationUI()
 		{
-			var orangeBrush = (Brush)new BrushConverter().ConvertFrom("#E8751A");
-			var darkBrush = (Brush)new BrushConverter().ConvertFrom("#3E3E42");
+			if (PaginationItemsControl == null) return;
 
-			// Reset màu cho tất cả các nút số
-			BtnPage1.Background = darkBrush;
-			BtnPage2.Background = darkBrush;
+			List<PageItem> pageButtons = new List<PageItem>();
 
-			// Tô màu cam cho nút số tương ứng với trang hiện tại
-			if (_currentPage == 1) BtnPage1.Background = orangeBrush;
-			else if (_currentPage == 2) BtnPage2.Background = orangeBrush;
+			for (int i = 1; i <= _totalPages; i++)
+			{
+				pageButtons.Add(new PageItem
+				{
+					Content = i.ToString(),
+					IsSelected = (i == _currentPage)
+				});
+			}
 
-			// In log kiểm tra
-			System.Diagnostics.Debug.WriteLine($"Đang ở trang: {_currentPage}");
+			// Đổ danh sách nút vào ItemsControl
+			PaginationItemsControl.ItemsSource = pageButtons;
+
+			// Cập nhật text Footer
+			if (FooterText != null)
+			{
+				FooterText.Text = $"Showing {CameraDataGrid.Items.Count} of {_allCameras.Count} (Page {_currentPage}/{_totalPages})";
+			}
 		}
 
 		private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)

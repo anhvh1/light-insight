@@ -890,6 +890,10 @@ namespace LightInsight.Dashboard.Dashboard
 
 				// Cập nhật Tag để lưu trữ
 				widget.Tag = $"{finalColSpan}x{finalRowSpan}";
+				if (widget is CameraListWidget listWidget)
+				{
+					listWidget.UpdateTable(listWidget._currentPage.ToString());
+				}
 			}
 		}
 
