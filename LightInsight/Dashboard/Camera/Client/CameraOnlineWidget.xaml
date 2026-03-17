@@ -80,7 +80,8 @@
                                        VerticalAlignment="Center"
                                        Margin="0 0 10 0"/>
 
-					        <TextBlock Text="142"
+					        <TextBlock x:Name="TxtOnlineCount"
+                                       Text="0"
                                        FontSize="32"
                                        FontWeight="Bold"
                                        Foreground="LimeGreen"
@@ -91,9 +92,9 @@
                                    Foreground="LightGray"
                                    FontSize="16"/>
 
-				        <TextBlock Text="↗ 2.3% vs last period"
+				        <!-- <TextBlock Text="↗ 2.3% vs last period"
                                    Foreground="LimeGreen"
-                                   FontSize="12"/>
+                                   FontSize="12"/>  -->
                     </StackPanel>
                 </Viewbox>
 
