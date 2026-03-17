@@ -11,5 +11,5 @@ namespace LightInsight.Dashboard.Dashboard
         event EventHandler DeleteRequested;
 
         void SetEditMode(bool isEdit);
-    }
+	}
 }

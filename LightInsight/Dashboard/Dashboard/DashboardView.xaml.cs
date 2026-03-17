@@ -90,8 +90,8 @@ namespace LightInsight.Dashboard.Dashboard
             new WidgetItem{ Name="Servers Offline Count", Category="KPI",WidgetType = typeof(ServersOfflineCountWidget)},
             new WidgetItem{ Name="Servers Total", Category="KPI",WidgetType = typeof(TotalServersWidget)},
             new WidgetItem{ Name="Storage Usage by Server", Category="KPI",WidgetType = typeof(StorageUsageWidget)},
-            //new WidgetItem{ Name="Temp", Category="Tables",WidgetType = typeof(Temp)},
-		};
+            new WidgetItem{ Name="Template", Category="Tables",WidgetType = typeof(Temp)},
+        };
         public DashboardView()
         {
             // nạp theme hiện tại ngay lúc mở
@@ -118,41 +118,41 @@ namespace LightInsight.Dashboard.Dashboard
                 });
             };
         }
-        private (int colSpan, int rowSpan) CalculateWidgetSpan(FrameworkElement widget)
-        {
-            double cellWidth = DashboardGrid.ActualWidth / 12;
-            double cellHeight = 80;
-
-            double widgetWidth = widget.Width;
-            double widgetHeight = widget.Height;
-
-            int colSpan = (int)Math.Round(widgetWidth / cellWidth);
-            int rowSpan = (int)Math.Ceiling(widgetHeight / cellHeight);
-
-            if (colSpan < 1) colSpan = 1;
-            if (rowSpan < 1) rowSpan = 1;
-
-            return (colSpan, rowSpan);
-        }
-
         //private (int colSpan, int rowSpan) CalculateWidgetSpan(FrameworkElement widget)
         //{
-        //	// Đọc cấu hình từ Tag (ví dụ "2x2", "4x3")
-        //	string config = widget.Tag as string;
+        //    double cellWidth = DashboardGrid.ActualWidth / 12;
+        //    double cellHeight = 80;
 
-        //	if (!string.IsNullOrEmpty(config) && config.Contains("x"))
-        //	{
-        //		var parts = config.Split('x');
-        //		if (parts.Length == 2)
-        //		{
-        //			int cols = int.Parse(parts[0]);
-        //			int rows = int.Parse(parts[1]);
-        //			return (cols, rows);
-        //		}
-        //	}
+        //    double widgetWidth = widget.Width;
+        //    double widgetHeight = widget.Height;
 
-        //	return (2, 2); // Mặc định nếu không có cấu hình
+        //    int colSpan = (int)Math.Round(widgetWidth / cellWidth);
+        //    int rowSpan = (int)Math.Ceiling(widgetHeight / cellHeight);
+
+        //    if (colSpan < 1) colSpan = 1;
+        //    if (rowSpan < 1) rowSpan = 1;
+
+        //    return (colSpan, rowSpan);
         //}
+
+        private (int colSpan, int rowSpan) CalculateWidgetSpan(FrameworkElement widget)
+        {
+            // Đọc cấu hình từ Tag (ví dụ "2x2", "4x3")
+            string config = widget.Tag as string;
+
+            if (!string.IsNullOrEmpty(config) && config.Contains("x"))
+            {
+                var parts = config.Split('x');
+                if (parts.Length == 2)
+                {
+                    int cols = int.Parse(parts[0]);
+                    int rows = int.Parse(parts[1]);
+                    return (cols, rows);
+                }
+            }
+
+            return (2, 2); // Mặc định nếu không có cấu hình
+        }
         private void Filter_Click(object sender, RoutedEventArgs e)
         {
             ToggleButton clickedBtn = sender as ToggleButton;
@@ -822,59 +822,80 @@ namespace LightInsight.Dashboard.Dashboard
 
             return Activator.CreateInstance(widgetType) as FrameworkElement;
         }
-        void SetupWidget(FrameworkElement widget)
-        {
-            widget.Margin = new Thickness(1, 1, 5, 5);
+		//void SetupWidget(FrameworkElement widget)  // old
+		//{
+		//    widget.Margin = new Thickness(1, 1, 5, 5);
 
-            widget.HorizontalAlignment = HorizontalAlignment.Stretch;
-            widget.VerticalAlignment = VerticalAlignment.Stretch;
-            widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
-            widget.MouseMove += Widget_MouseMove;
-            widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
+		//    widget.HorizontalAlignment = HorizontalAlignment.Stretch;
+		//    widget.VerticalAlignment = VerticalAlignment.Stretch;
+		//    widget.Loaded += (s, e) => 
+		//    {
+		//        var thumb = FindVisualChild<Thumb>(widget, "ResizeThumb");
+		//        if (thumb != null)
+		//        {
+		//            System.Diagnostics.Debug.WriteLine($"SUCCESS: Found ResizeThumb on {widget.GetType().Name}");
+		//            thumb.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
 
-            if (widget is IDashboardWidget dashboardWidget)
-            {
-                dashboardWidget.DeleteRequested += Widget_DeleteRequested;
-                dashboardWidget.SetEditMode(editMode);
-            }
-            // Tìm nút ResizeThumb trong Widget
-            var thumb = FindVisualChild<Thumb>(widget, "ResizeThumb");
-            if (thumb != null)
-            {
-                thumb.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
+		//            // Xóa sự kiện cũ (nếu có) để tránh lặp và đăng ký mới
+		//            thumb.DragDelta -= Thumb_DragDelta; 
+		//            thumb.DragDelta += Thumb_DragDelta;
+		//        }
+		//        else
+		//        {
+		//            System.Diagnostics.Debug.WriteLine($"ERROR: Still cannot find ResizeThumb on {widget.GetType().Name}");
+		//        }
+		//    };
+		//    widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
+		//    widget.MouseMove += Widget_MouseMove;
+		//    widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
 
-                thumb.DragDelta += (s, e) => {
-                    if (!editMode) return;
+		//    if (widget is IDashboardWidget dashboardWidget)
+		//    {
+		//        dashboardWidget.DeleteRequested += Widget_DeleteRequested;
+		//        dashboardWidget.SetEditMode(editMode);
+		//    }
+		//}
 
-                    double cellWidth = DashboardGrid.ActualWidth / 12;
-                    double cellHeight = 80;
+		void SetupWidget(FrameworkElement widget) // new
+		{
+			widget.Margin = new Thickness(1, 1, 5, 5);
+			widget.HorizontalAlignment = HorizontalAlignment.Stretch;
+			widget.VerticalAlignment = VerticalAlignment.Stretch;
 
-                    // --- PHẦN DEBUG ---
-                    System.Diagnostics.Debug.WriteLine($"--- RESIZING {widget.GetType().Name} ---");
-                    System.Diagnostics.Debug.WriteLine($"Delta X: {e.HorizontalChange:F2}, Delta Y: {e.VerticalChange:F2}");
-                    System.Diagnostics.Debug.WriteLine($"Actual Size: {widget.ActualWidth:F2}x{widget.ActualHeight:F2}");
-                    System.Diagnostics.Debug.WriteLine($"Cell Size: {cellWidth:F2}x{cellHeight:F2}");
+			widget.Loaded += (s, e) =>
+			{
+				Thumb thumb = null;
 
-                    // Tính toán Span mới
-                    int newColSpan = (int)Math.Max(1, Math.Round((widget.ActualWidth + e.HorizontalChange) / cellWidth));
-                    int newRowSpan = (int)Math.Max(1, Math.Round((widget.ActualHeight + e.VerticalChange) / cellHeight));
+				if (widget is IResizableWidget resizable)
+				{
+					thumb = resizable.ResizeThumb;
+				}
 
-                    System.Diagnostics.Debug.WriteLine($"Calculated Span: {newColSpan}x{newRowSpan}");
+				if (thumb != null)
+				{
+					System.Diagnostics.Debug.WriteLine($"SUCCESS: Found ResizeThumb on {widget.GetType().Name}");
+					thumb.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
 
-                    // Cập nhật giao diện
-                    Grid.SetColumnSpan(widget, newColSpan);
-                    Grid.SetRowSpan(widget, newRowSpan);
+					thumb.DragDelta -= Thumb_DragDelta;
+					thumb.DragDelta += Thumb_DragDelta;
+				}
+				else
+				{
+					System.Diagnostics.Debug.WriteLine($"ERROR: Still cannot find ResizeThumb on {widget.GetType().Name}");
+				}
+			};
 
-                    widget.Tag = $"{newColSpan}x{newRowSpan}";
-                };
-            }
-        }
-        /// <summary>
-        /// Xử lý sự kiện click để thu gọn/hiện sidebar
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ToggleSidebar_Click(object sender, RoutedEventArgs e)
+			widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
+			widget.MouseMove += Widget_MouseMove;
+			widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
+
+			if (widget is IDashboardWidget dashboardWidget)
+			{
+				dashboardWidget.DeleteRequested += Widget_DeleteRequested;
+				dashboardWidget.SetEditMode(editMode);
+			}
+		}
+		private void ToggleSidebar_Click(object sender, RoutedEventArgs e)
         {
             if (sidebarCollapsed)
             {
@@ -895,21 +916,81 @@ namespace LightInsight.Dashboard.Dashboard
 
             sidebarCollapsed = !sidebarCollapsed;
         }
-        private T FindVisualChild<T>(DependencyObject obj, string name) where T : DependencyObject
-        {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-            {
-                DependencyObject child = VisualTreeHelper.GetChild(obj, i);
-                if (child != null && child is T t && (child as FrameworkElement).Name == name)
-                    return t;
+		private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
+		{
+			if (!editMode) return;
 
-                T childOfChild = FindVisualChild<T>(child, name);
-                if (childOfChild != null)
-                    return childOfChild;
-            }
-            return null;
-        }
-        bool IsOverlap(FrameworkElement a, FrameworkElement b)
+			// 'sender' ở đây chính là cái Thumb
+			Thumb thumb = sender as Thumb;
+			FrameworkElement widget = FindParentWidget(thumb);
+
+			if (widget != null)
+			{
+				double cellWidth = DashboardGrid.ActualWidth / 12;
+				double cellHeight = 80;
+
+				// 1. Tính toán Span mong muốn dựa trên vị trí chuột
+				int targetColSpan = (int)Math.Max(1, Math.Round((widget.ActualWidth + e.HorizontalChange) / cellWidth));
+				int targetRowSpan = (int)Math.Max(1, Math.Round((widget.ActualHeight + e.VerticalChange) / cellHeight));
+
+				// 2. Lấy giới hạn tối thiểu từ chính Widget đó
+				int finalColSpan = targetColSpan;
+				int finalRowSpan = targetRowSpan;
+
+				// Mặc định là 1 cho các Widget cũ chỉ dùng IDashboardWidget
+				int minCol = 1;
+				int minRow = 1;
+
+				// Kiểm tra xem Widget này có "đăng ký" tính năng giới hạn kích thước không
+				if (widget is IResizableWidget resizable)
+				{
+					minCol = resizable.MinCol;
+					minRow = resizable.MinRow;
+					finalColSpan = Math.Max(minCol, targetColSpan);
+					finalRowSpan = Math.Max(minRow, targetRowSpan);
+				}
+				// 3. Cập nhật Layout
+				Grid.SetColumnSpan(widget, finalColSpan);
+				Grid.SetRowSpan(widget, finalRowSpan);
+
+				// Cập nhật Tag để lưu trữ
+				widget.Tag = $"{finalColSpan}x{finalRowSpan}";
+				if (widget is CameraListWidget listWidget)
+				{
+					listWidget.UpdateTable(listWidget._currentPage.ToString());
+				}
+			}
+		}
+
+		// Hàm bổ trợ để tìm ngược từ Thumb lên Widget cha
+		private FrameworkElement FindParentWidget(DependencyObject child)
+		{
+			DependencyObject parentObject = VisualTreeHelper.GetParent(child);
+			if (parentObject == null) return null;
+
+			if (parentObject is UserControl || (parentObject is FrameworkElement fe && DashboardGrid.Children.Contains(fe)))
+				return parentObject as FrameworkElement;
+
+			return FindParentWidget(parentObject);
+		}
+		// old
+		//private T FindVisualChild<T>(DependencyObject obj, string name) where T : DependencyObject 
+		//      {
+		//          for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+		//          {
+		//              DependencyObject child = VisualTreeHelper.GetChild(obj, i);
+		//              if (child != null && child is T t && (child as FrameworkElement).Name == name)
+		//                  return t;
+
+		//              T childOfChild = FindVisualChild<T>(child, name);
+		//              if (childOfChild != null)
+		//                  return childOfChild;
+		//          }
+		//          return null;
+		//      }
+
+
+		bool IsOverlap(FrameworkElement a, FrameworkElement b)
         {
             int r1 = Grid.GetRow(a);
             int c1 = Grid.GetColumn(a);

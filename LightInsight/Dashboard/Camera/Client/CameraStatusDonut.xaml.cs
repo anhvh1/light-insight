@@ -3,17 +3,19 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Media3D;
+using System.Windows.Controls.Primitives;
 using LiveCharts;
 using LiveCharts.Wpf;
 using System.Windows.Input;
 
 namespace LightInsight.Dashboard.Camera.Client
 {
-	public partial class CameraStatusDonut : UserControl, IDashboardWidget
+	public partial class CameraStatusDonut : UserControl, IResizableWidget
 	{
 		public event EventHandler DeleteRequested;
-
+		public int MinCol => 2;
+		public int MinRow => 2;
+		public Thumb ResizeThumb => this.InternalResizeThumb;
 		public CameraStatusDonut()
 		{
 			InitializeComponent();

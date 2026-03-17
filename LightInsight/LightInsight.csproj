@@ -41,6 +41,24 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="LiveCharts.Wpf">
       <Version>0.9.7</Version>
@@ -53,6 +71,9 @@
     </PackageReference>
     <PackageReference Include="MaterialDesignThemes">
       <Version>5.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="MilestoneSystems.VideoOS.Platform.SDK">
+      <Version>25.3.2</Version>
     </PackageReference>
     <PackageReference Include="System.Text.Json">
       <Version>10.0.3</Version>
@@ -99,6 +120,7 @@
     <Compile Include="Dashboard\AlarmsAndEvents\LiveAlarmsFeedWidget.xaml.cs">
       <DependentUpon>LiveAlarmsFeedWidget.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dashboard\Camera\CameraServices.cs" />
     <Compile Include="Dashboard\Camera\Client\CameraAnalyticsSummaryWidget.xaml.cs">
       <DependentUpon>CameraAnalyticsSummaryWidget.xaml</DependentUpon>
     </Compile>
@@ -185,6 +207,7 @@
     <Compile Include="Dashboard\Dashboard\DashboardViewItemManager.cs" />
     <Compile Include="Dashboard\Dashboard\DashboardViewItemWpfUserControl.cs" />
     <Compile Include="Dashboard\Dashboard\IDashboardWidget.cs" />
+    <Compile Include="Dashboard\Dashboard\IResizableWidget.cs" />
     <Compile Include="Dashboard\Dashboard\LightInsightWorkSpacePlugin.cs" />
     <Compile Include="Dashboard\Dashboard\Themes\Dark.xaml.cs">
       <DependentUpon>Dark.xaml</DependentUpon>
@@ -275,7 +298,6 @@
     <Resource Include="Resources\DummyItem.png" />
     <Resource Include="Resources\WorkSpaceIcon.png" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Page Include="Dashboard\Camera\Client\CameraOfflineWidget.xaml">
       <Generator>MSBuild:Compile</Generator>

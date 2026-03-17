@@ -4,16 +4,18 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using LightInsight.Dashboard.Dashboard;
-using LiveCharts; // Thêm namespace này
-using LiveCharts.Wpf; // Thêm namespace này
-
+using System.Windows.Controls.Primitives;
+using LiveCharts; 
+using LiveCharts.Wpf;
 namespace LightInsight.Dashboard.Camera.Client
 {
-    public partial class CameraDisconnectionTrend : UserControl, IDashboardWidget
+    public partial class CameraDisconnectionTrend : UserControl, IResizableWidget
     {
         public event EventHandler DeleteRequested;
-
-        public CameraDisconnectionTrend()
+		public int MinCol => 4;
+		public int MinRow => 3;
+		public Thumb ResizeThumb => this.InternalResizeThumb;
+		public CameraDisconnectionTrend()
         {
             InitializeComponent();
             DeleteButton.Visibility = Visibility.Collapsed;
@@ -37,8 +39,9 @@ namespace LightInsight.Dashboard.Camera.Client
                     Fill = Brushes.Transparent, // Không đổ màu vùng dưới đường line
                     PointGeometrySize = 8, // Kích thước điểm chấm
                     PointForeground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F44336")),
-                    LineSmoothness = 1 // Tạo đường cong spline mượt mà
-                }
+                    LineSmoothness = 1, // Tạo đường cong spline mượt mà
+					DataLabels = true
+				}
             };
         }
 
