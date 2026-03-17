@@ -1,5 +1,6 @@
 ﻿using LightInsight.Dashboard.AlarmsAndEvents;
 using LightInsight.Dashboard.Camera.Client;
+using LightInsight.Dashboard.Dashboard.Workspace;
 using LightInsight.Dashboard.RecordingServer;
 using System;
 using System.Collections.Generic;
@@ -976,6 +977,11 @@ namespace LightInsight.Dashboard.Dashboard
             {
                 AddMoreRows(10);
             }
+        }
+        private void WorkspaceBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var win = new LightInsight.Dashboard.Dashboard.Workspace.WorkspaceWindow();
+            win.ShowDialog();
         }
 
     }

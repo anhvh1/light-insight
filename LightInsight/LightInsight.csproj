@@ -45,6 +45,12 @@
     <PackageReference Include="LiveCharts.Wpf">
       <Version>0.9.7</Version>
     </PackageReference>
+    <PackageReference Include="MahApps.Metro.IconPacks">
+      <Version>6.2.1</Version>
+    </PackageReference>
+    <PackageReference Include="MahApps.Metro.IconPacks.FontAwesome">
+      <Version>6.2.1</Version>
+    </PackageReference>
     <PackageReference Include="MaterialDesignThemes">
       <Version>5.3.0</Version>
     </PackageReference>
@@ -181,6 +187,17 @@
     <Compile Include="Dashboard\Dashboard\IDashboardWidget.cs" />
     <Compile Include="Dashboard\Dashboard\LightInsightWorkSpacePlugin.cs" />
     <Compile Include="Dashboard\Dashboard\WidgetItem.cs" />
+    <Compile Include="Dashboard\Dashboard\Workspace\AddWorkspaceWindow.xaml.cs">
+      <DependentUpon>AddWorkspaceWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Dashboard\Workspace\WorkspaceModel.cs">
+      <Generator>MSBuild:Compile</Generator>
+    </Compile>
+    <Compile Include="Dashboard\Dashboard\Workspace\WorkspaceService.cs" />
+    <Compile Include="Dashboard\Dashboard\Workspace\WorkspaceStorage.cs" />
+    <Compile Include="Dashboard\Dashboard\Workspace\WorkspaceWindow.xaml.cs">
+      <DependentUpon>WorkspaceWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\RecordingServer\ServersOfflineCountWidget.xaml.cs">
       <DependentUpon>ServersOfflineCountWidget.xaml</DependentUpon>
     </Compile>
@@ -200,6 +217,14 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="LightInsightDefinition.cs" />
+    <Page Include="Dashboard\Dashboard\Workspace\AddWorkspaceWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\Dashboard\Workspace\WorkspaceWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dashboard\RecordingServer\ServersOfflineCountWidget.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

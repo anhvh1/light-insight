@@ -33,47 +33,178 @@ Background="#1E1E1E"
 
         <!-- ================= TOP BAR ================= -->
 
-        <Border Grid.Column="0"
-            Grid.ColumnSpan="3"
-            Background="#2B2B2B"
-            Padding="10">
+        <Border Grid.Row="0"
+        Grid.Column="0"
+        Grid.ColumnSpan="3"
+        Background="#2B2B2B"
+        Padding="10,5">
 
             <DockPanel LastChildFill="False">
+
                 <!-- LEFT AREA -->
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                <StackPanel Orientation="Horizontal"
+                    DockPanel.Dock="Left"
+                    VerticalAlignment="Center">
+
                     <!-- LOGO -->
-                    <Border Height="30" Margin="5,0,20,0" CornerRadius="8" Background="Transparent">
-                        <Image Source="/LightInsight;component/Dashboard/Asset/logo.png" Stretch="Uniform"/>
+                    <Border Height="30"
+                    Margin="5,0,20,0"
+                    CornerRadius="6">
+
+                        <Image Source="/LightInsight;component/Dashboard/Asset/logo.png"
+                       Stretch="Uniform"/>
                     </Border>
+
                     <!-- BREADCRUMB -->
-                    <TextBlock x:Name="BreadcrumbText" Text="Dashboard" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="White"/>
+                    <TextBlock x:Name="BreadcrumbText"
+                       Text="Dashboard > Operations"
+                       FontSize="16"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center"
+                       Foreground="White"/>
                 </StackPanel>
+
+
                 <!-- RIGHT AREA -->
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                <StackPanel Orientation="Horizontal"
+                    DockPanel.Dock="Right"
+                    VerticalAlignment="Center">
+
+                    <!-- WORKSPACE -->
+                    <Button x:Name="WorkspaceBtn"
+                            Height="30"
+                            Margin="5"
+                            Click="WorkspaceBtn_Click"
+                            Background="#3498DB"
+                            Foreground="White"
+                            Padding="12,4"
+                            BorderThickness="0">
+
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Center">
+
+                            <TextBlock Text="⚙"
+                                       FontSize="14"
+                                       Margin="0,0,6,0"
+                                       VerticalAlignment="Center"/>
+
+                            <TextBlock Text="Workspace"
+                                       VerticalAlignment="Center"/>
+
+                        </StackPanel>
+
+                    </Button>
                     <!-- EDIT LAYOUT -->
-                    <Button x:Name="EditLayoutBtn" Content="Edit Layout" Width="90" Margin="5" Click="EditLayoutBtn_Click" Background="Orange"/>
+                    <Button x:Name="EditLayoutBtn"
+                    Height="30"
+                    Margin="5"
+                    Click="EditLayoutBtn_Click"
+                    Background="#F39C12"
+                    Foreground="White"
+                    Padding="12,4"
+                    BorderThickness="0">
+
+                        <StackPanel Orientation="Horizontal"
+                            VerticalAlignment="Center">
+
+                            <TextBlock Text="✏"
+                               FontSize="14"
+                               Margin="0,0,6,0"
+                               VerticalAlignment="Center"/>
+
+                            <TextBlock Text="Edit Layout"
+                               VerticalAlignment="Center"/>
+
+                        </StackPanel>
+
+                    </Button>
+
+
                     <!-- SAVE -->
-                    <Button x:Name="SaveBtn" Content="Save" Width="60"  Margin="5" Visibility="Collapsed" Click="SaveBtn_Click" Background="#33CC66"/>
+                    <Button x:Name="SaveBtn"
+                    Content="Save"
+                    Height="30"
+                    Margin="5"
+                    Visibility="Collapsed"
+                    Click="SaveBtn_Click"
+                    Background="#33CC66"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Padding="10,4"/>
+
+
                     <!-- CANCEL -->
-                    <Button x:Name="CancelBtn" Content="Cancel" Width="80" Margin="5" Visibility="Collapsed" Click="CancelBtn_Click" Background="OrangeRed"/>
+                    <Button x:Name="CancelBtn"
+                    Content="Cancel"
+                    Height="30"
+                    Margin="5"
+                    Visibility="Collapsed"
+                    Click="CancelBtn_Click"
+                    Background="OrangeRed"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Padding="10,4"/>
+
+
                     <!-- TIME RANGE -->
-                    <ComboBox x:Name="TimeRangeCombo" Width="80" Margin="5" SelectedIndex="1" BorderThickness="0"  Background="Transparent">
+                    <ComboBox x:Name="TimeRangeCombo"
+                      Width="95"
+                      Height="30"
+                      Margin="5"
+                      SelectedIndex="1"
+                      BorderThickness="0">
+
                         <ComboBoxItem Content="Last 24h"/>
                         <ComboBoxItem Content="Last 7 days"/>
                         <ComboBoxItem Content="Last 30 days"/>
                         <ComboBoxItem Content="Custom"/>
+
                     </ComboBox>
-                    <!-- THEME BUTTON -->
-                    <Button x:Name="ThemeBtn" Content="🌙" Width="40" Margin="5" Click="ThemeBtn_Click"  BorderThickness="0" MinWidth="0" MinHeight="0"  Background="Transparent"/>
+
+
+                    <!-- THEME -->
+                    <Button x:Name="ThemeBtn"
+                    Content="🌙"
+                    Width="36"
+                    Height="30"
+                    Margin="5"
+                    Click="ThemeBtn_Click"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    MinWidth="0" 
+                    MinHeight="0"
+                    Foreground="White"/>
+
+
                     <!-- LANGUAGE -->
-                    <ComboBox x:Name="LanguageCombo" Width="40" Margin="5" SelectionChanged="LanguageCombo_SelectionChanged" BorderThickness="0">
+                    <ComboBox x:Name="LanguageCombo"
+                      Width="40"
+                      Height="30"
+                      Margin="5"
+                      BorderThickness="0"
+                      SelectionChanged="LanguageCombo_SelectionChanged">
                         <ComboBoxItem Content="EN"/>
                         <ComboBoxItem Content="VI"/>
                     </ComboBox>
+
+
                     <!-- REFRESH -->
-                    <Button x:Name="RefreshBtn" Content="🔄" Width="35" Margin="5" Click="RefreshBtn_Click" BorderThickness="0" Background="Transparent" Foreground="White" MinWidth="0" MinHeight="0"/>
+                    <Button x:Name="RefreshBtn"
+                    Content="🔄"
+                    Width="36"
+                    Height="30"
+                    Margin="5"
+                    Click="RefreshBtn_Click"
+                    Background="Transparent"
+                    Foreground="White"
+                    BorderThickness="0"
+                    MinWidth="0" 
+                    MinHeight="0"/>
+
                 </StackPanel>
+
             </DockPanel>
+
         </Border>
 
 

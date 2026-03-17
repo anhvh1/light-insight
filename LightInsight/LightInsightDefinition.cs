@@ -1,9 +1,11 @@
 using LightInsight.Dashboard.Dashboard;
+using MahApps.Metro.IconPacks;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
@@ -27,15 +29,22 @@ namespace LightInsight
     {
         private List<WorkSpacePlugin> _workSpacePlugins = new List<WorkSpacePlugin>();
         private List<ViewItemPlugin> _workSpaceViewItemPlugins = new List<ViewItemPlugin>();
+        public static List<PackIconMaterialKind> IconList { get; private set; }
         public override Guid Id => new Guid("55A448B4-4487-4BEF-9DBC-892C14F7D3C0");
 
         public override string Name => "Light Insight";
 
         public override Image Icon => throw new NotImplementedException();
-
+        private static void LoadIcons()
+        {
+            IconList = Enum.GetValues(typeof(PackIconMaterialKind))
+                .Cast<PackIconMaterialKind>()
+                .ToList();
+        }
         public override void Init()
         {
-           
+            LoadIcons();
+
             if (EnvironmentManager.Instance.EnvironmentType == EnvironmentType.SmartClient)
             {
                 _workSpacePlugins.Add(new LightInsightWorkSpacePlugin());
