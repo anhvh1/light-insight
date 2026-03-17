@@ -186,6 +186,12 @@
     <Compile Include="Dashboard\Dashboard\DashboardViewItemWpfUserControl.cs" />
     <Compile Include="Dashboard\Dashboard\IDashboardWidget.cs" />
     <Compile Include="Dashboard\Dashboard\LightInsightWorkSpacePlugin.cs" />
+    <Compile Include="Dashboard\Dashboard\Themes\Dark.xaml.cs">
+      <DependentUpon>Dark.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Dashboard\Themes\Light.xaml.cs">
+      <DependentUpon>Light.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\Dashboard\WidgetItem.cs" />
     <Compile Include="Dashboard\Dashboard\Workspace\AddWorkspaceWindow.xaml.cs">
       <DependentUpon>AddWorkspaceWindow.xaml</DependentUpon>
@@ -217,6 +223,14 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="LightInsightDefinition.cs" />
+    <Page Include="Dashboard\Dashboard\Themes\Dark.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dashboard\Dashboard\Themes\Light.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Dashboard\Dashboard\Workspace\AddWorkspaceWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

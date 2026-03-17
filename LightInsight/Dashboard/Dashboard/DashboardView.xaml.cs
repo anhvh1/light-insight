@@ -4,6 +4,8 @@ using LightInsight.Dashboard.Dashboard.Workspace;
 using LightInsight.Dashboard.RecordingServer;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -19,16 +21,23 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using VideoOS.Platform.Client;
+using VideoOS.Platform;
 using Path = System.IO.Path;
+using VideoOS.Platform.Messaging;
+using System.Threading;
 
 namespace LightInsight.Dashboard.Dashboard
 {
     /// <summary>
     /// Interaction logic for DashboardView.xaml
     /// </summary>
-    public partial class DashboardView : UserControl
+    public partial class DashboardView : UserControl, INotifyPropertyChanged
     {
+        private ResourceDictionary _currentThemeDictionary;
+        private object _themeChangedRegistration;
         bool editMode = false;
+        private bool _isDirty = false;
         private Point startPoint;
         Button currentMenu = null;
         string currentDashboard = "Operations";
@@ -37,7 +46,23 @@ namespace LightInsight.Dashboard.Dashboard
         bool isDraggingWidget = false;
         bool isDark = true;
         string currentFilter = null;
+        //public ObservableCollection<WorkspaceModel> DashboardMenus { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
 
+        void OnPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        private ObservableCollection<WorkspaceModel> _dashboardMenus;
+        public ObservableCollection<WorkspaceModel> DashboardMenus
+        {
+            get => _dashboardMenus;
+            set
+            {
+                _dashboardMenus = value;
+                OnPropertyChanged(nameof(DashboardMenus));
+            }
+        }
         // khai báo widget mẫu để hiển thị trong thư viện widget library
         List<WidgetItem> allWidgets = new List<WidgetItem>()
         {
@@ -69,13 +94,29 @@ namespace LightInsight.Dashboard.Dashboard
 		};
         public DashboardView()
         {
+            // nạp theme hiện tại ngay lúc mở
+            ApplySmartClientTheme(ClientControl.Instance?.Theme);
+
+            // đăng ký nghe sự kiện đổi theme
+            _themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
+                new MessageReceiver(OnThemeChanged),
+                new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
+            LoadSidebar();
+
             InitializeComponent();
-            OpenDashboard(OperationsBtn);
+            //OpenDashboard(OperationsBtn);
             TimeRangeCombo.SelectedIndex = 0;
             LanguageCombo.SelectedIndex = 0;
             ThemeBtn.Content = "🌙";
             WidgetList.ItemsSource = allWidgets;
             LoadLayout();
+            WorkspaceService.Instance.OnWorkspaceChanged += () =>
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    LoadSidebar();
+                });
+            };
         }
         private (int colSpan, int rowSpan) CalculateWidgetSpan(FrameworkElement widget)
         {
@@ -282,39 +323,59 @@ namespace LightInsight.Dashboard.Dashboard
 
             if (item.Content.ToString() == "VI")
             {
-                OperationsText.Text = " Vận hành";
-                AlarmMonitorText.Text = " Giám sát cảnh báo";
+                //OperationsText.Text = " Vận hành";
+                //AlarmMonitorText.Text = " Giám sát cảnh báo";
             }
             else
             {
-                OperationsText.Text = " Operations";
-                AlarmMonitorText.Text = " Alarm Monitor";
+                //OperationsText.Text = " Operations";
+                //AlarmMonitorText.Text = " Alarm Monitor";
             }
         }
+        //private void Menu_Click(object sender, RoutedEventArgs e)
+        //{
+        //    OpenDashboard(sender as Button);
+        //}
         private void Menu_Click(object sender, RoutedEventArgs e)
         {
-            OpenDashboard(sender as Button);
+            var item = (sender as FrameworkElement)?.DataContext as WorkspaceModel;
+
+            if (item == null)
+                return;
+
+            OpenDashboard(item);
+            ExitEditMode();
         }
-        void OpenDashboard(Button btn)
+        //void OpenDashboard(Button btn)
+        //{
+        //    SelectMenu(btn);
+
+        //    currentDashboard = btn.Tag.ToString();
+
+        //    string parent = DashboardExpander.Header.ToString();
+        //    string child = btn.Tag.ToString().Trim();
+        //    BreadcrumbText.Text = $"{parent} > {child}";
+
+        //    LoadLayout();
+        //}
+        //void SelectMenu(Button btn)
+        //{
+        //    if (currentMenu != null)
+        //        currentMenu.Background = Brushes.Transparent;
+
+        //    btn.Background = Brushes.DodgerBlue;
+
+        //    currentMenu = btn;
+        //}
+        private void OpenDashboard(WorkspaceModel item)
         {
-            SelectMenu(btn);
+            if (!ConfirmBeforeLeave())
+                return;
+            currentDashboard = item.Name;
 
-            currentDashboard = btn.Tag.ToString();
-
-            string parent = DashboardExpander.Header.ToString();
-            string child = btn.Tag.ToString().Trim();
-            BreadcrumbText.Text = $"{parent} > {child}";
+            BreadcrumbText.Text = $"Dashboard > {item.Name}";
 
             LoadLayout();
-        }
-        void SelectMenu(Button btn)
-        {
-            if (currentMenu != null)
-                currentMenu.Background = Brushes.Transparent;
-
-            btn.Background = Brushes.DodgerBlue;
-
-            currentMenu = btn;
         }
         private void Widget_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -325,6 +386,7 @@ namespace LightInsight.Dashboard.Dashboard
         private void EditLayoutBtn_Click(object sender, RoutedEventArgs e)
         {
             editMode = true;
+            _isDirty = false;
             InitGrid();
             CreateGrid();
             GridOverlay.Visibility = Visibility.Visible;
@@ -438,6 +500,7 @@ namespace LightInsight.Dashboard.Dashboard
 
         private void DashboardGrid_Drop(object sender, DragEventArgs e)
         {
+            _isDirty = true;
             if (!editMode)
                 return;
 
@@ -552,6 +615,7 @@ namespace LightInsight.Dashboard.Dashboard
         /// <param name="newLayouts"></param>
         void SaveLayout(List<WidgetLayout> newLayouts)
         {
+            _isDirty = false;
             string folder = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
                 "LightInsight");
@@ -816,16 +880,16 @@ namespace LightInsight.Dashboard.Dashboard
             {
                 SidebarColumn.Width = new GridLength(220);
 
-                OperationsText.Visibility = Visibility.Visible;
-                AlarmMonitorText.Visibility = Visibility.Visible;
+                //OperationsText.Visibility = Visibility.Visible;
+                //AlarmMonitorText.Visibility = Visibility.Visible;
                 DashboardExpander.Header = "Dashboard";
             }
             else
             {
-                SidebarColumn.Width = new GridLength(80);
+                SidebarColumn.Width = new GridLength(60);
 
-                OperationsText.Visibility = Visibility.Collapsed;
-                AlarmMonitorText.Visibility = Visibility.Collapsed;
+                //OperationsText.Visibility = Visibility.Collapsed;
+                //AlarmMonitorText.Visibility = Visibility.Collapsed;
                 DashboardExpander.Header = "";
             }
 
@@ -983,6 +1047,117 @@ namespace LightInsight.Dashboard.Dashboard
             var win = new LightInsight.Dashboard.Dashboard.Workspace.WorkspaceWindow();
             win.ShowDialog();
         }
+        private void LoadSidebar()
+        {
+            var root = FindById(WorkspaceService.Instance.Workspaces, "ROOT_DASHBOARD");
+
+            if (root != null)
+            {
+                DashboardMenus = root.Children; // 🔥 dùng trực tiếp reference
+                DataContext = this;
+            }
+        }
+        private WorkspaceModel FindById(IEnumerable<WorkspaceModel> list, string id)
+        {
+            foreach (var item in list)
+            {
+                if (item.Id == id)
+                    return item;
+
+                var found = FindById(item.Children, id);
+                if (found != null)
+                    return found;
+            }
+
+            return null;
+        }
+        private object OnThemeChanged(Message message, FQID dest, FQID sender)
+        {
+            var theme = message?.Data as Theme;
+            ApplySmartClientTheme(theme);
+            return null;
+        }
+
+        private void ApplySmartClientTheme(Theme scTheme)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                var themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Dark.xaml";
+                var crTheme = ClientControl.Instance.Theme.ThemeType;
+                //if (scTheme != null && scTheme.ThemeType == ThemeType.Light)
+                if (crTheme == ThemeType.Light)
+                    themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Light.xaml";
+
+                var newDict = new ResourceDictionary { Source = new Uri(themeUri, UriKind.RelativeOrAbsolute) };
+
+                if (_currentThemeDictionary != null)
+                    Resources.MergedDictionaries.Remove(_currentThemeDictionary);
+
+                Resources.MergedDictionaries.Insert(0, newDict);
+                _currentThemeDictionary = newDict;
+
+                //_vm?.SetThemeResources(Resources);
+                //_vm?.RefreshChartTheme();
+            });
+        }
+        //public void SetThemeResources(ResourceDictionary resources)
+        //{
+        //    _currentThemeDictionary = resources;
+        //}
+        private bool ConfirmBeforeLeave()
+        {
+            if (!editMode || !_isDirty)
+                return true;
+
+            var result = MessageBox.Show(
+                "Bạn có thay đổi chưa lưu. Bạn muốn lưu không?",
+                "Cảnh báo",
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                List<WidgetLayout> layouts = new List<WidgetLayout>();
+
+                foreach (UIElement child in DashboardGrid.Children)
+                {
+                    if (child is FrameworkElement widget)
+                    {
+                        WidgetLayout layout = new WidgetLayout
+                        {
+                            Dashboard = currentDashboard,
+                            Type = widget.GetType().Name,
+                            Row = Grid.GetRow(widget),
+                            Column = Grid.GetColumn(widget),
+                            RowSpan = Grid.GetRowSpan(widget),
+                            ColumnSpan = Grid.GetColumnSpan(widget)
+                        };
+
+                        layouts.Add(layout);
+                    }
+                }
+
+                SaveLayout(layouts);
+                ExitEditMode();
+                return true;
+            }
+            else if (result == MessageBoxResult.No)
+            {
+                // discard
+                return true;
+            }
+            else
+            {
+                return false; // cancel
+            }
+        }
+        private void Back_Click(object sender, RoutedEventArgs e)
+        {
+            if (!ConfirmBeforeLeave())
+                return;
+
+            // xử lý back
+        }       
 
     }
 

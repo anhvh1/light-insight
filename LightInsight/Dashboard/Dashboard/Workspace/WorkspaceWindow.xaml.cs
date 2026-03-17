@@ -51,17 +51,41 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
             }
         }
 
+        //private void AddWorkspace_Click(object sender, RoutedEventArgs e)
+        //{
+        //    var parent = WorkspaceTree.SelectedItem as WorkspaceModel;
+        //    if (parent == null)
+        //    { parent = WorkspaceService.Instance.Workspaces.FirstOrDefault(x => x.Id == "ROOT_DASHBOARD"); }
+        //    AddWorkspaceWindow win = new AddWorkspaceWindow();
+        //    win.Owner = this;
+        //    if (win.ShowDialog() == true)
+        //    {
+        //        WorkspaceService.Instance.AddWorkspace(win.WorkspaceLabel, win.WorkspaceIcon, win.WorkspaceType, parent);
+        //        //LoadWorkspaces();
+        //        WorkspaceService.Instance.NotifyChanged();
+        //    }
+        //}
         private void AddWorkspace_Click(object sender, RoutedEventArgs e)
         {
-            var parent = WorkspaceTree.SelectedItem as WorkspaceModel;
-            if (parent == null)
-            { parent = WorkspaceService.Instance.Workspaces.FirstOrDefault(x => x.Id == "ROOT_DASHBOARD"); }
+            var root = WorkspaceService.Instance.Workspaces
+                .FirstOrDefault(x => x.Id == "ROOT_DASHBOARD");
+
+            if (root == null)
+                return;
+
             AddWorkspaceWindow win = new AddWorkspaceWindow();
             win.Owner = this;
+
             if (win.ShowDialog() == true)
             {
-                WorkspaceService.Instance.AddWorkspace(win.WorkspaceLabel, win.WorkspaceIcon, win.WorkspaceType, parent);
-                LoadWorkspaces();
+                WorkspaceService.Instance.AddWorkspace(
+                    win.WorkspaceLabel,
+                    win.WorkspaceIcon,
+                    win.WorkspaceType,
+                    root // 🔥 LUÔN là root
+                );
+
+                WorkspaceService.Instance.NotifyChanged();
             }
         }
         private void DeleteWorkspace_Click(object sender, RoutedEventArgs e)
@@ -84,9 +108,9 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
             }
 
             WorkspaceService.Instance.Save();
-
+            WorkspaceService.Instance.NotifyChanged();
             // refresh lại tree
-            LoadWorkspaces();
+            //LoadWorkspaces();
         }
         private WorkspaceModel FindParent(IEnumerable<WorkspaceModel> list, WorkspaceModel child)
         {
@@ -139,7 +163,9 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
                 WorkspaceService.Instance.Save();
 
                 // refresh lại tree
-                LoadWorkspaces();
+                //LoadWorkspaces();
+                // ✅ gọi event để dashboard biết
+                WorkspaceService.Instance.NotifyChanged();
             }
         }
         private void WorkspaceTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)

@@ -1,0 +1,73 @@
+﻿<ResourceDictionary x:Class="LightInsight.Dashboard.Dashboard.Themes.Light"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ===== Surfaces & Text ===== -->
+    <SolidColorBrush x:Key="BgMain"        Color="#F6F8FC"/>
+    <SolidColorBrush x:Key="CardBg"        Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="TextPrimary"   Color="#0F172A"/>
+    <SolidColorBrush x:Key="TextSecondary" Color="#475569"/>
+
+    <!-- ===== Accents (đậm hơn để nổi bật) ===== -->
+    <SolidColorBrush x:Key="AccentBlue"    Color="#1D4ED8"/>
+    <SolidColorBrush x:Key="AccentGreen"   Color="#15803D"/>
+    <SolidColorBrush x:Key="AccentPurple"  Color="#6D28D9"/>
+    <SolidColorBrush x:Key="AccentOrange"  Color="#C2410C"/>
+    <SolidColorBrush x:Key="AccentCyan"    Color="#0EA5E9"/>
+
+    <!-- ===== Status ===== -->
+    <SolidColorBrush x:Key="StatusOnline"  Color="#16A34A"/>
+    <SolidColorBrush x:Key="StatusOffline" Color="#DC2626"/>
+
+    <!-- ===== Buttons ===== -->
+    <SolidColorBrush x:Key="ButtonBg"        Color="#EEF2F6"/>
+    <SolidColorBrush x:Key="ButtonBgHover"   Color="#E2E8F0"/>
+    <SolidColorBrush x:Key="ButtonBgPressed" Color="#CBD5E1"/>
+
+    <!-- ===== Hover & Borders ===== -->
+    <SolidColorBrush x:Key="ItemHoverBg"    Color="#F8FAFC"/>
+    <SolidColorBrush x:Key="RowHoverBg"     Color="#EDF2F7"/>
+    <SolidColorBrush x:Key="SeparatorBrush" Color="#E5E7EB"/>
+
+    <!-- ===== Card border + shadow ===== -->
+    <SolidColorBrush x:Key="CardBorder" Color="#CBD5E1"/>
+    <Thickness x:Key="CardBorderThickness">1</Thickness>
+    <DropShadowEffect x:Key="CardShadow" Color="#33000000" BlurRadius="12" ShadowDepth="1" Opacity="0.25"/>
+
+    <!-- ===== Icon backgrounds ===== -->
+    <SolidColorBrush x:Key="IconBgDevices"  Color="#DBEAFE"/>
+    <SolidColorBrush x:Key="IconBgVisitor"  Color="#DCFCE7"/>
+    <SolidColorBrush x:Key="IconBgVehicles" Color="#EDE9FE"/>
+    <SolidColorBrush x:Key="IconBgWarning"  Color="#FEF3C7"/>
+
+    <!-- ===== Status tiles / badges ===== -->
+    <SolidColorBrush x:Key="StatusTileOkBg"     Color="#E8F9ED"/>
+    <SolidColorBrush x:Key="StatusTileErrorBg"  Color="#FEE2E2"/>
+    <SolidColorBrush x:Key="BadgeErrorBg"       Color="#FCA5A5"/>
+    <SolidColorBrush x:Key="BadgeErrorText"     Color="#7F1D1D"/>
+
+    <!-- ===== Sub-stat cards (Đã đăng ký / Tổng số ...) ===== -->
+    <SolidColorBrush x:Key="StatPanelBg"     Color="#EEF2FF"/>
+    <SolidColorBrush x:Key="StatPanelBorder" Color="#1E40AF"/>
+    <SolidColorBrush x:Key="StatPanelText"   Color="#1E3A8A"/>
+    <SolidColorBrush x:Key="StatPanelValue"  Color="#2563EB"/>
+
+    <!-- ===== Table ===== -->
+    <SolidColorBrush x:Key="TableHeaderBg"   Color="#F1F5F9"/>
+    <SolidColorBrush x:Key="TableHeaderText" Color="#334155"/>
+    <SolidColorBrush x:Key="TableRowAltBg"   Color="#FAFBFD"/>
+
+    <!-- ===== LiveCharts ===== -->
+    <SolidColorBrush x:Key="ChartGuestStroke"    Color="#0284C7"/>
+    <SolidColorBrush x:Key="ChartGuestFill"      Color="#660284C7"/>
+    <SolidColorBrush x:Key="ChartVehicleStroke"  Color="#059669"/>
+    <SolidColorBrush x:Key="ChartVehicleFill"    Color="#66059669"/>
+    <SolidColorBrush x:Key="ChartEventStroke"    Color="#B45309"/>
+    <SolidColorBrush x:Key="ChartEventFill"      Color="#66B45309"/>
+    <SolidColorBrush x:Key="ChartGridBrush"      Color="#E2E8F0"/>
+
+    <!-- ===== Logo - chỉ dùng nền đỡ cho logo trắng ===== -->
+    <SolidColorBrush x:Key="LogoPlateBg" Color="#F1F5F9"/>
+    <ImageSource x:Key="CompanyLogo">/LightInsight;component/Dashboard/Asset/logo.png"</ImageSource>
+
+</ResourceDictionary>

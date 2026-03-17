@@ -22,7 +22,7 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
         /// <summary>
         /// Load workspace list từ file
         /// </summary>
-        public static List<WorkspaceModel> LoadWorkspaces()
+        public static  List<WorkspaceModel> LoadWorkspaces()
         {
             EnsureStorage();
 

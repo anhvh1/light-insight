@@ -1,4 +1,5 @@
 using LightInsight.Dashboard.Dashboard;
+using LightInsight.Dashboard.Dashboard.Workspace;
 using MahApps.Metro.IconPacks;
 using System;
 using System.Collections.Generic;
@@ -43,8 +44,10 @@ namespace LightInsight
         }
         public override void Init()
         {
+            // load trước icon
             LoadIcons();
-
+            // load trước dữ liệu trong workspace
+            WorkspaceService.Instance.Load();
             if (EnvironmentManager.Instance.EnvironmentType == EnvironmentType.SmartClient)
             {
                 _workSpacePlugins.Add(new LightInsightWorkSpacePlugin());
