@@ -80,7 +80,8 @@
                                        VerticalAlignment="Center"
                                        Margin="0 0 10 0"/>
 
-                            <TextBlock Text="150"
+                            <TextBlock x:Name="TxtTotalCount"
+                                       Text="0"
                                        FontSize="32"
                                        FontWeight="Bold"
                                        Foreground="#7DB8FF"

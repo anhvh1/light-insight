@@ -22,7 +22,7 @@
 
 		    <Grid>
 			    <Border Background="#3E3E42" Height="25" VerticalAlignment="Top" CornerRadius="6,6,6,6">
-				    <TextBlock Text="Camera Analytics Summary" Foreground="White" FontSize="14" VerticalAlignment="Center"/>
+				    <TextBlock Text="Camera Offline Widget" Foreground="White" FontSize="14" VerticalAlignment="Center"/>
 			    </Border>
 
                 <Button x:Name="DeleteButton" 
@@ -79,7 +79,8 @@
                                         VerticalAlignment="Center"
                                         Margin="0 0 10 0"/>
 
-                            <TextBlock Text="8"
+                            <TextBlock  x:Name="TxtOfflineCount"
+                                        Text="0"
                                         FontSize="32"
                                         FontWeight="Bold"
                                         Foreground="#FF8080"
@@ -89,10 +90,10 @@
                             <TextBlock Text="Cameras Offline"
                                         Foreground="LightGray"
                                         FontSize="16"/>
-
+                            <!--
                             <TextBlock Text="↘ 15% vs last period"
                                         Foreground="#EF4444" 
-                                        FontSize="12"/>
+                                        FontSize="12"/> -->
                         </StackPanel>
                 </Viewbox>
 
