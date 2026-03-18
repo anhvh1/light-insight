@@ -23,7 +23,7 @@
 
 		    <Grid>
 			    <Border Background="#3E3E42" Height="25" VerticalAlignment="Top" CornerRadius="6,6,6,6">
-				    <TextBlock Text="Camera Analytics Summary" Foreground="White" FontSize="14" VerticalAlignment="Center"/>
+				    <TextBlock Text="Camera Status Donut" Foreground="White" FontSize="14" VerticalAlignment="Center"/>
 			    </Border>
 
                 <Button x:Name="DeleteButton" 

@@ -7,6 +7,7 @@ using LiveCharts.Wpf;
 using LiveCharts;
 using LightInsight.Dashboard.Dashboard;
 using System.Windows.Input;
+using System.Windows.Controls.Primitives;
 
 namespace LightInsight.Dashboard.RecordingServer
 {
@@ -16,7 +17,7 @@ namespace LightInsight.Dashboard.RecordingServer
         public int UsedPercentage { get; set; }
     }
 
-    public partial class StorageUsageWidget : UserControl, IDashboardWidget
+    public partial class StorageUsageWidget : UserControl, IResizableWidget
     {
         public event EventHandler DeleteRequested;
 
@@ -24,6 +25,12 @@ namespace LightInsight.Dashboard.RecordingServer
         private List<string> _xAxisLabels = new List<string>();
 
         private SolidColorBrush _barColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#2ECC71");
+
+        public int MinCol => 4;
+
+        public int MinRow => 3;
+
+        public Thumb ResizeThumb => this.InternalResizeThumb;
 
         public StorageUsageWidget()
         {

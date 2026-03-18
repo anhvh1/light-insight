@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using LightInsight.Dashboard.Dashboard;
 using LiveCharts.Wpf;
 using LiveCharts;
+using System.Windows.Controls.Primitives;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {
@@ -24,7 +25,7 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         public int Alarms { get; set; }
     }
 
-    public partial class EventTrendChartWidget : UserControl, IDashboardWidget
+    public partial class EventTrendChartWidget : UserControl, IResizableWidget
     {
         public event EventHandler DeleteRequested;
 
@@ -32,6 +33,12 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         private List<string> _xAxisLabels = new List<string>();
 
         private SolidColorBrush _lineColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#FFA500");
+
+        public int MinCol => 4;
+
+        public int MinRow => 3;
+
+        public Thumb ResizeThumb => this.InternalResizeThumb;
 
         public EventTrendChartWidget()
         {

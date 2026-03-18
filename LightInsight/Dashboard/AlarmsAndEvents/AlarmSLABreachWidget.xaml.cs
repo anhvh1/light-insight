@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -22,8 +23,14 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         public int TrendPercentage { get; set; }
         public bool IsTrendUp { get; set; }
     }
-    public partial class AlarmSLABreachWidget : UserControl, IDashboardWidget
+    public partial class AlarmSLABreachWidget : UserControl, IResizableWidget
     {
+        public int MinCol => 2;
+
+        public int MinRow => 2;
+
+        public Thumb ResizeThumb => this.InternalResizeThumb;
+
         public event EventHandler DeleteRequested;
 
         public AlarmSLABreachWidget()

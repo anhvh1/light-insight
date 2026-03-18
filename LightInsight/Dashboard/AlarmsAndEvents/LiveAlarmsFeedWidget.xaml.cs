@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using LightInsight.Dashboard.Dashboard;
 
@@ -52,8 +53,14 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         public string BottomLineColor => IsLastItem ? "Transparent" : "#2A2B31";
     }
 
-    public partial class LiveAlarmsFeedWidget : UserControl, IDashboardWidget
+    public partial class LiveAlarmsFeedWidget : UserControl, IResizableWidget
     {
+        public int MinCol => 3;
+
+        public int MinRow => 4;
+
+        public Thumb ResizeThumb => this.InternalResizeThumb;
+
         public event EventHandler DeleteRequested;
 
         public LiveAlarmsFeedWidget()

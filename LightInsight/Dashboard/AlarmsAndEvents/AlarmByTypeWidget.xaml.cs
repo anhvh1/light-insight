@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using LightInsight.Dashboard.Dashboard;
 using LiveCharts.Wpf;
 using LiveCharts;
+using System.Windows.Controls.Primitives;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {
@@ -24,10 +25,13 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         public int Count { get; set; }
     }
 
-    public partial class AlarmByTypeWidget : UserControl, IDashboardWidget
+    public partial class AlarmByTypeWidget : UserControl, IResizableWidget
     {
         public event EventHandler DeleteRequested;
+        public int MinCol => 3;
+        public int MinRow => 2;
 
+        public Thumb ResizeThumb => this.InternalResizeThumb;
         // Chuyển sang biến nội bộ cho gọn, không cần Public nữa
         private SeriesCollection _chartSeries = new SeriesCollection();
         private List<string> _xAxisLabels = new List<string>();

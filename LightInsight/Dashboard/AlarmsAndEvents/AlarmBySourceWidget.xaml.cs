@@ -7,6 +7,7 @@ using LiveCharts.Wpf;
 using LiveCharts;
 using LightInsight.Dashboard.Dashboard;
 using System.Windows.Input;
+using System.Windows.Controls.Primitives;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {
@@ -17,7 +18,7 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         public int Count { get; set; }
     }
 
-    public partial class AlarmBySourceWidget : UserControl, IDashboardWidget
+    public partial class AlarmBySourceWidget : UserControl, IResizableWidget
     {
         public event EventHandler DeleteRequested;
 
@@ -27,6 +28,12 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         private SolidColorBrush _defaultColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#E87E14");
         private SolidColorBrush _hoverColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#F5A623");
         private System.Windows.Shapes.Rectangle _lastHoveredRect = null;
+
+        public int MinCol => 4;
+
+        public int MinRow => 4;
+
+        public Thumb ResizeThumb => this.InternalResizeThumb;
 
         public AlarmBySourceWidget()
         {
