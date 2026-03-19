@@ -29,6 +29,8 @@ using System.Threading;
 using VideoOS.Platform.OAuth;
 using Microsoft.Identity.Client;
 using System.Configuration;
+using System.Security.AccessControl;
+using System.Security.Principal;
 
 
 namespace LightInsight.Dashboard.Dashboard
@@ -107,10 +109,7 @@ namespace LightInsight.Dashboard.Dashboard
             _themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
                 new MessageReceiver(OnThemeChanged),
                 new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
-
-
             LoadSidebar();
-
             InitializeComponent();
             //OpenDashboard(OperationsBtn);
             TimeRangeCombo.SelectedIndex = 0;
@@ -717,8 +716,8 @@ namespace LightInsight.Dashboard.Dashboard
             {
                 WriteIndented = true
             });
-
             File.WriteAllText(filePath, json);
+            SetFilePermissionForAllUsers(filePath);
         }
         /// <summary>
         /// Load layout từ file JSON và hiển thị trên dashboard
@@ -1331,7 +1330,33 @@ namespace LightInsight.Dashboard.Dashboard
                 .OfType<FrameworkElement>()
                 .Any(x => x.GetType() == widgetType);
         }
+        void SetFilePermissionForAllUsers(string filePath)
+        {
+            try
+            {
+                var fileInfo = new FileInfo(filePath);
+                var fileSecurity = fileInfo.GetAccessControl();
 
-   
+                // Group "Users"
+                var users = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
+
+                var rule = new FileSystemAccessRule(
+                    users,
+                    FileSystemRights.Read | FileSystemRights.Write | FileSystemRights.Modify,
+                    InheritanceFlags.None,
+                    PropagationFlags.NoPropagateInherit,
+                    AccessControlType.Allow);
+
+                fileSecurity.AddAccessRule(rule);
+
+                fileInfo.SetAccessControl(fileSecurity);
+            }
+            catch (Exception ex)
+            {
+                // log nếu cần
+                System.Diagnostics.Debug.WriteLine("Set permission failed: " + ex.Message);
+            }
+        }
+
     }
 }

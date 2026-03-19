@@ -13,16 +13,15 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
     public static class WorkspaceStorage
     {
         private static string folder = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-                "LightInsight");
+            Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+            "LightInsight");
 
-        private static string file =
-            Path.Combine(folder, "workspace.json");
+        private static string file = Path.Combine(folder, "workspace.json");
 
         /// <summary>
         /// Load workspace list từ file
         /// </summary>
-        public static  List<WorkspaceModel> LoadWorkspaces()
+        public static List<WorkspaceModel> LoadWorkspaces()
         {
             EnsureStorage();
 
@@ -46,8 +45,7 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
         /// </summary>
         public static void SaveWorkspaces(ObservableCollection<WorkspaceModel> list)
         {
-            if (!Directory.Exists(folder))
-                Directory.CreateDirectory(folder);
+            EnsureStorage();
 
             string json = JsonSerializer.Serialize(list, new JsonSerializerOptions
             {
@@ -55,6 +53,37 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
             });
 
             File.WriteAllText(file, json);
+        }
+
+        /// <summary>
+        /// Đảm bảo storage tồn tại (folder + permission + file)
+        /// </summary>
+        private static void EnsureStorage()
+        {
+            // 1. Tạo folder nếu chưa có
+            if (!Directory.Exists(folder))
+            {
+                DirectoryInfo dir = Directory.CreateDirectory(folder);
+                SetFolderPermission(dir);
+            }
+
+            // 2. Tạo file nếu chưa có
+            if (!File.Exists(file))
+            {
+                using (File.Create(file)) { }
+
+                // 3. Set quyền cho file
+                SetFilePermission(file);
+
+                // 4. Ghi dữ liệu mặc định
+                var defaultData = CreateDefault();
+                string json = JsonSerializer.Serialize(defaultData, new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                });
+
+                File.WriteAllText(file, json);
+            }
         }
 
         /// <summary>
@@ -92,29 +121,49 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
                 });
             }
         }
-        private static void EnsureStorage()
+        private static void SetFolderPermission(DirectoryInfo dir)
         {
-            if (!Directory.Exists(folder))
+            try
             {
-                DirectoryInfo dir = Directory.CreateDirectory(folder);
+                var security = dir.GetAccessControl();
 
-                DirectorySecurity security = dir.GetAccessControl();
+                var users = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
 
-                security.AddAccessRule(
-                    new FileSystemAccessRule(
-                        new SecurityIdentifier(WellKnownSidType.WorldSid, null),
-                        FileSystemRights.FullControl,
-                        InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
-                        PropagationFlags.None,
-                        AccessControlType.Allow));
+                var rule = new FileSystemAccessRule(
+                    users,
+                    FileSystemRights.Read | FileSystemRights.Write | FileSystemRights.Modify,
+                    InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+                    PropagationFlags.None,
+                    AccessControlType.Allow);
 
+                security.AddAccessRule(rule);
                 dir.SetAccessControl(security);
             }
-
-            if (!File.Exists(file))
+            catch (Exception ex)
             {
-                var list = CreateDefault();
-                SaveWorkspaces(new ObservableCollection<WorkspaceModel>(list));
+                System.Diagnostics.Debug.WriteLine("Set folder permission failed: " + ex.Message);
+            }
+        }
+        private static void SetFilePermission(string filePath)
+        {
+            try
+            {
+                var fileInfo = new FileInfo(filePath);
+                var fileSecurity = fileInfo.GetAccessControl();
+
+                var users = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
+
+                var rule = new FileSystemAccessRule(
+                    users,
+                    FileSystemRights.Read | FileSystemRights.Write | FileSystemRights.Modify,
+                    AccessControlType.Allow);
+
+                fileSecurity.AddAccessRule(rule);
+                fileInfo.SetAccessControl(fileSecurity);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Set file permission failed: " + ex.Message);
             }
         }
     }
