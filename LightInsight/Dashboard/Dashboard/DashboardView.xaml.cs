@@ -1,4 +1,4 @@
-﻿using LightInsight.Dashboard.AlarmsAndEvents;
+using LightInsight.Dashboard.AlarmsAndEvents;
 using LightInsight.Dashboard.Camera.Client;
 using LightInsight.Dashboard.Dashboard.Workspace;
 using LightInsight.Dashboard.RecordingServer;
@@ -116,6 +116,7 @@ namespace LightInsight.Dashboard.Dashboard
             TimeRangeCombo.SelectedIndex = 0;
             //LanguageCombo.SelectedIndex = 0;
             //ThemeBtn.Content = "🌙";
+            LocalizeWidgetNames();
             WidgetList.ItemsSource = allWidgets;
             LoadLayout();
             WorkspaceService.Instance.OnWorkspaceChanged += () =>
@@ -125,6 +126,61 @@ namespace LightInsight.Dashboard.Dashboard
                     LoadSidebar();
                 });
             };
+        }
+        private void LocalizeWidgetNames()
+        {
+            string GetText(string key, string fallback)
+            {
+                return TryFindResource(key) as string ?? fallback;
+            }
+
+            foreach (var w in allWidgets)
+            {
+                if (w.WidgetType == typeof(CameraOnlineWidget))
+                    w.Name = GetText("WidgetName_CameraOnlineCount", w.Name);
+                else if (w.WidgetType == typeof(CameraOfflineWidget))
+                    w.Name = GetText("WidgetName_CameraOfflineCount", w.Name);
+                else if (w.WidgetType == typeof(TotalCameraCount))
+                    w.Name = GetText("WidgetName_CameraTotalCount", w.Name);
+                else if (w.WidgetType == typeof(CameraOnlineNOffline))
+                    w.Name = GetText("WidgetName_CameraOnlinePlusOffline", w.Name);
+                else if (w.WidgetType == typeof(CameraStatusDonut))
+                    w.Name = GetText("WidgetName_CameraStatusDonut", w.Name);
+                else if (w.WidgetType == typeof(CameraOfflineDurationTop10))
+                    w.Name = GetText("WidgetName_CameraOfflineDurationTop10", w.Name);
+                else if (w.WidgetType == typeof(CameraDisconnectionTrend))
+                    w.Name = GetText("WidgetName_CameraDisconnectionTrend", w.Name);
+                else if (w.WidgetType == typeof(CameraAnalyticsSummaryWidget))
+                    w.Name = GetText("WidgetName_CameraAnalyticsSummary", w.Name);
+                else if (w.WidgetType == typeof(CameraListWidget))
+                    w.Name = GetText("WidgetName_CameraList", w.Name);
+                else if (w.WidgetType == typeof(CameraHealthScoreWidget))
+                    w.Name = GetText("WidgetName_CameraHealthScore", w.Name);
+                else if (w.WidgetType == typeof(LiveAlarmsFeedWidget))
+                    w.Name = GetText("WidgetName_LiveAlarmFeed", w.Name);
+                else if (w.WidgetType == typeof(AlarmBySeverityWidget))
+                    w.Name = GetText("WidgetName_AlarmBySeverity", w.Name);
+                else if (w.WidgetType == typeof(AlarmDailyCountWidget))
+                    w.Name = GetText("WidgetName_AlarmDailyCount", w.Name);
+                else if (w.WidgetType == typeof(AlarmBySourceWidget))
+                    w.Name = GetText("WidgetName_AlarmBySource", w.Name);
+                else if (w.WidgetType == typeof(AlarmByTypeWidget))
+                    w.Name = GetText("WidgetName_AlarmByType", w.Name);
+                else if (w.WidgetType == typeof(AlarmSLABreachWidget))
+                    w.Name = GetText("WidgetName_AlarmSLABreach", w.Name);
+                else if (w.WidgetType == typeof(EventTrendChartWidget))
+                    w.Name = GetText("WidgetName_EventTrendChart", w.Name);
+                else if (w.WidgetType == typeof(ServersOnlineCountWidget))
+                    w.Name = GetText("WidgetName_ServersOnlineCount", w.Name);
+                else if (w.WidgetType == typeof(ServersOfflineCountWidget))
+                    w.Name = GetText("WidgetName_ServersOfflineCount", w.Name);
+                else if (w.WidgetType == typeof(TotalServersWidget))
+                    w.Name = GetText("WidgetName_ServersTotal", w.Name);
+                else if (w.WidgetType == typeof(StorageUsageWidget))
+                    w.Name = GetText("WidgetName_StorageUsageByServer", w.Name);
+                else if (w.WidgetType == typeof(Temp))
+                    w.Name = GetText("WidgetName_Template", w.Name);
+            }
         }
         //private (int colSpan, int rowSpan) CalculateWidgetSpan(FrameworkElement widget)
         //{

@@ -85,7 +85,7 @@
                                VerticalAlignment="Center"/>
 				        </StackPanel>
 
-				        <TextBlock Text="Health Score"
+				        <TextBlock Text="{DynamicResource Camera_Label_HealthScore}"
                            Foreground="{DynamicResource TextPrimary}"
                            FontSize="16"/>
 

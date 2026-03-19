@@ -45,7 +45,7 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Column="0"
-                               Text="Storage Usage by Server"
+                               Text="{DynamicResource Recording_Title_StorageUsageByServer}"
                                Foreground="{DynamicResource TextPrimary}"
                                FontSize="16"
                                FontWeight="SemiBold"

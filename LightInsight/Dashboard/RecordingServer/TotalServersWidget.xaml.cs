@@ -18,6 +18,7 @@ using LightInsight.Dashboard.Dashboard;
 using VideoOS.Platform;
 using VideoOS.Platform.Client;
 using VideoOS.Platform.Messaging;
+using System.Threading;
 
 namespace LightInsight.Dashboard.RecordingServer
 {
@@ -40,6 +41,7 @@ namespace LightInsight.Dashboard.RecordingServer
 
         public TotalServersWidget()
         {
+            ApplySmartClientLanguage(Thread.CurrentThread.CurrentUICulture.Name);
             InitializeComponent();
             ApplySmartClientTheme(ClientControl.Instance?.Theme);
             _themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
@@ -48,6 +50,20 @@ namespace LightInsight.Dashboard.RecordingServer
             DeleteButton.Visibility = Visibility.Collapsed;
 
             LoadData();
+        }
+        private void ApplySmartClientLanguage(string name)
+        {
+            var uri = name == "vi-VN"
+                       ? "/LightInsight;component/Dashboard/Dashboard/Language/Vi.xaml"
+                       : "/LightInsight;component/Dashboard/Dashboard/Language/English.xaml";
+
+            var dict = new ResourceDictionary
+            {
+                Source = new Uri(uri, UriKind.Relative)
+            };
+
+            Resources.MergedDictionaries.Clear();
+            Resources.MergedDictionaries.Add(dict);
         }
 
         private object OnThemeChanged(Message message, FQID dest, FQID sender)

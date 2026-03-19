@@ -1,4 +1,4 @@
-﻿<ResourceDictionary  x:Class="LightInsight.Dashboard.Dashboard.Language.Vi"
+<ResourceDictionary  x:Class="LightInsight.Dashboard.Dashboard.Language.Vi"
                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
@@ -29,5 +29,72 @@
     <sys:String x:Key="Charts">Biểu đồ</sys:String>
     <sys:String x:Key="Tables">Bảng</sys:String>
     <sys:String x:Key="Lists">Danh sách</sys:String>
+
+    <!-- DashboardView widget names (from DashboardView.xaml.cs) -->
+    <sys:String x:Key="WidgetName_CameraOnlineCount">Số camera trực tuyến</sys:String>
+    <sys:String x:Key="WidgetName_CameraOfflineCount">Số camera ngoại tuyến</sys:String>
+    <sys:String x:Key="WidgetName_CameraTotalCount">Tổng số camera</sys:String>
+    <sys:String x:Key="WidgetName_CameraOnlinePlusOffline">Camera trực tuyến + ngoại tuyến</sys:String>
+    <sys:String x:Key="WidgetName_CameraStatusDonut">Biểu đồ trạng thái camera</sys:String>
+    <sys:String x:Key="WidgetName_CameraOfflineDurationTop10">Thời lượng camera ngoại tuyến top 10</sys:String>
+    <sys:String x:Key="WidgetName_CameraDisconnectionTrend">Xu hướng mất kết nối camera</sys:String>
+    <sys:String x:Key="WidgetName_CameraAnalyticsSummary">Tổng quan phân tích camera</sys:String>
+    <sys:String x:Key="WidgetName_CameraList">Danh sách camera</sys:String>
+    <sys:String x:Key="WidgetName_CameraHealthScore">Điểm sức khỏe camera</sys:String>
+    <sys:String x:Key="WidgetName_LiveAlarmFeed">Luồng cảnh báo trực tiếp</sys:String>
+    <sys:String x:Key="WidgetName_AlarmBySeverity">Cảnh báo theo mức độ</sys:String>
+    <sys:String x:Key="WidgetName_AlarmDailyCount">Số cảnh báo theo ngày</sys:String>
+    <sys:String x:Key="WidgetName_AlarmBySource">Cảnh báo theo nguồn</sys:String>
+    <sys:String x:Key="WidgetName_AlarmByType">Cảnh báo theo loại</sys:String>
+    <sys:String x:Key="WidgetName_AlarmSLABreach">Vi phạm SLA cảnh báo</sys:String>
+    <sys:String x:Key="WidgetName_EventTrendChart">Biểu đồ xu hướng sự kiện</sys:String>
+    <sys:String x:Key="WidgetName_ServersOnlineCount">Số máy chủ trực tuyến</sys:String>
+    <sys:String x:Key="WidgetName_ServersOfflineCount">Số máy chủ ngoại tuyến</sys:String>
+    <sys:String x:Key="WidgetName_ServersTotal">Tổng số máy chủ</sys:String>
+    <sys:String x:Key="WidgetName_StorageUsageByServer">Mức sử dụng lưu trữ theo máy chủ</sys:String>
+    <sys:String x:Key="WidgetName_Template">Mẫu</sys:String>
+
+    <!-- Camera labels -->
+    <sys:String x:Key="Camera_Title_AnalyticsSummary">Tổng quan phân tích camera</sys:String>
+    <sys:String x:Key="Camera_Title_DisconnectionTrend">Xu hướng mất kết nối camera</sys:String>
+    <sys:String x:Key="Camera_Title_OfflineDurationTop10">Thời lượng camera ngoại tuyến top 10</sys:String>
+    <sys:String x:Key="Camera_Title_StatusDonut">Biểu đồ trạng thái camera</sys:String>
+    <sys:String x:Key="Camera_Label_HealthScore">Điểm sức khỏe</sys:String>
+    <sys:String x:Key="Camera_Label_TotalCameras">Tổng số camera</sys:String>
+    <sys:String x:Key="Camera_Label_CamerasOnline">Camera trực tuyến</sys:String>
+    <sys:String x:Key="Camera_Label_CamerasOffline">Camera ngoại tuyến</sys:String>
+    <sys:String x:Key="Camera_Label_OnlineOffline">Trực tuyến / Ngoại tuyến</sys:String>
+    <sys:String x:Key="Camera_Filter_All8">Tất cả (8)</sys:String>
+    <sys:String x:Key="Camera_Filter_Online6">Trực tuyến (6)</sys:String>
+    <sys:String x:Key="Camera_Filter_Offline2">Ngoại tuyến (2)</sys:String>
+    <sys:String x:Key="Camera_GridHeader_ID">ID</sys:String>
+    <sys:String x:Key="Camera_GridHeader_NAME">TÊN</sys:String>
+    <sys:String x:Key="Camera_GridHeader_STATUS">TRẠNG THÁI</sys:String>
+    <sys:String x:Key="Camera_GridHeader_IP">IP</sys:String>
+    <sys:String x:Key="Camera_GridHeader_RECORDING">GHI HÌNH</sys:String>
+    <sys:String x:Key="Camera_GridHeader_UPTIME">THỜI GIAN HOẠT ĐỘNG</sys:String>
+    <sys:String x:Key="Camera_Label_Showing0Of0">Hiển thị 0 trên 0</sys:String>
+    <sys:String x:Key="Camera_Template_Title">Widget mẫu có thể đổi kích thước</sys:String>
+    <sys:String x:Key="Camera_Template_Text">Văn bản</sys:String>
+    <sys:String x:Key="Camera_Template_Widget">Widget mẫu</sys:String>
+
+    <!-- Alarms and Events labels -->
+    <sys:String x:Key="Alarm_Title_LiveAlarmsFeed">Luồng cảnh báo trực tiếp</sys:String>
+    <sys:String x:Key="Alarm_Title_BySeverity">Cảnh báo theo mức độ</sys:String>
+    <sys:String x:Key="Alarm_Title_ByType">Cảnh báo theo loại</sys:String>
+    <sys:String x:Key="Alarm_Title_BySource">Cảnh báo theo nguồn</sys:String>
+    <sys:String x:Key="Alarm_Title_DailyCount">Số cảnh báo theo ngày</sys:String>
+    <sys:String x:Key="Alarm_Title_SLABreach">Vi phạm SLA cảnh báo</sys:String>
+    <sys:String x:Key="Alarm_Title_EventTrendChart">Biểu đồ xu hướng sự kiện</sys:String>
+    <sys:String x:Key="Alarm_Label_SLABreaches">Số vi phạm SLA</sys:String>
+
+    <!-- Recording Server labels -->
+    <sys:String x:Key="Recording_Title_ServersOnlineCount">Số máy chủ trực tuyến</sys:String>
+    <sys:String x:Key="Recording_Title_ServersOfflineCount">Số máy chủ ngoại tuyến</sys:String>
+    <sys:String x:Key="Recording_Title_TotalServers">Tổng số máy chủ</sys:String>
+    <sys:String x:Key="Recording_Title_StorageUsageByServer">Mức sử dụng lưu trữ theo máy chủ</sys:String>
+    <sys:String x:Key="Recording_Label_ServersOnline">Máy chủ trực tuyến</sys:String>
+    <sys:String x:Key="Recording_Label_ServersOffline">Máy chủ ngoại tuyến</sys:String>
+    <sys:String x:Key="Recording_Label_TotalServers">Tổng số máy chủ</sys:String>
 
 </ResourceDictionary>

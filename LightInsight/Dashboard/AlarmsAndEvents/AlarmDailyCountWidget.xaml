@@ -35,7 +35,7 @@
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0" Background="{DynamicResource BgMain}">
-                    <TextBlock Text="Alarms Daily Count"
+                    <TextBlock Text="{DynamicResource Alarm_Title_DailyCount}"
                                Foreground="{DynamicResource TextPrimary}"
                                FontSize="14"
                                VerticalAlignment="Center"

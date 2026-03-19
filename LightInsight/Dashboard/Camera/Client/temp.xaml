@@ -25,7 +25,7 @@
 
             <Grid>
                 <Border Background="{DynamicResource BgMain}" Height="25" VerticalAlignment="Top" CornerRadius="6,6,6,6">
-                    <TextBlock Text="Resizable template widget" Foreground="{DynamicResource TextPrimary}" FontSize="14" VerticalAlignment="Center" Margin="10,0"/>
+                    <TextBlock Text="{DynamicResource Camera_Template_Title}" Foreground="{DynamicResource TextPrimary}" FontSize="14" VerticalAlignment="Center" Margin="10,0"/>
                 </Border>
 
                 <Button x:Name="DeleteButton" 
@@ -79,7 +79,7 @@
                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE722;" FontSize="24" Foreground="#60A5FA" VerticalAlignment="Center" Margin="0,0,10,0"/>
                             <TextBlock Text="Text" FontSize="32" FontWeight="Bold" Foreground="#60A5FA" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <TextBlock Text="Template Widget" Foreground="{DynamicResource TextPrimary}" FontSize="16"/>
+                        <TextBlock Text="{DynamicResource Camera_Template_Widget}" Foreground="{DynamicResource TextPrimary}" FontSize="16"/>
                         <TextBlock Text="↗ 2.3% small text and number" Foreground="#60A5FA" FontSize="12"/>
                     </StackPanel>
                 </Viewbox>

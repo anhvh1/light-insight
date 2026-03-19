@@ -124,9 +124,9 @@
 
                     <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,10">
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                            <RadioButton Content="All (8)" Style="{StaticResource TabButtonStyle}" IsChecked="True" Margin="0,0,5,0"/>
-                            <RadioButton Content="Online (6)" Style="{StaticResource TabButtonStyle}" Margin="0,0,5,0"/>
-                            <RadioButton Content="Offline (2)" Style="{StaticResource TabButtonStyle}"/>
+                            <RadioButton Content="{DynamicResource Camera_Filter_All8}" Style="{StaticResource TabButtonStyle}" IsChecked="True" Margin="0,0,5,0"/>
+                            <RadioButton Content="{DynamicResource Camera_Filter_Online6}" Style="{StaticResource TabButtonStyle}" Margin="0,0,5,0"/>
+                            <RadioButton Content="{DynamicResource Camera_Filter_Offline2}" Style="{StaticResource TabButtonStyle}"/>
                         </StackPanel>
                         <Border DockPanel.Dock="Right" Background="{DynamicResource BgMain}" CornerRadius="4" Width="180" Height="22">
                             <Grid>
@@ -144,8 +144,8 @@
                               HeadersVisibility="Column"
                               HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding ID}" Width="80"/>
-                            <DataGridTextColumn Header="NAME" Binding="{Binding Name}" Width="*"/> <DataGridTemplateColumn Header="STATUS" Width="90">
+                            <DataGridTextColumn Header="{DynamicResource Camera_GridHeader_ID}" Binding="{Binding ID}" Width="80"/>
+                            <DataGridTextColumn Header="{DynamicResource Camera_GridHeader_NAME}" Binding="{Binding Name}" Width="*"/> <DataGridTemplateColumn Header="{DynamicResource Camera_GridHeader_STATUS}" Width="90">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border Background="{Binding StatusColor}" CornerRadius="2" Padding="5,1" HorizontalAlignment="Center">
@@ -154,14 +154,14 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="IP" Binding="{Binding IP}" Width="120"/>
-                            <DataGridTextColumn Header="RECORDING" Binding="{Binding Recording}" Width="90"/>
-                            <DataGridTextColumn Header="UPTIME" Binding="{Binding Uptime}" Width="70"/>
+                            <DataGridTextColumn Header="{DynamicResource Camera_GridHeader_IP}" Binding="{Binding IP}" Width="120"/>
+                            <DataGridTextColumn Header="{DynamicResource Camera_GridHeader_RECORDING}" Binding="{Binding Recording}" Width="90"/>
+                            <DataGridTextColumn Header="{DynamicResource Camera_GridHeader_UPTIME}" Binding="{Binding Uptime}" Width="70"/>
                         </DataGrid.Columns>
                     </DataGrid>
 
                     <DockPanel Grid.Row="2" Margin="0,5,0,0">
-                       <TextBlock x:Name="FooterText" Text="Showing 0 of 0" Foreground="{DynamicResource TextPrimary}" FontSize="11" VerticalAlignment="Center"/>
+                       <TextBlock x:Name="FooterText" Text="{DynamicResource Camera_Label_Showing0Of0}" Foreground="{DynamicResource TextPrimary}" FontSize="11" VerticalAlignment="Center"/>
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
                             <Button Content="&lt;" Style="{StaticResource PageButtonStyle}" Click="PageButton_Click"/>
 

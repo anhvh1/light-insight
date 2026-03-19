@@ -37,7 +37,7 @@
 
                 <!-- HEADER -->
                 <Grid Grid.Row="0" Background="{DynamicResource BgMain}">
-                    <TextBlock Text="Alarm SLA Breach"
+                    <TextBlock Text="{DynamicResource Alarm_Title_SLABreach}"
                                Foreground="{DynamicResource TextPrimary}"
                                FontSize="14"
                                VerticalAlignment="Center"
@@ -111,7 +111,7 @@
                                            Foreground="#2ECC71"/>
                             </StackPanel>
 
-                            <TextBlock Text="SLA Breaches"
+                            <TextBlock Text="{DynamicResource Alarm_Label_SLABreaches}"
                                        Foreground="{DynamicResource TextPrimary}"
                                        FontSize="16"
                                        Margin="0,5,0,5"/>

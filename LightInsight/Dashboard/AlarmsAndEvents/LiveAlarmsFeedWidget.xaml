@@ -37,7 +37,7 @@
 
                 <!-- HEADER -->
                 <Grid Grid.Row="0" Background="{DynamicResource BgMain}">
-                    <TextBlock Text="Live Alarms Feed"
+                    <TextBlock Text="{DynamicResource Alarm_Title_LiveAlarmsFeed}"
                                Foreground="{DynamicResource TextPrimary}"
                                FontSize="14"
                                VerticalAlignment="Center"

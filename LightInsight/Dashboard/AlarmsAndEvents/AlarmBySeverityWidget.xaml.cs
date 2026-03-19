@@ -11,6 +11,7 @@ using LightInsight.Dashboard.Dashboard;
 using VideoOS.Platform;
 using VideoOS.Platform.Client;
 using VideoOS.Platform.Messaging;
+using System.Threading;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {
@@ -48,6 +49,7 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
 
         public AlarmBySeverityWidget()
         {
+            ApplySmartClientLanguage(Thread.CurrentThread.CurrentUICulture.Name);
             InitializeComponent();
             ApplySmartClientTheme(ClientControl.Instance?.Theme);
             _themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
@@ -56,6 +58,20 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
             DeleteButton.Visibility = Visibility.Collapsed;
             this.Loaded += AlarmBySeverityWidget_Loaded;
             this.DataContext = this;
+        }
+        private void ApplySmartClientLanguage(string name)
+        {
+            var uri = name == "vi-VN"
+                       ? "/LightInsight;component/Dashboard/Dashboard/Language/Vi.xaml"
+                       : "/LightInsight;component/Dashboard/Dashboard/Language/English.xaml";
+
+            var dict = new ResourceDictionary
+            {
+                Source = new Uri(uri, UriKind.Relative)
+            };
+
+            Resources.MergedDictionaries.Clear();
+            Resources.MergedDictionaries.Add(dict);
         }
 
         private void AlarmBySeverityWidget_Loaded(object sender, RoutedEventArgs e)

@@ -36,7 +36,7 @@
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0" Background="{DynamicResource BgMain}">
-                    <TextBlock Text="Alarms by Severity"
+                    <TextBlock Text="{DynamicResource Alarm_Title_BySeverity}"
                                Foreground="{DynamicResource TextPrimary}"
                                FontSize="14"
                                VerticalAlignment="Center"

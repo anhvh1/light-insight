@@ -43,7 +43,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="Event Trend Chart"
+                    <TextBlock Text="{DynamicResource Alarm_Title_EventTrendChart}"
                                Foreground="{DynamicResource TextPrimary}"
                                FontSize="14"
                                VerticalAlignment="Center"

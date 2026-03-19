@@ -7,6 +7,7 @@ using System.Windows.Controls.Primitives;
 using VideoOS.Platform;
 using VideoOS.Platform.Client;
 using VideoOS.Platform.Messaging;
+using System.Threading;
 
 namespace LightInsight.Dashboard.Camera.Client
 {
@@ -23,12 +24,27 @@ namespace LightInsight.Dashboard.Camera.Client
 		public Thumb ResizeThumb => this.InternalResizeThumb;
 		public CameraHealthScoreWidget()
 		{
+			ApplySmartClientLanguage(Thread.CurrentThread.CurrentUICulture.Name);
 			InitializeComponent();
 			ApplySmartClientTheme(ClientControl.Instance?.Theme);
 			_themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
 				new MessageReceiver(OnThemeChanged),
 				new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
 			DeleteButton.Visibility = Visibility.Collapsed;
+		}
+		private void ApplySmartClientLanguage(string name)
+		{
+			var uri = name == "vi-VN"
+					   ? "/LightInsight;component/Dashboard/Dashboard/Language/Vi.xaml"
+					   : "/LightInsight;component/Dashboard/Dashboard/Language/English.xaml";
+
+			var dict = new ResourceDictionary
+			{
+				Source = new Uri(uri, UriKind.Relative)
+			};
+
+			Resources.MergedDictionaries.Clear();
+			Resources.MergedDictionaries.Add(dict);
 		}
 		public void SetEditMode(bool isEdit)
 		{

@@ -91,7 +91,7 @@
                                        VerticalAlignment="Center"/>
                         </StackPanel>
 
-                        <TextBlock Text="Total Cameras"
+                        <TextBlock Text="{DynamicResource Camera_Label_TotalCameras}"
                                    Foreground="{DynamicResource TextPrimary}"
                                    FontSize="16"/>
                     </StackPanel>

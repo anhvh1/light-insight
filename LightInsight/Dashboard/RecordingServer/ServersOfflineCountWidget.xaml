@@ -37,7 +37,7 @@
 
                 <!-- HEADER -->
                 <Grid Grid.Row="0" Background="{DynamicResource BgMain}">
-                    <TextBlock Text="Servers Offline Count"
+                    <TextBlock Text="{DynamicResource Recording_Title_ServersOfflineCount}"
                                Foreground="{DynamicResource TextPrimary}"
                                FontSize="14"
                                VerticalAlignment="Center"
@@ -116,7 +116,7 @@
                                            Foreground="#FF6B6B"/>
                             </StackPanel>
 
-                            <TextBlock Text="Servers Offline"
+                            <TextBlock Text="{DynamicResource Recording_Label_ServersOffline}"
                                        Foreground="{DynamicResource TextPrimary}"
                                        FontSize="16"
                                        Margin="0,5,0,10"/>

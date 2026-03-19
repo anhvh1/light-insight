@@ -8,6 +8,7 @@ using LightInsight.Dashboard.Dashboard;
 using VideoOS.Platform;
 using VideoOS.Platform.Client;
 using VideoOS.Platform.Messaging;
+using System.Threading;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {
@@ -70,6 +71,7 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
 
         public LiveAlarmsFeedWidget()
         {
+            ApplySmartClientLanguage(Thread.CurrentThread.CurrentUICulture.Name);
             InitializeComponent();
             ApplySmartClientTheme(ClientControl.Instance?.Theme);
             _themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
@@ -93,6 +95,20 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
                 new AlarmItem { Location = "Backdoor Alley", EventType = "Intrusion", IdAndTime = "ALM-011 • 08:30:00", Status = "Closed", IsHighPriority = false },
                 new AlarmItem { Location = "Parking B", EventType = "Vehicle Wrong Way", IdAndTime = "ALM-012 • 08:15:22", Status = "Ack", IsHighPriority = false, IsLastItem = true }
             };
+        }
+        private void ApplySmartClientLanguage(string name)
+        {
+            var uri = name == "vi-VN"
+                       ? "/LightInsight;component/Dashboard/Dashboard/Language/Vi.xaml"
+                       : "/LightInsight;component/Dashboard/Dashboard/Language/English.xaml";
+
+            var dict = new ResourceDictionary
+            {
+                Source = new Uri(uri, UriKind.Relative)
+            };
+
+            Resources.MergedDictionaries.Clear();
+            Resources.MergedDictionaries.Add(dict);
         }
 
         private object OnThemeChanged(Message message, FQID dest, FQID sender)

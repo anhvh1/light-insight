@@ -90,7 +90,7 @@
                                         VerticalAlignment="Center"/>
                             </StackPanel>
 
-                            <TextBlock Text="Cameras Offline"
+                            <TextBlock Text="{DynamicResource Camera_Label_CamerasOffline}"
                                         Foreground="{DynamicResource TextPrimary}"
                                         FontSize="16"/>
 

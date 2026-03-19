@@ -37,7 +37,7 @@
 
                 <!-- HEADER -->
                 <Grid Grid.Row="0" Background="{DynamicResource BgMain}">
-                    <TextBlock Text="Total Servers"
+                    <TextBlock Text="{DynamicResource Recording_Title_TotalServers}"
                                Foreground="{DynamicResource TextPrimary}"
                                FontSize="14"
                                VerticalAlignment="Center"
@@ -116,7 +116,7 @@
                                            Foreground="#75A9F9"/>
                             </StackPanel>
 
-                            <TextBlock Text="Total Servers"
+                            <TextBlock Text="{DynamicResource Recording_Label_TotalServers}"
                                        Foreground="{DynamicResource TextPrimary}"
                                        FontSize="16"
                                        Margin="0,5,0,0"/>
