@@ -25,7 +25,7 @@
 
 		    <Grid>
 			    <Border Background="{DynamicResource BgMain}" Height="25" VerticalAlignment="Top" CornerRadius="6,6,6,6">
-				    <TextBlock Text="Camera Analytics Summary" Foreground="{DynamicResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
+				    <TextBlock Text="Camera Online" Foreground="{DynamicResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
 			    </Border>
 
                 <Button x:Name="DeleteButton" 
