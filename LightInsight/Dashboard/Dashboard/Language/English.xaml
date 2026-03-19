@@ -1,0 +1,33 @@
+﻿<ResourceDictionary  x:Class="LightInsight.Dashboard.Dashboard.Language.English"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Top -->
+    <sys:String x:Key="Breadcrumb_Default">Dashboard &gt; Operations</sys:String>
+    <sys:String x:Key="Workspace">Workspace</sys:String>
+    <sys:String x:Key="EditLayout">Edit Layout</sys:String>
+    <sys:String x:Key="Save">Save</sys:String>
+    <sys:String x:Key="Cancel">Cancel</sys:String>
+
+    <!-- Time -->
+    <sys:String x:Key="Last24h">Last 24h</sys:String>
+    <sys:String x:Key="Last7Days">Last 7 days</sys:String>
+    <sys:String x:Key="Last30Days">Last 30 days</sys:String>
+    <sys:String x:Key="Custom">Custom</sys:String>
+
+    <!-- Sidebar -->
+    <sys:String x:Key="Dashboard">Dashboard</sys:String>
+    <sys:String x:Key="Collapse">☰ Collapse</sys:String>
+
+    <!-- Widget -->
+    <sys:String x:Key="WidgetLibrary">Widget Library</sys:String>
+    <sys:String x:Key="Add">Add</sys:String>
+
+    <!-- Filter -->
+    <sys:String x:Key="KPI">KPI</sys:String>
+    <sys:String x:Key="Charts">Charts</sys:String>
+    <sys:String x:Key="Tables">Tables</sys:String>
+    <sys:String x:Key="Lists">Lists</sys:String>
+
+</ResourceDictionary>

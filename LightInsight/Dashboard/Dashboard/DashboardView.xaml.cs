@@ -28,6 +28,7 @@ using VideoOS.Platform.Messaging;
 using System.Threading;
 using VideoOS.Platform.OAuth;
 using Microsoft.Identity.Client;
+using System.Configuration;
 
 
 namespace LightInsight.Dashboard.Dashboard
@@ -37,6 +38,7 @@ namespace LightInsight.Dashboard.Dashboard
     /// </summary>
     public partial class DashboardView : UserControl, INotifyPropertyChanged
     {
+        private object _languageChangedRegistration;
         private ResourceDictionary _currentThemeDictionary;
         private object _themeChangedRegistration;
         bool editMode = false;
@@ -97,13 +99,16 @@ namespace LightInsight.Dashboard.Dashboard
         };
         public DashboardView()
         {
+            ApplySmartClientLanguage(Thread.CurrentThread.CurrentUICulture.Name);
+
             // nạp theme hiện tại ngay lúc mở
             ApplySmartClientTheme(ClientControl.Instance?.Theme);
-
             // đăng ký nghe sự kiện đổi theme
             _themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
                 new MessageReceiver(OnThemeChanged),
                 new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
+
+
             LoadSidebar();
 
             InitializeComponent();
@@ -1185,6 +1190,20 @@ namespace LightInsight.Dashboard.Dashboard
                 //_vm?.RefreshChartTheme();
             });
         }
+        private void ApplySmartClientLanguage(string name)
+        {
+            var uri = name == "vi-VN"
+                       ? "/LightInsight;component/Dashboard/Dashboard/Language/Vi.xaml"
+                       : "/LightInsight;component/Dashboard/Dashboard/Language/English.xaml";
+
+                                var dict = new ResourceDictionary
+                                {
+                                    Source = new Uri(uri, UriKind.Relative)
+                                };
+
+                                Resources.MergedDictionaries.Clear();
+                                Resources.MergedDictionaries.Add(dict);
+        }
         //public void SetThemeResources(ResourceDictionary resources)
         //{
         //    _currentThemeDictionary = resources;
@@ -1250,6 +1269,6 @@ namespace LightInsight.Dashboard.Dashboard
                 .Any(x => x.GetType() == widgetType);
         }
 
-
+   
     }
 }
