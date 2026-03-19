@@ -10,7 +10,19 @@
              SnapsToDevicePixels="True">
 
     <Grid Margin="5,5,0,0">
-        <Border Background="{DynamicResource BgMain}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="6" x:Name="MainBorder">
+        <Border Background="{DynamicResource BgMain}" BorderThickness="1" CornerRadius="6" x:Name="MainBorder">
+            <Border.BorderBrush>
+                <VisualBrush Stretch="None">
+                    <VisualBrush.Visual>
+                        <Rectangle Stroke="#E8751A"
+                                   StrokeDashArray="4 2"
+                                   StrokeThickness="1"
+                                   RadiusX="6" RadiusY="6"
+                                   Width="{Binding ElementName=MainBorder, Path=ActualWidth}"
+                                   Height="{Binding ElementName=MainBorder, Path=ActualHeight}"/>
+                    </VisualBrush.Visual>
+                </VisualBrush>
+            </Border.BorderBrush>
 
 		    <Grid>
 			    <Border Background="{DynamicResource BgMain}" Height="25" VerticalAlignment="Top" CornerRadius="6,6,6,6">
