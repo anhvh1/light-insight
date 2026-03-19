@@ -36,7 +36,7 @@
     <sys:String x:Key="WidgetName_CameraTotalCount">Tổng số camera</sys:String>
     <sys:String x:Key="WidgetName_CameraOnlinePlusOffline">Camera trực tuyến + ngoại tuyến</sys:String>
     <sys:String x:Key="WidgetName_CameraStatusDonut">Biểu đồ trạng thái camera</sys:String>
-    <sys:String x:Key="WidgetName_CameraOfflineDurationTop10">Thời lượng camera ngoại tuyến top 10</sys:String>
+    <sys:String x:Key="WidgetName_CameraOfflineDurationTop10">Thời lượng camera ngoại tuyến</sys:String>
     <sys:String x:Key="WidgetName_CameraDisconnectionTrend">Xu hướng mất kết nối camera</sys:String>
     <sys:String x:Key="WidgetName_CameraAnalyticsSummary">Tổng quan phân tích camera</sys:String>
     <sys:String x:Key="WidgetName_CameraList">Danh sách camera</sys:String>
@@ -51,7 +51,7 @@
     <sys:String x:Key="WidgetName_ServersOnlineCount">Số máy chủ trực tuyến</sys:String>
     <sys:String x:Key="WidgetName_ServersOfflineCount">Số máy chủ ngoại tuyến</sys:String>
     <sys:String x:Key="WidgetName_ServersTotal">Tổng số máy chủ</sys:String>
-    <sys:String x:Key="WidgetName_StorageUsageByServer">Mức sử dụng lưu trữ theo máy chủ</sys:String>
+    <sys:String x:Key="WidgetName_StorageUsageByServer">Mức sử dụng lưu trữ</sys:String>
     <sys:String x:Key="WidgetName_Template">Mẫu</sys:String>
 
     <!-- Camera labels -->
