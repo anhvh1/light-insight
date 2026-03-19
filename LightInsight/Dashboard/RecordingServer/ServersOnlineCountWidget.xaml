@@ -113,7 +113,7 @@
                                            Text="12"
                                            FontSize="32"
                                            FontWeight="Bold"
-                                           Foreground="{DynamicResource TextPrimary}"/>
+                                           Foreground="#2ECC71"/>
                             </StackPanel>
 
                             <TextBlock Text="Servers Online"
@@ -131,7 +131,7 @@
 
                                 <TextBlock x:Name="TrendText"
                                            Text="0% vs last period"
-                                           Foreground="{DynamicResource TextPrimary}"
+                                           Foreground="#2ECC71"
                                            FontSize="12"/>
                             </StackPanel>
 

@@ -76,7 +76,7 @@
                 <Viewbox Stretch="Uniform" Margin="10,35,10,10" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <StackPanel Width="220">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE722;" FontSize="24" Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE722;" FontSize="24" Foreground="#60A5FA" VerticalAlignment="Center" Margin="0,0,10,0"/>
                             <TextBlock Text="Text" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                         </StackPanel>
                         <TextBlock Text="Template Widget" Foreground="{DynamicResource TextPrimary}" FontSize="16"/>

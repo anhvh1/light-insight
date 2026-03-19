@@ -77,7 +77,7 @@
                 <Viewbox Stretch="Uniform" Margin="10,35,10,10" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <StackPanel Width="220">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-					        <materialDesign:PackIcon Kind="Pulse" Foreground="{DynamicResource TextPrimary}" Width="40" Height="40"/>
+					        <materialDesign:PackIcon Kind="Pulse" Foreground="#4ADE80" Width="40" Height="40"/>
 					        <TextBlock Text="142"
                                FontSize="32"
                                FontWeight="Bold"

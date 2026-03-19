@@ -113,7 +113,7 @@
                                            Text="13"
                                            FontSize="32"
                                            FontWeight="Bold"
-                                           Foreground="{DynamicResource TextPrimary}"/>
+                                           Foreground="#75A9F9"/>
                             </StackPanel>
 
                             <TextBlock Text="Total Servers"

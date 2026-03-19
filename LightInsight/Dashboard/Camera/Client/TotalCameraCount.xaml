@@ -80,7 +80,7 @@
                             <TextBlock FontFamily="Segoe MDL2 Assets" 
                                        Text="&#xE722;" 
                                        FontSize="24" 
-                                       Foreground="{DynamicResource TextPrimary}"
+                                       Foreground="#60A5FA"
                                        VerticalAlignment="Center"
                                        Margin="0 0 10 0"/>
 

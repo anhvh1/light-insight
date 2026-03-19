@@ -108,7 +108,7 @@
                                            Text="3"
                                            FontSize="32"
                                            FontWeight="Bold"
-                                           Foreground="{DynamicResource TextPrimary}"/>
+                                           Foreground="#FF6B6B"/>
                             </StackPanel>
 
                             <TextBlock Text="SLA Breaches"
@@ -125,7 +125,7 @@
 
                                 <TextBlock x:Name="TrendText"
                                            Text="25% vs last period"
-                                           Foreground="{DynamicResource TextPrimary}"
+                                           Foreground="#2ECC71"
                                            FontSize="12"/>
                             </StackPanel>
 
