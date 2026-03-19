@@ -101,23 +101,13 @@ namespace LightInsight.Dashboard.Dashboard
         };
         public DashboardView()
         {
+            InitializeComponent();
+            TimeRangeCombo.SelectedIndex = 0;
+            LocalizeWidgetNames();
+            LoadSidebar();
+            // nạp dữ liệu ngôn ngữ
             ApplySmartClientLanguage(Thread.CurrentThread.CurrentUICulture.Name);
 
-            // nạp theme hiện tại ngay lúc mở
-            ApplySmartClientTheme(ClientControl.Instance?.Theme);
-            // đăng ký nghe sự kiện đổi theme
-            _themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
-                new MessageReceiver(OnThemeChanged),
-                new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
-            LoadSidebar();
-            InitializeComponent();
-            //OpenDashboard(OperationsBtn);
-            TimeRangeCombo.SelectedIndex = 0;
-            //LanguageCombo.SelectedIndex = 0;
-            //ThemeBtn.Content = "🌙";
-            LocalizeWidgetNames();
-            WidgetList.ItemsSource = allWidgets;
-            LoadLayout();
             WorkspaceService.Instance.OnWorkspaceChanged += () =>
             {
                 Application.Current.Dispatcher.Invoke(() =>
@@ -125,6 +115,16 @@ namespace LightInsight.Dashboard.Dashboard
                     LoadSidebar();
                 });
             };
+            // nạp theme hiện tại ngay lúc mở
+            ApplySmartClientTheme(ClientControl.Instance?.Theme);
+            // đăng ký nghe sự kiện đổi theme
+            _themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
+                new MessageReceiver(OnThemeChanged),
+                new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
+            WidgetList.ItemsSource = allWidgets;
+            // đọc lại dữ liệu widget đang có
+            LoadLayout();
+
         }
         private void LocalizeWidgetNames()
         {
@@ -724,7 +724,10 @@ namespace LightInsight.Dashboard.Dashboard
         /// </summary>
         void LoadLayout()
         {
-            DashboardGrid.Children.Clear();
+            if (DashboardGrid.Children.Count > 0)
+            {
+                DashboardGrid.Children.Clear();
+            }
 
             string folder = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
@@ -1258,13 +1261,13 @@ namespace LightInsight.Dashboard.Dashboard
                        ? "/LightInsight;component/Dashboard/Dashboard/Language/Vi.xaml"
                        : "/LightInsight;component/Dashboard/Dashboard/Language/English.xaml";
 
-                                var dict = new ResourceDictionary
-                                {
-                                    Source = new Uri(uri, UriKind.Relative)
-                                };
+            var dict = new ResourceDictionary
+            {
+                Source = new Uri(uri, UriKind.Relative)
+            };
 
-                                Resources.MergedDictionaries.Clear();
-                                Resources.MergedDictionaries.Add(dict);
+            Resources.MergedDictionaries.Clear();
+            Resources.MergedDictionaries.Add(dict);
         }
         //public void SetThemeResources(ResourceDictionary resources)
         //{

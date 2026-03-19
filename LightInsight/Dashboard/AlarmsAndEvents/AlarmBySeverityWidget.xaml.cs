@@ -50,14 +50,16 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         public AlarmBySeverityWidget()
         {
             ApplySmartClientLanguage(Thread.CurrentThread.CurrentUICulture.Name);
-            InitializeComponent();
             ApplySmartClientTheme(ClientControl.Instance?.Theme);
             _themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
                 new MessageReceiver(OnThemeChanged),
                 new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
+            InitializeComponent();
+
             DeleteButton.Visibility = Visibility.Collapsed;
             this.Loaded += AlarmBySeverityWidget_Loaded;
             this.DataContext = this;
+
         }
         private void ApplySmartClientLanguage(string name)
         {
