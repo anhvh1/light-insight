@@ -3,15 +3,27 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using VideoOS.Platform.Messaging;
+using VideoOS.Platform;
+using System;
+using VideoOS.Platform.Client;
 
 namespace LightInsight.Dashboard.Dashboard.Workspace
 {
     public partial class WorkspaceWindow : Window
     {
+        private ResourceDictionary _currentThemeDictionary;
+        private object _themeChangedRegistration;
         public WorkspaceWindow()
         {
             InitializeComponent();
+            // nạp theme hiện tại ngay lúc mở
+            ApplySmartClientTheme(ClientControl.Instance?.Theme);
 
+            // đăng ký nghe sự kiện đổi theme
+            _themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
+                new MessageReceiver(OnThemeChanged),
+                new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
             DataContext = WorkspaceService.Instance;
 
             LoadWorkspaces();
@@ -190,6 +202,35 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
                 EditButton.Visibility = Visibility.Collapsed;
                 DeleteButton.Visibility = Visibility.Collapsed;
             }
+        }
+        private object OnThemeChanged(Message message, FQID dest, FQID sender)
+        {
+            var theme = message?.Data as Theme;
+            ApplySmartClientTheme(theme);
+            return null;
+        }
+
+        private void ApplySmartClientTheme(Theme scTheme)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                var themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Dark.xaml";
+                var crTheme = ClientControl.Instance.Theme.ThemeType;
+                //if (scTheme != null && scTheme.ThemeType == ThemeType.Light)
+                if (crTheme == ThemeType.Light)
+                    themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Light.xaml";
+
+                var newDict = new ResourceDictionary { Source = new Uri(themeUri, UriKind.RelativeOrAbsolute) };
+
+                if (_currentThemeDictionary != null)
+                    Resources.MergedDictionaries.Remove(_currentThemeDictionary);
+
+                Resources.MergedDictionaries.Insert(0, newDict);
+                _currentThemeDictionary = newDict;
+
+                //_vm?.SetThemeResources(Resources);
+                //_vm?.RefreshChartTheme();
+            });
         }
     }
 }

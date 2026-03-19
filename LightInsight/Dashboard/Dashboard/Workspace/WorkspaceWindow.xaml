@@ -4,8 +4,7 @@
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks" 
         Title="Workspace Settings"
         Height="520"
-        Width="900"
-        Background="#1f2630">
+        Width="900">
 
     <!-- ================= STYLES ================= -->
     <Window.Resources>
@@ -15,15 +14,15 @@
             <Setter Property="Width" Value="30"/>
             <Setter Property="Height" Value="30"/>
             <Setter Property="Margin" Value="2"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+            <Setter Property="Background" Value="{DynamicResource BgMain}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
 
             <Style.Triggers>
 
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#3b4450"/>
+                    <Setter Property="Background" Value="{DynamicResource TextPrimary}"/>
                 </Trigger>
 
             </Style.Triggers>
@@ -31,10 +30,10 @@
         </Style>
         <Style TargetType="TreeViewItem">
 
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
             <Setter Property="Margin" Value="0,2"/>
             <Setter Property="Padding" Value="4"/>
-            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Background" Value="{DynamicResource BgMain}"/>
 
             <Setter Property="Template">
                 <Setter.Value>
@@ -63,7 +62,7 @@
 
                             <!-- Hover -->
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
                             </Trigger>
                             <!-- Selected -->
                             <Trigger Property="IsSelected" Value="True">
@@ -91,7 +90,7 @@
 
 
         <!-- ================= TOOLBAR ================= -->
-        <Grid Background="#2a323d" Grid.Row="0">
+        <Grid Background="{DynamicResource BgMain}" Grid.Row="0">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -157,7 +156,7 @@
             <!-- ================= SEARCH ================= -->
             <Border Grid.Column="1"
                     Margin="336,6,10,6"
-                    Background="#1f2630"
+                    Background="{DynamicResource BgMain}"
                     CornerRadius="4">
 
                 <DockPanel LastChildFill="True" Margin="321,0,0,0">
@@ -165,7 +164,7 @@
                     <!-- Search Icon -->
                     <TextBlock FontFamily="Segoe MDL2 Assets"
                                Text="&#xE721;"
-                               Foreground="Gray"
+                               Foreground="{DynamicResource ButtonBg}"
                                VerticalAlignment="Center"
                                Margin="8,0"/>
 
@@ -173,7 +172,7 @@
                     <TextBox
                         Background="Transparent"
                         BorderThickness="0"
-                        Foreground="White"
+                        Foreground="{DynamicResource TextPrimary}"
                         FontSize="14"
                         Width="300"
                         Padding="6"
@@ -182,7 +181,7 @@
                     <!-- Clear Button -->
                     <TextBlock FontFamily="Segoe MDL2 Assets"
                                Text="&#xE711;"
-                               Foreground="Gray"
+                               Foreground="{DynamicResource TextPrimary}"
                                VerticalAlignment="Center"
                                Margin="8,0"/>
 
@@ -195,13 +194,13 @@
 
         <!-- ================= TREE ================= -->
         <Border Grid.Row="1"
-        Background="#252c36"
-        Padding="10">
+                Background="{DynamicResource BgMain}"
+                Padding="10">
 
             <TreeView x:Name="WorkspaceTree"
               ItemsSource="{Binding Workspaces}"
-              Background="Transparent"
-              Foreground="White"
+              Background="{DynamicResource BgMain}"
+              Foreground="{DynamicResource TextPrimary}"
               BorderThickness="0">
 
                 <TreeView.ItemTemplate>
@@ -222,7 +221,7 @@
                                         Width="16"
                                         Height="16"
                                         Margin="0,0,6,0"
-                                        Foreground="White"/>
+                                        Foreground="{DynamicResource TextPrimary}"/>
 
                             <!-- NAME -->
                             <TextBlock Grid.Column="1"

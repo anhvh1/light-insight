@@ -6,13 +6,13 @@
         Height="450"
         Width="380"
         WindowStartupLocation="CenterOwner"
-        Background="#1a1d21"
-        Foreground="White"
+        Background="{DynamicResource BgMain}"
+        Foreground="{DynamicResource TextPrimary}"
         ResizeMode="NoResize"
         WindowStyle="None"
         AllowsTransparency="True">
 
-    <Border BorderBrush="#3a4250"
+    <Border BorderBrush="{DynamicResource CardBorder}"
             BorderThickness="1"
             CornerRadius="8">
 
@@ -32,22 +32,22 @@
                        FontSize="18"
                        FontWeight="SemiBold"
                        Margin="0,0,0,20"
-                       Foreground="#efefef"/>
+                       Foreground="{DynamicResource TextPrimary}"/>
 
             <!-- LABEL -->
             <StackPanel Grid.Row="1" Margin="0,0,0,15">
 
                 <TextBlock Text="Label"
-                           Foreground="#9ca3af"
+                           Foreground="{DynamicResource TextPrimary}"
                            FontSize="12"
                            Margin="0,0,0,6"/>
 
                 <TextBox x:Name="LabelBox"
                          Height="36"
                          Padding="10,5"
-                         Background="#252a31"
-                         Foreground="White"
-                         BorderBrush="#3a4250"
+                         Background="{DynamicResource BgMain}"
+                         Foreground="{DynamicResource TextPrimary}"
+                         BorderBrush="{DynamicResource CardBorder}"
                          BorderThickness="1"
                          VerticalContentAlignment="Center"/>
 
@@ -64,9 +64,9 @@
 
                 <ComboBox x:Name="TypeBox"
                           Height="36"
-                          Background="#252a31"
-                          Foreground="White"
-                          BorderBrush="#3a4250"
+                          Background="{DynamicResource BgMain}"
+                          Foreground="{DynamicResource TextPrimary}"
+                          BorderBrush="{DynamicResource CardBorder}"
                           BorderThickness="1">
 
                     <ComboBoxItem Content="Smart Layout" />
@@ -88,8 +88,8 @@
                 <!-- SELECT ICON BUTTON -->
                 <Button x:Name="SelectIconButton"
                         Height="36"
-                        Background="#252a31"
-                        BorderBrush="#3a4250"
+                        Background="{DynamicResource BgMain}"
+                        BorderBrush="{DynamicResource CardBorder}"
                         BorderThickness="1"
                         Click="SelectIconButton_Click">
 
@@ -118,11 +118,11 @@
                        PlacementTarget="{Binding ElementName=SelectIconButton}"
                        StaysOpen="False">
 
-                    <Border Background="#1a1d21"
-                            BorderBrush="#3a4250"
+                    <Border Background="{DynamicResource BgMain}"
+                            BorderBrush="{DynamicResource CardBorder}"
                             BorderThickness="1"
                             CornerRadius="6"
-                            Width="320"
+                            Width="330"
                             Height="300"
                             Padding="10">
 
@@ -137,9 +137,9 @@
                             <TextBox x:Name="IconSearchBox"
                                      Height="35"
                                      Margin="0,0,0,10"
-                                     Background="#252a31"
-                                     Foreground="White"
-                                     BorderBrush="#3a4250"
+                                     Background="{DynamicResource BgMain}"
+                                     Foreground="{DynamicResource TextPrimary}"
+                                     BorderBrush="{DynamicResource CardBorder}"
                                      KeyDown="IconSearchBox_KeyDown"
                                      Padding="8"/>
 
@@ -148,7 +148,7 @@
                             <ScrollViewer Grid.Row="1">
 
                                 <ListBox x:Name="IconList"
-                                         Background="Transparent"
+                                         Background="{DynamicResource CardBorder}"
                                          VirtualizingPanel.IsVirtualizing="True"
                                          VirtualizingPanel.VirtualizationMode="Recycling"
                                          BorderThickness="0"
@@ -175,7 +175,7 @@
                                                     <ControlTemplate TargetType="ListBoxItem">
 
                                                         <Border x:Name="IconBorder"
-                                                                Background="Transparent"
+                                                                Background="{DynamicResource ButtonBg}"
                                                                 CornerRadius="4">
 
                                                             <ContentPresenter
@@ -189,13 +189,13 @@
                                                             <Trigger Property="IsMouseOver" Value="True">
                                                                 <Setter TargetName="IconBorder"
                                                                         Property="Background"
-                                                                        Value="#3a4250"/>
+                                                                        Value="{DynamicResource TextPrimary}"/>
                                                             </Trigger>
 
                                                             <Trigger Property="IsSelected" Value="True">
                                                                 <Setter TargetName="IconBorder"
                                                                         Property="Background"
-                                                                        Value="#22a6d5"/>
+                                                                        Value="{DynamicResource TextPrimary}"/>
                                                             </Trigger>
 
                                                         </ControlTemplate.Triggers>
@@ -246,16 +246,16 @@
                         Width="90"
                         Height="34"
                         Margin="0,0,10,0"
-                        Background="Transparent"
+                        Background="{DynamicResource ButtonBg}"
                         Foreground="#9ca3af"
                         BorderThickness="0"
                         Click="Cancel_Click"/>
 
-                <Button Content="Create"
+                <Button Content="Save"
                         Width="100"
                         Height="34"
-                        Background="#22a6d5"
-                        Foreground="White"
+                        Background="{DynamicResource ButtonBg}"
+                        Foreground="{DynamicResource TextPrimary}"
                         BorderThickness="0"
                         Click="Create_Click"/>
 

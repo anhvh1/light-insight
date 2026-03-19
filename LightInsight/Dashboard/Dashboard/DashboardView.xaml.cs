@@ -26,6 +26,9 @@ using VideoOS.Platform;
 using Path = System.IO.Path;
 using VideoOS.Platform.Messaging;
 using System.Threading;
+using VideoOS.Platform.OAuth;
+using Microsoft.Identity.Client;
+
 
 namespace LightInsight.Dashboard.Dashboard
 {
@@ -70,14 +73,14 @@ namespace LightInsight.Dashboard.Dashboard
             new WidgetItem{ Name="Camera Offline Count", Category="KPI",WidgetType = typeof(CameraOfflineWidget)},
             new WidgetItem{ Name="Camera Total Count", Category="KPI",WidgetType = typeof(TotalCameraCount)},
             new WidgetItem{ Name="Camera Online + Offline", Category="KPI",WidgetType = typeof(CameraOnlineNOffline)},
-			new WidgetItem{ Name="Camera Status Donut", Category="Charts",WidgetType = typeof(CameraStatusDonut)},
-			new WidgetItem{ Name="Camera Offline Duration top 10", Category="Tables",WidgetType = typeof(CameraOfflineDurationTop10)},
-			new WidgetItem{ Name="Camera Disconnection Trend", Category="Tables",WidgetType = typeof(CameraDisconnectionTrend)},
-			new WidgetItem{ Name="Camera Analytics Summary",WidgetType = typeof(CameraAnalyticsSummaryWidget)},
-			new WidgetItem{ Name="Camera List",WidgetType = typeof(CameraListWidget)},
-			new WidgetItem{ Name="Camera Health Score",WidgetType = typeof(CameraHealthScoreWidget)},
+            new WidgetItem{ Name="Camera Status Donut", Category="Charts",WidgetType = typeof(CameraStatusDonut)},
+            new WidgetItem{ Name="Camera Offline Duration top 10", Category="Tables",WidgetType = typeof(CameraOfflineDurationTop10)},
+            new WidgetItem{ Name="Camera Disconnection Trend", Category="Tables",WidgetType = typeof(CameraDisconnectionTrend)},
+            new WidgetItem{ Name="Camera Analytics Summary",WidgetType = typeof(CameraAnalyticsSummaryWidget)},
+            new WidgetItem{ Name="Camera List",WidgetType = typeof(CameraListWidget)},
+            new WidgetItem{ Name="Camera Health Score",WidgetType = typeof(CameraHealthScoreWidget)},
 
-			new WidgetItem{ Name="Live Alarm Feed", Category="Lists", WidgetType = typeof(LiveAlarmsFeedWidget)},
+            new WidgetItem{ Name="Live Alarm Feed", Category="Lists", WidgetType = typeof(LiveAlarmsFeedWidget)},
             new WidgetItem{ Name="Alarm by Severity", Category="Charts", WidgetType = typeof(AlarmBySeverityWidget)},
             new WidgetItem{ Name="Alarm Daily Count", Category="Charts", WidgetType = typeof(AlarmDailyCountWidget)},
             new WidgetItem{ Name="Alarm by Source", Category="Charts", WidgetType = typeof(AlarmBySourceWidget)},
@@ -106,8 +109,8 @@ namespace LightInsight.Dashboard.Dashboard
             InitializeComponent();
             //OpenDashboard(OperationsBtn);
             TimeRangeCombo.SelectedIndex = 0;
-            LanguageCombo.SelectedIndex = 0;
-            ThemeBtn.Content = "🌙";
+            //LanguageCombo.SelectedIndex = 0;
+            //ThemeBtn.Content = "🌙";
             WidgetList.ItemsSource = allWidgets;
             LoadLayout();
             WorkspaceService.Instance.OnWorkspaceChanged += () =>
@@ -298,40 +301,40 @@ namespace LightInsight.Dashboard.Dashboard
 
             WidgetList.ItemsSource = result;
         }
-        void ThemeBtn_Click(object sender, RoutedEventArgs e)
-        {
-            isDark = !isDark;
+        //void ThemeBtn_Click(object sender, RoutedEventArgs e)
+        //{
+        //    isDark = !isDark;
 
-            if (!isDark)
-            {
-                ThemeBtn.Content = "🌙";
-                //this.Background = new SolidColorBrush(Color.FromRgb(30, 30, 30));
-            }
-            else
-            {
-                ThemeBtn.Content = "☀";
-                //this.Background = Brushes.White;
-            }
-        }
+        //    if (!isDark)
+        //    {
+        //        ThemeBtn.Content = "🌙";
+        //        //this.Background = new SolidColorBrush(Color.FromRgb(30, 30, 30));
+        //    }
+        //    else
+        //    {
+        //        ThemeBtn.Content = "☀";
+        //        //this.Background = Brushes.White;
+        //    }
+        //}
         void RefreshBtn_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Refreshing dashboard...");
         }
-        void LanguageCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ComboBoxItem item = (ComboBoxItem)LanguageCombo.SelectedItem;
+        //void LanguageCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        //{
+        //    ComboBoxItem item = (ComboBoxItem)LanguageCombo.SelectedItem;
 
-            if (item.Content.ToString() == "VI")
-            {
-                //OperationsText.Text = " Vận hành";
-                //AlarmMonitorText.Text = " Giám sát cảnh báo";
-            }
-            else
-            {
-                //OperationsText.Text = " Operations";
-                //AlarmMonitorText.Text = " Alarm Monitor";
-            }
-        }
+        //    if (item.Content.ToString() == "VI")
+        //    {
+        //        //OperationsText.Text = " Vận hành";
+        //        //AlarmMonitorText.Text = " Giám sát cảnh báo";
+        //    }
+        //    else
+        //    {
+        //        //OperationsText.Text = " Operations";
+        //        //AlarmMonitorText.Text = " Alarm Monitor";
+        //    }
+        //}
         //private void Menu_Click(object sender, RoutedEventArgs e)
         //{
         //    OpenDashboard(sender as Button);
@@ -477,6 +480,7 @@ namespace LightInsight.Dashboard.Dashboard
                 return;
 
             FrameworkElement widget = sender as FrameworkElement;
+
 
             Point pos = e.GetPosition(DashboardGrid);
 
@@ -822,80 +826,80 @@ namespace LightInsight.Dashboard.Dashboard
 
             return Activator.CreateInstance(widgetType) as FrameworkElement;
         }
-		//void SetupWidget(FrameworkElement widget)  // old
-		//{
-		//    widget.Margin = new Thickness(1, 1, 5, 5);
+        //void SetupWidget(FrameworkElement widget)  // old
+        //{
+        //    widget.Margin = new Thickness(1, 1, 5, 5);
 
-		//    widget.HorizontalAlignment = HorizontalAlignment.Stretch;
-		//    widget.VerticalAlignment = VerticalAlignment.Stretch;
-		//    widget.Loaded += (s, e) => 
-		//    {
-		//        var thumb = FindVisualChild<Thumb>(widget, "ResizeThumb");
-		//        if (thumb != null)
-		//        {
-		//            System.Diagnostics.Debug.WriteLine($"SUCCESS: Found ResizeThumb on {widget.GetType().Name}");
-		//            thumb.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
+        //    widget.HorizontalAlignment = HorizontalAlignment.Stretch;
+        //    widget.VerticalAlignment = VerticalAlignment.Stretch;
+        //    widget.Loaded += (s, e) => 
+        //    {
+        //        var thumb = FindVisualChild<Thumb>(widget, "ResizeThumb");
+        //        if (thumb != null)
+        //        {
+        //            System.Diagnostics.Debug.WriteLine($"SUCCESS: Found ResizeThumb on {widget.GetType().Name}");
+        //            thumb.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
 
-		//            // Xóa sự kiện cũ (nếu có) để tránh lặp và đăng ký mới
-		//            thumb.DragDelta -= Thumb_DragDelta; 
-		//            thumb.DragDelta += Thumb_DragDelta;
-		//        }
-		//        else
-		//        {
-		//            System.Diagnostics.Debug.WriteLine($"ERROR: Still cannot find ResizeThumb on {widget.GetType().Name}");
-		//        }
-		//    };
-		//    widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
-		//    widget.MouseMove += Widget_MouseMove;
-		//    widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
+        //            // Xóa sự kiện cũ (nếu có) để tránh lặp và đăng ký mới
+        //            thumb.DragDelta -= Thumb_DragDelta; 
+        //            thumb.DragDelta += Thumb_DragDelta;
+        //        }
+        //        else
+        //        {
+        //            System.Diagnostics.Debug.WriteLine($"ERROR: Still cannot find ResizeThumb on {widget.GetType().Name}");
+        //        }
+        //    };
+        //    widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
+        //    widget.MouseMove += Widget_MouseMove;
+        //    widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
 
-		//    if (widget is IDashboardWidget dashboardWidget)
-		//    {
-		//        dashboardWidget.DeleteRequested += Widget_DeleteRequested;
-		//        dashboardWidget.SetEditMode(editMode);
-		//    }
-		//}
+        //    if (widget is IDashboardWidget dashboardWidget)
+        //    {
+        //        dashboardWidget.DeleteRequested += Widget_DeleteRequested;
+        //        dashboardWidget.SetEditMode(editMode);
+        //    }
+        //}
 
-		void SetupWidget(FrameworkElement widget) // new
-		{
-			widget.Margin = new Thickness(1, 1, 5, 5);
-			widget.HorizontalAlignment = HorizontalAlignment.Stretch;
-			widget.VerticalAlignment = VerticalAlignment.Stretch;
+        void SetupWidget(FrameworkElement widget) // new
+        {
+            widget.Margin = new Thickness(1, 1, 5, 5);
+            widget.HorizontalAlignment = HorizontalAlignment.Stretch;
+            widget.VerticalAlignment = VerticalAlignment.Stretch;
 
-			widget.Loaded += (s, e) =>
-			{
-				Thumb thumb = null;
+            widget.Loaded += (s, e) =>
+            {
+                Thumb thumb = null;
 
-				if (widget is IResizableWidget resizable)
-				{
-					thumb = resizable.ResizeThumb;
-				}
+                if (widget is IResizableWidget resizable)
+                {
+                    thumb = resizable.ResizeThumb;
+                }
 
-				if (thumb != null)
-				{
-					System.Diagnostics.Debug.WriteLine($"SUCCESS: Found ResizeThumb on {widget.GetType().Name}");
-					thumb.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
+                if (thumb != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"SUCCESS: Found ResizeThumb on {widget.GetType().Name}");
+                    thumb.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
 
-					thumb.DragDelta -= Thumb_DragDelta;
-					thumb.DragDelta += Thumb_DragDelta;
-				}
-				else
-				{
-					System.Diagnostics.Debug.WriteLine($"ERROR: Still cannot find ResizeThumb on {widget.GetType().Name}");
-				}
-			};
+                    thumb.DragDelta -= Thumb_DragDelta;
+                    thumb.DragDelta += Thumb_DragDelta;
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"ERROR: Still cannot find ResizeThumb on {widget.GetType().Name}");
+                }
+            };
 
-			widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
-			widget.MouseMove += Widget_MouseMove;
-			widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
+            widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
+            widget.MouseMove += Widget_MouseMove;
+            widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
 
-			if (widget is IDashboardWidget dashboardWidget)
-			{
-				dashboardWidget.DeleteRequested += Widget_DeleteRequested;
-				dashboardWidget.SetEditMode(editMode);
-			}
-		}
-		private void ToggleSidebar_Click(object sender, RoutedEventArgs e)
+            if (widget is IDashboardWidget dashboardWidget)
+            {
+                dashboardWidget.DeleteRequested += Widget_DeleteRequested;
+                dashboardWidget.SetEditMode(editMode);
+            }
+        }
+        private void ToggleSidebar_Click(object sender, RoutedEventArgs e)
         {
             if (sidebarCollapsed)
             {
@@ -916,81 +920,81 @@ namespace LightInsight.Dashboard.Dashboard
 
             sidebarCollapsed = !sidebarCollapsed;
         }
-		private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
-		{
-			if (!editMode) return;
+        private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            if (!editMode) return;
 
-			// 'sender' ở đây chính là cái Thumb
-			Thumb thumb = sender as Thumb;
-			FrameworkElement widget = FindParentWidget(thumb);
+            // 'sender' ở đây chính là cái Thumb
+            Thumb thumb = sender as Thumb;
+            FrameworkElement widget = FindParentWidget(thumb);
 
-			if (widget != null)
-			{
-				double cellWidth = DashboardGrid.ActualWidth / 12;
-				double cellHeight = 80;
+            if (widget != null)
+            {
+                double cellWidth = DashboardGrid.ActualWidth / 12;
+                double cellHeight = 80;
 
-				// 1. Tính toán Span mong muốn dựa trên vị trí chuột
-				int targetColSpan = (int)Math.Max(1, Math.Round((widget.ActualWidth + e.HorizontalChange) / cellWidth));
-				int targetRowSpan = (int)Math.Max(1, Math.Round((widget.ActualHeight + e.VerticalChange) / cellHeight));
+                // 1. Tính toán Span mong muốn dựa trên vị trí chuột
+                int targetColSpan = (int)Math.Max(1, Math.Round((widget.ActualWidth + e.HorizontalChange) / cellWidth));
+                int targetRowSpan = (int)Math.Max(1, Math.Round((widget.ActualHeight + e.VerticalChange) / cellHeight));
 
-				// 2. Lấy giới hạn tối thiểu từ chính Widget đó
-				int finalColSpan = targetColSpan;
-				int finalRowSpan = targetRowSpan;
+                // 2. Lấy giới hạn tối thiểu từ chính Widget đó
+                int finalColSpan = targetColSpan;
+                int finalRowSpan = targetRowSpan;
 
-				// Mặc định là 1 cho các Widget cũ chỉ dùng IDashboardWidget
-				int minCol = 1;
-				int minRow = 1;
+                // Mặc định là 1 cho các Widget cũ chỉ dùng IDashboardWidget
+                int minCol = 1;
+                int minRow = 1;
 
-				// Kiểm tra xem Widget này có "đăng ký" tính năng giới hạn kích thước không
-				if (widget is IResizableWidget resizable)
-				{
-					minCol = resizable.MinCol;
-					minRow = resizable.MinRow;
-					finalColSpan = Math.Max(minCol, targetColSpan);
-					finalRowSpan = Math.Max(minRow, targetRowSpan);
-				}
-				// 3. Cập nhật Layout
-				Grid.SetColumnSpan(widget, finalColSpan);
-				Grid.SetRowSpan(widget, finalRowSpan);
+                // Kiểm tra xem Widget này có "đăng ký" tính năng giới hạn kích thước không
+                if (widget is IResizableWidget resizable)
+                {
+                    minCol = resizable.MinCol;
+                    minRow = resizable.MinRow;
+                    finalColSpan = Math.Max(minCol, targetColSpan);
+                    finalRowSpan = Math.Max(minRow, targetRowSpan);
+                }
+                // 3. Cập nhật Layout
+                Grid.SetColumnSpan(widget, finalColSpan);
+                Grid.SetRowSpan(widget, finalRowSpan);
 
-				// Cập nhật Tag để lưu trữ
-				widget.Tag = $"{finalColSpan}x{finalRowSpan}";
-				if (widget is CameraListWidget listWidget)
-				{
-					listWidget.UpdateTable(listWidget._currentPage.ToString());
-				}
-			}
-		}
+                // Cập nhật Tag để lưu trữ
+                widget.Tag = $"{finalColSpan}x{finalRowSpan}";
+                if (widget is CameraListWidget listWidget)
+                {
+                    listWidget.UpdateTable(listWidget._currentPage.ToString());
+                }
+            }
+        }
 
-		// Hàm bổ trợ để tìm ngược từ Thumb lên Widget cha
-		private FrameworkElement FindParentWidget(DependencyObject child)
-		{
-			DependencyObject parentObject = VisualTreeHelper.GetParent(child);
-			if (parentObject == null) return null;
+        // Hàm bổ trợ để tìm ngược từ Thumb lên Widget cha
+        private FrameworkElement FindParentWidget(DependencyObject child)
+        {
+            DependencyObject parentObject = VisualTreeHelper.GetParent(child);
+            if (parentObject == null) return null;
 
-			if (parentObject is UserControl || (parentObject is FrameworkElement fe && DashboardGrid.Children.Contains(fe)))
-				return parentObject as FrameworkElement;
+            if (parentObject is UserControl || (parentObject is FrameworkElement fe && DashboardGrid.Children.Contains(fe)))
+                return parentObject as FrameworkElement;
 
-			return FindParentWidget(parentObject);
-		}
-		// old
-		//private T FindVisualChild<T>(DependencyObject obj, string name) where T : DependencyObject 
-		//      {
-		//          for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-		//          {
-		//              DependencyObject child = VisualTreeHelper.GetChild(obj, i);
-		//              if (child != null && child is T t && (child as FrameworkElement).Name == name)
-		//                  return t;
+            return FindParentWidget(parentObject);
+        }
+        // old
+        //private T FindVisualChild<T>(DependencyObject obj, string name) where T : DependencyObject 
+        //      {
+        //          for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+        //          {
+        //              DependencyObject child = VisualTreeHelper.GetChild(obj, i);
+        //              if (child != null && child is T t && (child as FrameworkElement).Name == name)
+        //                  return t;
 
-		//              T childOfChild = FindVisualChild<T>(child, name);
-		//              if (childOfChild != null)
-		//                  return childOfChild;
-		//          }
-		//          return null;
-		//      }
+        //              T childOfChild = FindVisualChild<T>(child, name);
+        //              if (childOfChild != null)
+        //                  return childOfChild;
+        //          }
+        //          return null;
+        //      }
 
 
-		bool IsOverlap(FrameworkElement a, FrameworkElement b)
+        bool IsOverlap(FrameworkElement a, FrameworkElement b)
         {
             int r1 = Grid.GetRow(a);
             int c1 = Grid.GetColumn(a);
@@ -1238,8 +1242,14 @@ namespace LightInsight.Dashboard.Dashboard
                 return;
 
             // xử lý back
-        }       
+        }
+        bool IsWidgetAdded(Type widgetType)
+        {
+            return DashboardGrid.Children
+                .OfType<FrameworkElement>()
+                .Any(x => x.GetType() == widgetType);
+        }
+
 
     }
-
 }
