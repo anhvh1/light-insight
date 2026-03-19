@@ -124,9 +124,11 @@
                                       Margin="0,0,6,0"/>
 
                                 <TextBlock x:Name="TrendText"
-                                           Text="25% vs last period"
                                            Foreground="#2ECC71"
-                                           FontSize="12"/>
+                                           FontSize="12">
+                                    <Run Text="25% "/>
+                                    <Run Text="{DynamicResource Common_VsLastPeriod}"/>
+                                </TextBlock>
                             </StackPanel>
 
                         </StackPanel>

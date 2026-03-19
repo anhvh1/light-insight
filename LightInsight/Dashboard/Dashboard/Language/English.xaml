@@ -59,6 +59,12 @@
     <sys:String x:Key="Camera_Title_DisconnectionTrend">Camera Disconnection Trend</sys:String>
     <sys:String x:Key="Camera_Title_OfflineDurationTop10">Camera Offline Duration Top 10</sys:String>
     <sys:String x:Key="Camera_Title_StatusDonut">Camera Status Donut</sys:String>
+    <sys:String x:Key="Camera_Title_Online">Camera Online</sys:String>
+    <sys:String x:Key="Camera_Title_Offline">Camera Offline</sys:String>
+    <sys:String x:Key="Camera_Title_TotalCamera">Total Camera</sys:String>
+    <sys:String x:Key="Camera_Title_OnlineAndOffline">Camera Online and Offline</sys:String>
+    <sys:String x:Key="Camera_Title_HealthScoreWidget">Camera Health Score</sys:String>
+    <sys:String x:Key="Camera_Title_CameraList">Camera List</sys:String>
     <sys:String x:Key="Camera_Label_HealthScore">Health Score</sys:String>
     <sys:String x:Key="Camera_Label_TotalCameras">Total Cameras</sys:String>
     <sys:String x:Key="Camera_Label_CamerasOnline">Cameras Online</sys:String>
@@ -77,6 +83,10 @@
     <sys:String x:Key="Camera_Template_Title">Resizable template widget</sys:String>
     <sys:String x:Key="Camera_Template_Text">Text</sys:String>
     <sys:String x:Key="Camera_Template_Widget">Template Widget</sys:String>
+    <sys:String x:Key="Camera_Template_TrendSample">↗ 2.3% small text and number</sys:String>
+
+    <!-- Common -->
+    <sys:String x:Key="Common_VsLastPeriod">vs last period</sys:String>
 
     <!-- Alarms and Events labels -->
     <sys:String x:Key="Alarm_Title_LiveAlarmsFeed">Live Alarms Feed</sys:String>

@@ -59,6 +59,12 @@
     <sys:String x:Key="Camera_Title_DisconnectionTrend">Xu hướng mất kết nối camera</sys:String>
     <sys:String x:Key="Camera_Title_OfflineDurationTop10">Thời lượng camera ngoại tuyến top 10</sys:String>
     <sys:String x:Key="Camera_Title_StatusDonut">Biểu đồ trạng thái camera</sys:String>
+    <sys:String x:Key="Camera_Title_Online">Camera trực tuyến</sys:String>
+    <sys:String x:Key="Camera_Title_Offline">Camera ngoại tuyến</sys:String>
+    <sys:String x:Key="Camera_Title_TotalCamera">Tổng số camera</sys:String>
+    <sys:String x:Key="Camera_Title_OnlineAndOffline">Camera trực tuyến và ngoại tuyến</sys:String>
+    <sys:String x:Key="Camera_Title_HealthScoreWidget">Điểm sức khỏe camera</sys:String>
+    <sys:String x:Key="Camera_Title_CameraList">Danh sách camera</sys:String>
     <sys:String x:Key="Camera_Label_HealthScore">Điểm sức khỏe</sys:String>
     <sys:String x:Key="Camera_Label_TotalCameras">Tổng số camera</sys:String>
     <sys:String x:Key="Camera_Label_CamerasOnline">Camera trực tuyến</sys:String>
@@ -77,6 +83,10 @@
     <sys:String x:Key="Camera_Template_Title">Widget mẫu có thể đổi kích thước</sys:String>
     <sys:String x:Key="Camera_Template_Text">Văn bản</sys:String>
     <sys:String x:Key="Camera_Template_Widget">Widget mẫu</sys:String>
+    <sys:String x:Key="Camera_Template_TrendSample">↗ 2.3% chữ nhỏ và số</sys:String>
+
+    <!-- Common -->
+    <sys:String x:Key="Common_VsLastPeriod">so với kỳ trước</sys:String>
 
     <!-- Alarms and Events labels -->
     <sys:String x:Key="Alarm_Title_LiveAlarmsFeed">Luồng cảnh báo trực tiếp</sys:String>

@@ -26,7 +26,7 @@
 
 		    <Grid>
 			    <Border Background="{DynamicResource BgMain}" Height="25" VerticalAlignment="Top" CornerRadius="6,6,6,6">
-				    <TextBlock Text="Camera Health Score" Foreground="{DynamicResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
+				    <TextBlock Text="{DynamicResource Camera_Title_HealthScoreWidget}" Foreground="{DynamicResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
 			    </Border>
 
                 <Button x:Name="DeleteButton" 
@@ -89,9 +89,10 @@
                            Foreground="{DynamicResource TextPrimary}"
                            FontSize="16"/>
 
-				        <TextBlock Text="↗ 2.3% vs last period"
-                           Foreground="#4ADE80"
-                           FontSize="12"/>
+				        <TextBlock Foreground="#4ADE80" FontSize="12">
+                            <Run Text="↗ 2.3% "/>
+                            <Run Text="{DynamicResource Common_VsLastPeriod}"/>
+                        </TextBlock>
                     </StackPanel>
                 </Viewbox>
 

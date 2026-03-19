@@ -77,10 +77,10 @@
                     <StackPanel Width="220">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE722;" FontSize="24" Foreground="#60A5FA" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <TextBlock Text="Text" FontSize="32" FontWeight="Bold" Foreground="#60A5FA" VerticalAlignment="Center"/>
+                            <TextBlock Text="{DynamicResource Camera_Template_Text}" FontSize="32" FontWeight="Bold" Foreground="#60A5FA" VerticalAlignment="Center"/>
                         </StackPanel>
                         <TextBlock Text="{DynamicResource Camera_Template_Widget}" Foreground="{DynamicResource TextPrimary}" FontSize="16"/>
-                        <TextBlock Text="↗ 2.3% small text and number" Foreground="#60A5FA" FontSize="12"/>
+                        <TextBlock Text="{DynamicResource Camera_Template_TrendSample}" Foreground="#60A5FA" FontSize="12"/>
                     </StackPanel>
                 </Viewbox>
 
