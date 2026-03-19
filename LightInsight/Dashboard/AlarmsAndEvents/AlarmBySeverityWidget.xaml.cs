@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using LiveCharts;
@@ -10,7 +11,6 @@ using LightInsight.Dashboard.Dashboard;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {
-    // 1. NHÚNG MODEL VÀO ĐÂY
     public class SeverityData
     {
         public string Title { get; set; }
@@ -32,8 +32,12 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         }
     }
 
-    public partial class AlarmBySeverityWidget : UserControl, IDashboardWidget
+    public partial class AlarmBySeverityWidget : UserControl, IResizableWidget
     {
+        public int MinCol => 3;
+        public int MinRow => 3;
+        public Thumb ResizeThumb => this.InternalResizeThumb;
+
         public event EventHandler DeleteRequested;
         public SeriesCollection ChartSeries { get; set; } = new SeriesCollection();
 
@@ -55,13 +59,12 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
 
         private void LoadChartData()
         {
-            // 2. NHÚNG FAKE DATA VÀO ĐÂY (Thay vì gọi AlarmDataProvider)
             var rawData = new List<SeverityData>
             {
                 new SeverityData { Title = "Minor", Count = 45 },
-                new SeverityData { Title = "Warning", Count = 66 },
                 new SeverityData { Title = "Major", Count = 27 },
-                new SeverityData { Title = "Critical", Count = 12 }
+                new SeverityData { Title = "Warning", Count = 66 },
+                new SeverityData { Title = "Critical", Count = 22 }
             };
 
             foreach (var item in rawData)
@@ -72,34 +75,29 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
                 {
                     Title = item.Title,
                     Values = new ChartValues<int> { item.Count },
-
                     DataLabels = true,
                     LabelPosition = PieLabelPosition.OutsideSlice,
                     LabelPoint = chartPoint => $" {item.Title} {chartPoint.Participation:P0} ",
-
                     Fill = sliceColor,
                     Foreground = sliceColor,
                     FontSize = 13,
                     FontWeight = FontWeights.Medium,
-
-                    PushOut = 2,
+                    PushOut = 0,
                     StrokeThickness = 1,
                     Stroke = Brushes.White
                 });
             }
         }
 
-        // HÀM XỬ LÝ KHI RÊ CHUỘT VÀO VẠCH
         private void Chart_DataHover(object sender, ChartPoint chartPoint)
         {
             HoverText.Text = $"{chartPoint.SeriesView.Title} : {chartPoint.Instance}";
-            HoverPopup.IsOpen = true; // Mở bảng đen
+            HoverPopup.IsOpen = true;
         }
 
-        // HÀM XỬ LÝ KHI RÚT CHUỘT RA NGOÀI
         private void Chart_MouseLeave(object sender, MouseEventArgs e)
         {
-            HoverPopup.IsOpen = false; // Tắt bảng đen
+            HoverPopup.IsOpen = false;
         }
 
         public void SetEditMode(bool isEdit)

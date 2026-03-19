@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives; // Bắt buộc để dùng Thumb
+using System.Windows.Input;
 using System.Windows.Media;
 using LiveCharts.Wpf;
 using LiveCharts;
 using LightInsight.Dashboard.Dashboard;
-using System.Windows.Input;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {
@@ -16,11 +17,16 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         public int Count { get; set; }
     }
 
-    public partial class AlarmDailyCountWidget : UserControl,IDashboardWidget
+    // Đổi IDashboardWidget thành IResizableWidget để khớp chuẩn hệ thống
+    public partial class AlarmDailyCountWidget : UserControl, IResizableWidget
     {
+        // Khai báo các thuộc tính bắt buộc của IResizableWidget
+        public int MinCol => 5;
+        public int MinRow => 3;
+        public Thumb ResizeThumb => this.InternalResizeThumb;
+
         public event EventHandler DeleteRequested;
 
-        // Chuyển sang biến nội bộ cho gọn, không cần Public nữa
         private SeriesCollection _chartSeries = new SeriesCollection();
         private List<string> _xAxisLabels = new List<string>();
 
@@ -35,7 +41,6 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
 
             LoadChartData();
 
-            // THẦN CHÚ LÀ ĐÂY: Gán thẳng tay data vào biểu đồ, không trượt đi đâu được!
             DailyChart.Series = _chartSeries;
             DailyAxisX.Labels = _xAxisLabels;
         }
@@ -53,7 +58,6 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
                 new DailyCountData { Day = "Sun", Count = 12 }
             };
 
-            // Kiểm tra xem DataProvider có thực sự trả về data không
             if (rawData != null && rawData.Count > 0)
             {
                 var values = new ChartValues<int>();
@@ -75,7 +79,6 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
             }
             else
             {
-                // Dòng này để phòng hờ bác truyền lộn Enum, nó sẽ tạo Data giả để hiện cột luôn
                 _chartSeries.Add(new ColumnSeries { Values = new ChartValues<int> { 10, 20, 30 }, Fill = _defaultColor });
                 _xAxisLabels.AddRange(new[] { "Lỗi Data", "Không có", "Dữ liệu" });
             }
