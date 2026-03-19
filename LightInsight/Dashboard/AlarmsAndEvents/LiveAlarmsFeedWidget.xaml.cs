@@ -1,10 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using LightInsight.Dashboard.Dashboard;
+using VideoOS.Platform;
+using VideoOS.Platform.Client;
+using VideoOS.Platform.Messaging;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {
@@ -55,6 +58,8 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
 
     public partial class LiveAlarmsFeedWidget : UserControl, IResizableWidget
     {
+        private ResourceDictionary _currentThemeDictionary;
+        private object _themeChangedRegistration;
         public int MinCol => 3;
 
         public int MinRow => 4;
@@ -66,6 +71,10 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         public LiveAlarmsFeedWidget()
         {
             InitializeComponent();
+            ApplySmartClientTheme(ClientControl.Instance?.Theme);
+            _themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
+                new MessageReceiver(OnThemeChanged),
+                new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
             DeleteButton.Visibility = Visibility.Collapsed;
 
             // 2. NHÚNG TRỰC TIẾP FAKE DATA VÀO DATACONTEXT
@@ -84,6 +93,32 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
                 new AlarmItem { Location = "Backdoor Alley", EventType = "Intrusion", IdAndTime = "ALM-011 • 08:30:00", Status = "Closed", IsHighPriority = false },
                 new AlarmItem { Location = "Parking B", EventType = "Vehicle Wrong Way", IdAndTime = "ALM-012 • 08:15:22", Status = "Ack", IsHighPriority = false, IsLastItem = true }
             };
+        }
+
+        private object OnThemeChanged(Message message, FQID dest, FQID sender)
+        {
+            var theme = message?.Data as Theme;
+            ApplySmartClientTheme(theme);
+            return null;
+        }
+
+        private void ApplySmartClientTheme(Theme scTheme)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                var themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Dark.xaml";
+                var crTheme = ClientControl.Instance.Theme.ThemeType;
+                if (crTheme == ThemeType.Light)
+                    themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Light.xaml";
+
+                var newDict = new ResourceDictionary { Source = new Uri(themeUri, UriKind.RelativeOrAbsolute) };
+
+                if (_currentThemeDictionary != null)
+                    Resources.MergedDictionaries.Remove(_currentThemeDictionary);
+
+                Resources.MergedDictionaries.Insert(0, newDict);
+                _currentThemeDictionary = newDict;
+            });
         }
 
         public void SetEditMode(bool isEdit)

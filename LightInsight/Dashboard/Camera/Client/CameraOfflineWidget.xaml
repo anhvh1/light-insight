@@ -9,11 +9,14 @@
              SnapsToDevicePixels="True">
 
         <Grid Margin="5,5,0,0">
-        <Border Background="#2D2D30" BorderThickness="1" CornerRadius="6" x:Name="MainBorder">
+        <Border Background="{DynamicResource BgMain}" BorderThickness="1" CornerRadius="6" x:Name="MainBorder">
             <Border.BorderBrush>
                 <VisualBrush Stretch="None">
                     <VisualBrush.Visual>
-                        <Rectangle Stroke="#E8751A" StrokeDashArray="4 2" StrokeThickness="1" RadiusX="6" RadiusY="6"
+                        <Rectangle Stroke="#E8751A"
+                                   StrokeDashArray="4 2"
+                                   StrokeThickness="1"
+                                   RadiusX="6" RadiusY="6"
                                    Width="{Binding ElementName=MainBorder, Path=ActualWidth}"
                                    Height="{Binding ElementName=MainBorder, Path=ActualHeight}"/>
                     </VisualBrush.Visual>
@@ -21,8 +24,8 @@
             </Border.BorderBrush>
 
 		    <Grid>
-			    <Border Background="#3E3E42" Height="25" VerticalAlignment="Top" CornerRadius="6,6,6,6">
-				    <TextBlock Text="Camera Analytics Summary" Foreground="White" FontSize="14" VerticalAlignment="Center"/>
+			    <Border Background="{DynamicResource BgMain}" Height="25" VerticalAlignment="Top" CornerRadius="6,6,6,6">
+				    <TextBlock Text="Camera Offline" Foreground="{DynamicResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
 			    </Border>
 
                 <Button x:Name="DeleteButton" 
@@ -34,9 +37,10 @@
                         VerticalAlignment="Top" 
                         Margin="0,3,3,0"
                         Padding="0"
+                        Background="{DynamicResource ButtonBg}"
                         FontSize="12"
                         FontWeight="Bold"
-                        Foreground="White"
+                        Foreground="{DynamicResource TextPrimary}"
                         BorderThickness="0"
                         HorizontalContentAlignment="Center"
                         VerticalContentAlignment="Center"
@@ -59,11 +63,11 @@
 
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="btnBorder" Property="Background" Value="#55FFFFFF"/> </Trigger>
+                                    <Setter TargetName="btnBorder" Property="Background" Value="{DynamicResource ButtonBg}"/> </Trigger>
                 
                                 <Trigger Property="IsPressed" Value="True">
-                                    <Setter TargetName="btnBorder" Property="Background" Value="#33FFFFFF"/>
-                                    <Setter Property="Foreground" Value="#DDD"/>
+                                    <Setter TargetName="btnBorder" Property="Background" Value="{DynamicResource ButtonBg}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -75,23 +79,23 @@
                             <TextBlock FontFamily="Segoe MDL2 Assets" 
                                         Text="&#xEB55;" 
                                         FontSize="24" 
-                                        Foreground="#FF8080"
+                                        Foreground="#F87171"
                                         VerticalAlignment="Center"
                                         Margin="0 0 10 0"/>
 
                             <TextBlock Text="8"
                                         FontSize="32"
                                         FontWeight="Bold"
-                                        Foreground="#FF8080"
+                                        Foreground="#F87171"
                                         VerticalAlignment="Center"/>
                             </StackPanel>
 
                             <TextBlock Text="Cameras Offline"
-                                        Foreground="LightGray"
+                                        Foreground="{DynamicResource TextPrimary}"
                                         FontSize="16"/>
 
                             <TextBlock Text="↘ 15% vs last period"
-                                        Foreground="#EF4444" 
+                                        Foreground="#F87171" 
                                         FontSize="12"/>
                         </StackPanel>
                 </Viewbox>
