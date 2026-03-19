@@ -45,7 +45,7 @@ namespace LightInsight.Dashboard.Dashboard
         private bool _isDirty = false;
         private Point startPoint;
         Button currentMenu = null;
-        string currentDashboard = "Operations";
+        string currentDashboard = "Default Workspace";
         bool sidebarCollapsed = false;
         FrameworkElement selectedWidget = null;
         bool isDraggingWidget = false;
@@ -702,6 +702,14 @@ namespace LightInsight.Dashboard.Dashboard
             // lưu tất cả cell đã dùng
             HashSet<string> usedCells = new HashSet<string>();
 
+            // nếu không có thì lấy default nếu có rồi thì lấy phần tử đầu tiên
+            if (DashboardMenus.Any())
+            {
+                currentDashboard = DashboardMenus[0].Name;
+                BreadcrumbText.Text = $"Dashboard > {currentDashboard}";
+            }
+
+
             foreach (var layout in layouts)
             {
                 if (layout.Dashboard != currentDashboard)
@@ -743,7 +751,6 @@ namespace LightInsight.Dashboard.Dashboard
                     continue;
 
                 SetupWidget(widget);
-
                 Grid.SetRow(widget, row);
                 Grid.SetColumn(widget, col);
                 Grid.SetRowSpan(widget, rowSpan);

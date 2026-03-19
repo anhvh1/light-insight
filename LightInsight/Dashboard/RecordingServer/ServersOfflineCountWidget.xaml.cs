@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using LightInsight.Dashboard.Dashboard;
 using VideoOS.Platform;
 using VideoOS.Platform.Client;
+using VideoOS.Platform.ConfigurationItems;
 using VideoOS.Platform.Messaging;
 
 namespace LightInsight.Dashboard.RecordingServer
@@ -109,5 +110,27 @@ namespace LightInsight.Dashboard.RecordingServer
         {
             DeleteRequested?.Invoke(this, EventArgs.Empty);
         }
+
+        // lấy dữ liệu recording server offline từ server và cập nhật UI
+        //public int GetTotalRecordingServers()
+        //{
+        //    int count = 0;
+
+        //    var managementServer = Configuration.Instance.GetItem(
+        //        Kind.ManagementServer,
+        //        ItemHierarchy.SystemDefined
+        //    );
+
+        //    if (managementServer != null)
+        //    {
+        //        var recordingServers = managementServer.GetChildren();
+
+        //        count = recordingServers
+        //            .Where(x => x.FQID.Kind == Kind.RecordingServer)
+        //            .Count();
+        //    }
+
+        //    return count;
+        //}
     }
 }

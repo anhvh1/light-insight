@@ -4,7 +4,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <!-- Top -->
-    <sys:String x:Key="Breadcrumb_Default">Dashboard &gt; Operations</sys:String>
+    <sys:String x:Key="Breadcrumb_Default">Dashboard &gt; Default Workspace</sys:String>
     <sys:String x:Key="Workspace">Workspace</sys:String>
     <sys:String x:Key="EditLayout">Edit Layout</sys:String>
     <sys:String x:Key="Save">Save</sys:String>
