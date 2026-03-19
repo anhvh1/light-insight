@@ -113,7 +113,8 @@ namespace LightInsight.Dashboard.RecordingServer
             CountText.Text = data.Count.ToString();
 
             // Text hiển thị
-            TrendText.Text = $"{data.TrendPercentage}% vs last period";
+            var vsLastPeriod = TryFindResource("Common_VsLastPeriod") as string ?? "vs last period";
+            TrendText.Text = $"{data.TrendPercentage}% {vsLastPeriod}";
         }
 
         public void SetEditMode(bool isEdit)

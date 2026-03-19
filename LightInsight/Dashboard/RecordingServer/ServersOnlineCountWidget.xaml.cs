@@ -112,7 +112,9 @@ namespace LightInsight.Dashboard.RecordingServer
             CountText.Text = data.Count.ToString();
 
             // Xử lý logic Text Trend
-            string trendDirection = data.IsTrendUp ? "vs last period" : "down vs last period";
+            string trendDirection = data.IsTrendUp
+                ? (TryFindResource("Common_VsLastPeriod") as string ?? "vs last period")
+                : (TryFindResource("Common_DownVsLastPeriod") as string ?? "down vs last period");
             TrendText.Text = $"{data.TrendPercentage}% {trendDirection}";
         }
 

@@ -87,6 +87,7 @@
 
     <!-- Common -->
     <sys:String x:Key="Common_VsLastPeriod">vs last period</sys:String>
+    <sys:String x:Key="Common_DownVsLastPeriod">down vs last period</sys:String>
 
     <!-- Alarms and Events labels -->
     <sys:String x:Key="Alarm_Title_LiveAlarmsFeed">Live Alarms Feed</sys:String>

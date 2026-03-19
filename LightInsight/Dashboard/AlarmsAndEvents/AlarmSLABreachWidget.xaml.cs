@@ -80,7 +80,9 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
             CountText.Text = data.Count.ToString();
 
             // Xử lý text hiển thị cho phần Trend
-            string trendDirection = data.IsTrendUp ? "vs last period" : "down vs last period";
+            string trendDirection = data.IsTrendUp
+                ? (TryFindResource("Common_VsLastPeriod") as string ?? "vs last period")
+                : (TryFindResource("Common_DownVsLastPeriod") as string ?? "down vs last period");
             TrendText.Text = $"{data.TrendPercentage}% {trendDirection}";
 
             // Nếu trend giảm (IsTrendUp = false) thì bác có thể viết thêm vài dòng đổi màu Text/Icon sang đỏ ở đây. 
