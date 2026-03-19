@@ -10,20 +10,11 @@
              SnapsToDevicePixels="True">
 
     <Grid Margin="5,5,0,0">
-        <Border Background="#2D2D30" BorderThickness="1" CornerRadius="6" x:Name="MainBorder">
-            <Border.BorderBrush>
-                <VisualBrush Stretch="None">
-                    <VisualBrush.Visual>
-                        <Rectangle Stroke="#E8751A" StrokeDashArray="4 2" StrokeThickness="1" RadiusX="6" RadiusY="6"
-                                   Width="{Binding ElementName=MainBorder, Path=ActualWidth}"
-                                   Height="{Binding ElementName=MainBorder, Path=ActualHeight}"/>
-                    </VisualBrush.Visual>
-                </VisualBrush>
-            </Border.BorderBrush>
+        <Border Background="{DynamicResource BgMain}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="6" x:Name="MainBorder">
 
 		    <Grid>
-			    <Border Background="#3E3E42" Height="25" VerticalAlignment="Top" CornerRadius="6,6,6,6">
-				    <TextBlock Text="Camera Disconnection Trend" Foreground="White" FontSize="14" VerticalAlignment="Center"/>
+			    <Border Background="{DynamicResource BgMain}" Height="25" VerticalAlignment="Top" CornerRadius="6,6,6,6">
+				    <TextBlock Text="Camera Disconnection Trend" Foreground="{DynamicResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
 			    </Border>
 
                 <Button x:Name="DeleteButton" 
@@ -35,9 +26,10 @@
                         VerticalAlignment="Top" 
                         Margin="0,3,3,0"
                         Padding="0"
+                        Background="{DynamicResource ButtonBg}"
                         FontSize="12"
                         FontWeight="Bold"
-                        Foreground="White"
+                        Foreground="{DynamicResource TextPrimary}"
                         BorderThickness="0"
                         HorizontalContentAlignment="Center"
                         VerticalContentAlignment="Center"
@@ -60,11 +52,11 @@
 
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="btnBorder" Property="Background" Value="#55FFFFFF"/> </Trigger>
+                                    <Setter TargetName="btnBorder" Property="Background" Value="{DynamicResource ButtonBg}"/> </Trigger>
                 
                                 <Trigger Property="IsPressed" Value="True">
-                                    <Setter TargetName="btnBorder" Property="Background" Value="#33FFFFFF"/>
-                                    <Setter Property="Foreground" Value="#DDD"/>
+                                    <Setter TargetName="btnBorder" Property="Background" Value="{DynamicResource ButtonBg}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -74,7 +66,7 @@
 
                         <lvc:CartesianChart x:Name="TrendChart" Hoverable="True" Height="199">
 					    <lvc:CartesianChart.AxisX>
-						    <lvc:Axis Labels="00:00, 04:00, 08:00, 12:00, 16:00, 20:00, 24:00" Foreground="Gray">
+						    <lvc:Axis Labels="00:00, 04:00, 08:00, 12:00, 16:00, 20:00, 24:00" Foreground="{DynamicResource TextPrimary}">
 							    <lvc:Axis.Separator>
 								    <lvc:Separator Step="1" StrokeThickness="0" />
 							    </lvc:Axis.Separator>
@@ -82,7 +74,7 @@
 					    </lvc:CartesianChart.AxisX>
 
 					    <lvc:CartesianChart.AxisY>
-						    <lvc:Axis Foreground="Gray" MinValue="0">
+						    <lvc:Axis Foreground="{DynamicResource TextPrimary}" MinValue="0">
 							    <lvc:Axis.Separator>
 								    <lvc:Separator StrokeThickness="1" Stroke="#33FFFFFF" StrokeDashArray="2"/>
 							    </lvc:Axis.Separator>

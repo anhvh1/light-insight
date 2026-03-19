@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,6 +8,9 @@ using System.Windows.Media;
 using LiveCharts.Wpf;
 using LiveCharts;
 using LightInsight.Dashboard.Dashboard;
+using VideoOS.Platform;
+using VideoOS.Platform.Client;
+using VideoOS.Platform.Messaging;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {
@@ -20,6 +23,8 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
     // Đổi IDashboardWidget thành IResizableWidget để khớp chuẩn hệ thống
     public partial class AlarmDailyCountWidget : UserControl, IResizableWidget
     {
+        private ResourceDictionary _currentThemeDictionary;
+        private object _themeChangedRegistration;
         // Khai báo các thuộc tính bắt buộc của IResizableWidget
         public int MinCol => 5;
         public int MinRow => 3;
@@ -37,6 +42,10 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         public AlarmDailyCountWidget()
         {
             InitializeComponent();
+            ApplySmartClientTheme(ClientControl.Instance?.Theme);
+            _themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
+                new MessageReceiver(OnThemeChanged),
+                new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
             DeleteButton.Visibility = Visibility.Collapsed;
 
             LoadChartData();
@@ -126,6 +135,32 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
                 _lastHoveredRect.Fill = _defaultColor;
                 _lastHoveredRect = null;
             }
+        }
+
+        private object OnThemeChanged(Message message, FQID dest, FQID sender)
+        {
+            var theme = message?.Data as Theme;
+            ApplySmartClientTheme(theme);
+            return null;
+        }
+
+        private void ApplySmartClientTheme(Theme scTheme)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                var themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Dark.xaml";
+                var crTheme = ClientControl.Instance.Theme.ThemeType;
+                if (crTheme == ThemeType.Light)
+                    themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Light.xaml";
+
+                var newDict = new ResourceDictionary { Source = new Uri(themeUri, UriKind.RelativeOrAbsolute) };
+
+                if (_currentThemeDictionary != null)
+                    Resources.MergedDictionaries.Remove(_currentThemeDictionary);
+
+                Resources.MergedDictionaries.Insert(0, newDict);
+                _currentThemeDictionary = newDict;
+            });
         }
 
         public void SetEditMode(bool isEdit)
