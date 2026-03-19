@@ -87,7 +87,7 @@
                             <TextBlock Text="150"
                                        FontSize="32"
                                        FontWeight="Bold"
-                                       Foreground="{DynamicResource TextPrimary}"
+                                       Foreground="#60A5FA"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
 

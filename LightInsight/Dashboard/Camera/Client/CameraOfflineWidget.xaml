@@ -86,7 +86,7 @@
                             <TextBlock Text="8"
                                         FontSize="32"
                                         FontWeight="Bold"
-                                        Foreground="{DynamicResource TextPrimary}"
+                                        Foreground="#F87171"
                                         VerticalAlignment="Center"/>
                             </StackPanel>
 
@@ -95,7 +95,7 @@
                                         FontSize="16"/>
 
                             <TextBlock Text="↘ 15% vs last period"
-                                        Foreground="{DynamicResource TextPrimary}" 
+                                        Foreground="#F87171" 
                                         FontSize="12"/>
                         </StackPanel>
                 </Viewbox>

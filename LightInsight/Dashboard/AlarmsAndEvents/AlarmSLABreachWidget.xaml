@@ -99,7 +99,7 @@
 
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <Path Data="M0,12 L5,12 L8,2 L12,22 L15,12 L20,12"
-                                      Stroke="#FF6B6B"
+                                      Stroke="#2ECC71"
                                       StrokeThickness="2.5"
                                       Width="24" Height="24"
                                       Margin="0,0,10,0"/>
@@ -108,7 +108,7 @@
                                            Text="3"
                                            FontSize="32"
                                            FontWeight="Bold"
-                                           Foreground="#FF6B6B"/>
+                                           Foreground="#2ECC71"/>
                             </StackPanel>
 
                             <TextBlock Text="SLA Breaches"

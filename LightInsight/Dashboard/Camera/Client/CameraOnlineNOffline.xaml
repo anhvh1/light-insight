@@ -81,7 +81,7 @@
                                    Text="142"
                                    FontSize="32"
                                    FontWeight="Bold"
-                                   Foreground="{DynamicResource TextPrimary}" 
+                                   Foreground="#4ADE80" 
                                    VerticalAlignment="Center"/>
 
 						<TextBlock Text=" / "
@@ -95,7 +95,7 @@
                                    Text="8"
                                    FontSize="32"
                                    FontWeight="Bold"
-                                   Foreground="{DynamicResource TextPrimary}"
+                                   Foreground="#F87171"
                                    VerticalAlignment="Center"/>
 					    </StackPanel>
 				    </StackPanel>
