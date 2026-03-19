@@ -23,6 +23,8 @@ namespace LightInsight.Dashboard.Camera.Client
 			};
             _cServices.Start();
 
+			TestApiButton_Click();
+
 			this.Unloaded += (s, e) => {
 				_cServices?.Dispose();
 			};
@@ -37,6 +39,18 @@ namespace LightInsight.Dashboard.Camera.Client
         {
             DeleteRequested?.Invoke(this, EventArgs.Empty);
 			_cServices?.Dispose();
+		}
+
+		private async void TestApiButton_Click()
+		{
+			var myApi = new api();
+
+			// 1. Test lấy Token thô
+			myApi.GetMilestoneAccessToken();
+
+			// 2. Test gọi REST API (Asynchronous)
+			await myApi.TestRestApiCall();
+
 		}
 	}
 }

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IdentityModel.Protocols.WSTrust;
 using System.Linq;
 using System.Windows;
+using System.Windows.Forms;
 using VideoOS.Platform;
 using VideoOS.Platform.Data;
 using VideoOS.Platform.Messaging;
@@ -52,7 +53,7 @@ namespace LightInsight.Dashboard.Camera
             GC.SuppressFinalize(this);
         }
 
-	private object CurrentStateResponseHandler(VideoOS.Platform.Messaging.Message message, FQID dest, FQID source)
+		private object CurrentStateResponseHandler(VideoOS.Platform.Messaging.Message message, FQID dest, FQID source)
 		{
 			if (message.Data is Collection<ItemState> result)
 			{
@@ -69,72 +70,91 @@ namespace LightInsight.Dashboard.Camera
 			return null;
 		}
 
-		private object RealTimeEventHandler(VideoOS.Platform.Messaging.Message message, FQID dest, FQID source)
-		{
-			var eventData = message.Data as EventData;
-			if (eventData?.EventHeader.Source.FQID.Kind == Kind.Camera)
-			{
-				_cameraStatusCache[eventData.EventHeader.Source.FQID.ObjectId] = eventData.EventHeader.Message;
-				NotifyStatus();
-			}
-			return null;
-		}
-
-		//private void NotifyStatus()
+		//private object RealTimeEventHandler(VideoOS.Platform.Messaging.Message message, FQID dest, FQID source)
 		//{
-		//	 //var allStates = _cameraStatusCache.Values.ToList();
-		//	 //System.Diagnostics.Debug.WriteLine($"All States: {string.Join(", ", allStates)}");
-		//	 //var summary = allStates.GroupBy(s => s).Select(g => $"{g.Key}: {g.Count()}");
-		//	 //System.Diagnostics.Debug.WriteLine($"Summary: {string.Join(" | ", summary)}");
-		//		//	foreach (var entry in _cameraStatusCache) {
-		//		//		var item = Configuration.Instance.GetItem(entry.Key, Kind.Camera);
-		//		//		if (item != null) {
-		//		//				System.Diagnostics.Debug.WriteLine($"Name: {item.Name} | ID: {entry.Key} | State: {entry.Value}");
-		//		//		}
-		//		//		else {
-		//		//				System.Diagnostics.Debug.WriteLine($"Unknown Camera | ID: {entry.Key} | State: {entry.Value}");
-		//		//		}
-		//		//	}
-
-		//	int online = _cameraStatusCache.Values.Count(s => s == "Responding" || s == "Enabled");
-		//	int offline = _cameraStatusCache.Values.Count(s => s == "Not Responding" || s == "Disabled");
-			
-		//	Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+		//	var eventData = message.Data as EventData;
+		//	if (eventData?.EventHeader.Source.FQID.Kind == Kind.Camera)
 		//	{
-		//		StatusUpdated?.Invoke(online, offline, 0);
-		//	}));
+		//		//System.Diagnostics.Debug.WriteLine($"REAL-TIME EVENT: {eventData.EventHeader.Source} -> {eventData.EventHeader.Message}");
+		//		_cameraStatusCache[eventData.EventHeader.Source.FQID.ObjectId] = eventData.EventHeader.Message;
+		//		NotifyStatus();
+		//	}
+		//	return null;
 		//}
-private void NotifyStatus()
- {
-     int online = 0;
-     int offline = 0;
-     int totalCount = 0;
 
-     // Duyệt qua tất cả các ID đang có trong bộ nhớ đệm
-     foreach (var entry in _cameraStatusCache)
-     {
-         // Kiểm tra xem ID này có thực sự là một Camera đang tồn tại trong cấu hình không     
-         var item = Configuration.Instance.GetItem(entry.Key, Kind.Camera);
+		 private object RealTimeEventHandler(VideoOS.Platform.Messaging.Message message, FQID dest, FQID source)
+		 {
+			 var eventData = message.Data as EventData;
+			 if (eventData?.EventHeader.Source.FQID.Kind == Kind.Camera)
+			 {
+				 string msg = eventData.EventHeader.Message;
 
-         if (item != null)
-         {
-             // Đây là camera thực tế (Không phải camera ma)
-             totalCount++;
+					// CHỈ CẬP NHẬT NẾU LÀ TIN NHẮN TRẠNG THÁI KẾT NỐI
+					// Chúng ta lọc các tin nhắn "lạ" như "Phát hiện tấn công", "Chuyển động"...
+					string[] statusMessages = { "Responding", "Not Responding", "Disabled", "Enabled", "Communication error" };
 
-             // Kiểm tra trạng thái
-             if (entry.Value.Equals("Responding", StringComparison.OrdinalIgnoreCase))
-                 online++;
-             else if (entry.Value.Equals("Not Responding", StringComparison.OrdinalIgnoreCase))
-                 offline++;
-         }
-     }
+				 bool isStatusMessage = statusMessages.Any(s => msg.Equals(s, StringComparison.OrdinalIgnoreCase));
 
-     // Gửi dữ liệu về UI
-     Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-     {
-         // Bây giờ số lượng sẽ là: Online: 9, Offline: 3, Total: 12
-         StatusUpdated?.Invoke(online, offline, totalCount);
-     }));
- }
+				 if (isStatusMessage)
+				 {
+					 _cameraStatusCache[eventData.EventHeader.Source.FQID.ObjectId] = msg;
+					 NotifyStatus();
+				 }
+				 else
+				 {
+					 // Nếu là sự kiện khác (tấn công, chuyển động), ta vẫn giữ nguyên trạng thái Online/Offline cũ
+					 System.Diagnostics.Debug.WriteLine($"Ignored Event (Not a status change): {msg}");
+				 }
+			 }
+			 return null;
+		 }
+
+		 //private void DumpAllCameraStatus()
+		 //{
+			// System.Diagnostics.Debug.WriteLine("=== DANH SÁCH TRẠNG THÁI 12 CAMERA ===");
+	
+			// foreach (var entry in _cameraStatusCache)
+			// {
+			//	 var item = Configuration.Instance.GetItem(entry.Key, Kind.Camera);
+			//	 if (item != null)
+			//	 {
+			//		 // In ra: Tên Camera | Trạng thái hiện tại trong Cache
+			//		 System.Diagnostics.Debug.WriteLine($"Camera: {item.Name.PadRight(30)} | Status: {entry.Value}");
+			//	 }
+			// }
+			// System.Diagnostics.Debug.WriteLine("======================================");
+		 //}
+			
+		private void NotifyStatus()
+		{
+			int online = 0;
+			int offline = 0;
+			int totalCount = 0;
+
+			// Duyệt qua tất cả các ID đang có trong bộ nhớ đệm
+			foreach (var entry in _cameraStatusCache)
+			{
+				// Kiểm tra xem ID này có thực sự là một Camera đang tồn tại trong cấu hình không     
+				var item = Configuration.Instance.GetItem(entry.Key, Kind.Camera);
+
+				if (item != null)
+				{
+					totalCount++;
+
+					// Kiểm tra trạng thái
+					if (entry.Value.Equals("Responding", StringComparison.OrdinalIgnoreCase))
+						online++;
+					else if (entry.Value.Equals("Not Responding", StringComparison.OrdinalIgnoreCase))
+						offline++;
+				}
+			}
+
+			// Gửi dữ liệu về UI
+			System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+			{
+				StatusUpdated?.Invoke(online, offline, totalCount);
+			}));
+			//DumpAllCameraStatus();
+		}
 	}
 }

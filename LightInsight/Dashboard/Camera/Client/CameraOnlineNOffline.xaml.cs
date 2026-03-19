@@ -15,10 +15,20 @@ namespace LightInsight.Dashboard.Camera.Client
 		public int MinCol => 2;
 		public int MinRow => 2;
 		public Thumb ResizeThumb => this.InternalResizeThumb;
+		private readonly CameraServices _cServices;
 		public CameraOnlineNOffline()
 		{
 			InitializeComponent();
-			DeleteButton.Visibility = Visibility.Collapsed;
+			DeleteButton.Visibility = Visibility.Collapsed; _cServices = new CameraServices();
+			_cServices.StatusUpdated += (online, offline, totalCount) => {
+				TxtOnlineCount.Text = online.ToString();
+				TxtOfflineCount.Text = offline.ToString();
+			};
+			_cServices.Start();
+
+			this.Unloaded += (s, e) => {
+				_cServices?.Dispose();
+			};
 		}
 
 		/// <summary>
@@ -39,6 +49,7 @@ namespace LightInsight.Dashboard.Camera.Client
 		private void DeleteWidget_Click(object sender, RoutedEventArgs e)
 		{
 			DeleteRequested?.Invoke(this, EventArgs.Empty);
+			_cServices?.Dispose();
 		}
 	}
 }
