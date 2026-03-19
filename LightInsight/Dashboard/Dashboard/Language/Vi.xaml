@@ -87,6 +87,7 @@
 
     <!-- Common -->
     <sys:String x:Key="Common_VsLastPeriod">so với kỳ trước</sys:String>
+    <sys:String x:Key="Common_DownVsLastPeriod">giảm so với kỳ trước</sys:String>
 
     <!-- Alarms and Events labels -->
     <sys:String x:Key="Alarm_Title_LiveAlarmsFeed">Luồng cảnh báo trực tiếp</sys:String>
