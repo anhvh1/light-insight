@@ -43,7 +43,7 @@ namespace LightInsight.Dashboard.Camera.Client
 
 		private async void TestApiButton_Click()
 		{
-			var myApi = new api();
+			var myApi = new Api();
 
 			// 1. Test lấy Token thô
 			myApi.GetMilestoneAccessToken();
