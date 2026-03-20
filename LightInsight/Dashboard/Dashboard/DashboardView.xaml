@@ -214,7 +214,7 @@ xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
 
         <Border Grid.Row="1"
         Grid.Column="0"
-        Background="{DynamicResource BgMain}">
+        Background="{DynamicResource ButtonBg}">
 
             <Grid>
 
