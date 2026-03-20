@@ -235,6 +235,7 @@
     <Compile Include="Dashboard\Dashboard\Workspace\WorkspaceWindow.xaml.cs">
       <DependentUpon>WorkspaceWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dashboard\RecordingServer\ServerServices.cs" />
     <Compile Include="Dashboard\RecordingServer\ServersOfflineCountWidget.xaml.cs">
       <DependentUpon>ServersOfflineCountWidget.xaml</DependentUpon>
     </Compile>

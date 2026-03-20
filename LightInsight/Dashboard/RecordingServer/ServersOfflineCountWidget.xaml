@@ -110,7 +110,7 @@
                                       Margin="0,0,10,0"/>
 
                                 <TextBlock x:Name="CountText"
-                                           Text="1"
+                                           Text="100"
                                            FontSize="32"
                                            FontWeight="Bold"
                                            Foreground="#FF6B6B"/>
@@ -120,22 +120,6 @@
                                        Foreground="{DynamicResource TextPrimary}"
                                        FontSize="16"
                                        Margin="0,5,0,10"/>
-
-                            <StackPanel Orientation="Horizontal">
-                                <Path Data="M 2,8 L 6,14 L 10,10 L 16,16 
-                                            M 12,16 L 16,16 L 16,12"
-                                      Stroke="#EF4444"
-                                      StrokeThickness="2"
-                                      Width="12"
-                                      Height="12"
-                                      Margin="0,0,6,0"/>
-
-                                <TextBlock x:Name="TrendText"
-                                           Text="50% vs last period"
-                                           Foreground="#EF4444"
-                                           FontSize="12"/>
-                            </StackPanel>
-
                         </StackPanel>
                     </Viewbox>
 
