@@ -122,6 +122,7 @@ namespace LightInsight.Dashboard.Dashboard
                 new MessageReceiver(OnThemeChanged),
                 new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
             WidgetList.ItemsSource = allWidgets;
+            EnsureDashboardFile();
             // đọc lại dữ liệu widget đang có
             LoadLayout();
 
@@ -1360,6 +1361,100 @@ namespace LightInsight.Dashboard.Dashboard
                 System.Diagnostics.Debug.WriteLine("Set permission failed: " + ex.Message);
             }
         }
+        void EnsureDashboardFile()
+        {
+            string folder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                "LightInsight");
 
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
+            string filePath = Path.Combine(folder, "dashboard_layout.json");
+
+            // 🔥 CHỈ tạo khi chưa có file
+            if (!File.Exists(filePath))
+            {
+                string defaultJson = @"
+                                        [
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""CameraOnlineWidget"",
+                                            ""Row"": 0,
+                                            ""Column"": 0,
+                                            ""RowSpan"": 2,
+                                            ""ColumnSpan"": 2
+                                          },
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""CameraOfflineWidget"",
+                                            ""Row"": 0,
+                                            ""Column"": 2,
+                                            ""RowSpan"": 2,
+                                            ""ColumnSpan"": 2
+                                          },
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""TotalCameraCount"",
+                                            ""Row"": 0,
+                                            ""Column"": 4,
+                                            ""RowSpan"": 2,
+                                            ""ColumnSpan"": 2
+                                          },
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""CameraListWidget"",
+                                            ""Row"": 5,
+                                            ""Column"": 0,
+                                            ""RowSpan"": 4,
+                                            ""ColumnSpan"": 12
+                                          },
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""CameraHealthScoreWidget"",
+                                            ""Row"": 0,
+                                            ""Column"": 6,
+                                            ""RowSpan"": 2,
+                                            ""ColumnSpan"": 2
+                                          },
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""StorageUsageWidget"",
+                                            ""Row"": 0,
+                                            ""Column"": 8,
+                                            ""RowSpan"": 3,
+                                            ""ColumnSpan"": 4
+                                          },
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""TotalServersWidget"",
+                                            ""Row"": 2,
+                                            ""Column"": 0,
+                                            ""RowSpan"": 2,
+                                            ""ColumnSpan"": 2
+                                          },
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""AlarmSLABreachWidget"",
+                                            ""Row"": 2,
+                                            ""Column"": 2,
+                                            ""RowSpan"": 2,
+                                            ""ColumnSpan"": 2
+                                          },
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""AlarmBySeverityWidget"",
+                                            ""Row"": 2,
+                                            ""Column"": 4,
+                                            ""RowSpan"": 3,
+                                            ""ColumnSpan"": 3
+                                          }
+                                        ]";
+
+                File.WriteAllText(filePath, defaultJson);
+
+                SetFilePermissionForAllUsers(filePath);
+            }
+        }
     }
 }
