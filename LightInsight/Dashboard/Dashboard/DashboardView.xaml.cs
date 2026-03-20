@@ -530,7 +530,7 @@ namespace LightInsight.Dashboard.Dashboard
         private void DashboardGrid_DragOver(object sender, DragEventArgs e)
         {
             e.Effects = DragDropEffects.Copy;
-            e.Handled = true;
+            e.Handled = false;
         }
 
         private void Widget_MouseMove(object sender, MouseEventArgs e)
@@ -1189,8 +1189,23 @@ namespace LightInsight.Dashboard.Dashboard
 
             CreateGrid();
         }
+        private void DashboardScroll_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            ScrollViewer scrollViewer = sender as ScrollViewer;
+
+            if (scrollViewer != null)
+            {
+                scrollViewer.ScrollToVerticalOffset(
+                    scrollViewer.VerticalOffset - e.Delta);
+
+                e.Handled = true; // 🔥 QUAN TRỌNG
+            }
+        }
         private void DashboardScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
+            // 🔥 CHẶN nếu không phải edit mode
+            if (!editMode)
+                return;
             ScrollViewer sv = sender as ScrollViewer;
 
             if (sv.VerticalOffset + sv.ViewportHeight >= sv.ExtentHeight - 5)

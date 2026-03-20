@@ -14,6 +14,39 @@ xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
             <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}"/>
         </Style>
+        <Style x:Key="NoArrowExpander" TargetType="Expander">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Expander">
+
+                        <Border Background="{TemplateBinding Background}">
+                            <StackPanel>
+
+                                <!-- HEADER FIX -->
+                                <ContentPresenter 
+                            Content="{TemplateBinding Header}"
+                            ContentTemplate="{TemplateBinding HeaderTemplate}"
+                            RecognizesAccessKey="True"/>
+
+                                <!-- CONTENT -->
+                                <ContentPresenter x:Name="ExpandSite"
+                                          Visibility="Collapsed"
+                                          Margin="10,5,0,0"
+                                          Content="{TemplateBinding Content}"/>
+
+                            </StackPanel>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="True">
+                                <Setter TargetName="ExpandSite" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource BgMain}">
@@ -227,41 +260,109 @@ xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
 
                 <StackPanel Grid.Row="0">
 
-                    <Expander Header="{DynamicResource Dashboard}"
-                      FontSize="16"
-                      x:Name="DashboardExpander"
-                      Foreground="{DynamicResource TextPrimary}"
-                      Margin="5"
-                      IsExpanded="True">
+                    <Expander x:Name="DashboardExpander"
+                              Style="{StaticResource NoArrowExpander}"
+              FontSize="14"
+              Margin="5"
+              IsExpanded="True"
+              Background="Transparent"
+              BorderThickness="0">
 
-                        <!-- 🔥 DYNAMIC MENU -->
+                        <!-- 🔥 HEADER CUSTOM -->
+                        <Expander.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- ICON -->
+                                <iconPacks:PackIconMaterial 
+                    Kind="ViewDashboard"
+                    Width="15"
+                    Height="20"
+                    Margin="5,0,10,0"
+                    VerticalAlignment="Center"
+                    Foreground="{DynamicResource TextPrimary}"/>
+
+                                <!-- TEXT -->
+                                <TextBlock Grid.Column="1"
+                           Text="{DynamicResource Dashboard}"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource TextPrimary}"
+                           FontWeight="SemiBold"/>
+
+                                <!-- ARROW RIGHT -->
+                                <iconPacks:PackIconMaterial 
+                    Grid.Column="2"
+                    Kind="ChevronDown"
+                    Width="18"
+                    Height="18"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    Foreground="{DynamicResource TextPrimary}">
+
+                                    <iconPacks:PackIconMaterial.Style>
+                                        <Style TargetType="iconPacks:PackIconMaterial">
+                                            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+                                            <Style.Triggers>
+
+                                                <!-- COLLAPSE -->
+                                                <DataTrigger Binding="{Binding IsExpanded, RelativeSource={RelativeSource AncestorType=Expander}}" Value="False">
+                                                    <Setter Property="RenderTransform">
+                                                        <Setter.Value>
+                                                            <RotateTransform Angle="-90"/>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+
+                                                <!-- EXPAND -->
+                                                <DataTrigger Binding="{Binding IsExpanded, RelativeSource={RelativeSource AncestorType=Expander}}" Value="True">
+                                                    <Setter Property="RenderTransform">
+                                                        <Setter.Value>
+                                                            <RotateTransform Angle="0"/>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+
+                                            </Style.Triggers>
+                                        </Style>
+                                    </iconPacks:PackIconMaterial.Style>
+
+                                </iconPacks:PackIconMaterial>
+
+                            </Grid>
+                        </Expander.Header>
+
+                        <!-- 🔥 CONTENT -->
                         <ItemsControl ItemsSource="{Binding DashboardMenus}">
 
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
 
                                     <Button Click="Menu_Click"
-                                    Margin="5"
-                                    Height="28"
-                                    Width="187"
-                                    Foreground="{DynamicResource TextPrimary}"
-                                    BorderThickness="0"
-                                    Background="{DynamicResource ButtonBg}"
-                                    HorizontalContentAlignment="Left">
+                            Margin="5"
+                            Height="28"
+                            Width="187"
+                            Foreground="{DynamicResource TextPrimary}"
+                            BorderThickness="0"
+                            Background="{DynamicResource ButtonBg}"
+                            HorizontalContentAlignment="Left">
 
                                         <StackPanel Orientation="Horizontal" Width="171">
 
                                             <!-- ICON -->
                                             <iconPacks:PackIconMaterial 
-                                        Kind="{Binding Icon}" 
-                                        Width="20" Height="20"
-                                        Margin="0,0,10,0"/>
+                                Kind="{Binding Icon}" 
+                                Width="20" Height="20"
+                                Margin="0,0,10,0"/>
 
                                             <!-- TEXT -->
                                             <TextBlock Text="{Binding Name}"
-                                               Foreground="{DynamicResource TextPrimary}"
-                                               VerticalAlignment="Center"
-                                               Margin="5,0,0,0"/>
+                                       Foreground="{DynamicResource TextPrimary}"
+                                       VerticalAlignment="Center"
+                                       Margin="5,0,0,0"/>
 
                                         </StackPanel>
 
@@ -309,6 +410,8 @@ xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
 
             <ScrollViewer x:Name="DashboardScroll"
               VerticalScrollBarVisibility="Auto"
+              PanningMode="VerticalOnly"
+              PreviewMouseWheel="DashboardScroll_PreviewMouseWheel"
               ScrollChanged="DashboardScroll_ScrollChanged">
 
                 <Grid>
@@ -318,6 +421,7 @@ xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                           Background="Transparent"
                           MinHeight="1000"
                           AllowDrop="True"
+                          IsHitTestVisible="True"
                           Drop="DashboardGrid_Drop"
                           DragOver="DashboardGrid_DragOver">
 
