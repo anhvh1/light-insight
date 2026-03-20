@@ -63,6 +63,12 @@
     <PackageReference Include="LiveCharts.Wpf">
       <Version>0.9.7</Version>
     </PackageReference>
+    <PackageReference Include="MahApps.Metro.IconPacks">
+      <Version>6.2.1</Version>
+    </PackageReference>
+    <PackageReference Include="MahApps.Metro.IconPacks.FontAwesome">
+      <Version>6.2.1</Version>
+    </PackageReference>
     <PackageReference Include="MaterialDesignThemes">
       <Version>5.3.0</Version>
     </PackageReference>
@@ -79,6 +85,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq">
@@ -203,8 +210,31 @@
     <Compile Include="Dashboard\Dashboard\DashboardViewItemWpfUserControl.cs" />
     <Compile Include="Dashboard\Dashboard\IDashboardWidget.cs" />
     <Compile Include="Dashboard\Dashboard\IResizableWidget.cs" />
+    <Compile Include="Dashboard\Dashboard\Language\English.xaml.cs">
+      <DependentUpon>English.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Dashboard\Language\Vi.xaml.cs">
+      <DependentUpon>Vi.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\Dashboard\LightInsightWorkSpacePlugin.cs" />
+    <Compile Include="Dashboard\Dashboard\Themes\Dark.xaml.cs">
+      <DependentUpon>Dark.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Dashboard\Themes\Light.xaml.cs">
+      <DependentUpon>Light.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\Dashboard\WidgetItem.cs" />
+    <Compile Include="Dashboard\Dashboard\Workspace\AddWorkspaceWindow.xaml.cs">
+      <DependentUpon>AddWorkspaceWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Dashboard\Workspace\WorkspaceModel.cs">
+      <Generator>MSBuild:Compile</Generator>
+    </Compile>
+    <Compile Include="Dashboard\Dashboard\Workspace\WorkspaceService.cs" />
+    <Compile Include="Dashboard\Dashboard\Workspace\WorkspaceStorage.cs" />
+    <Compile Include="Dashboard\Dashboard\Workspace\WorkspaceWindow.xaml.cs">
+      <DependentUpon>WorkspaceWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\RecordingServer\ServersOfflineCountWidget.xaml.cs">
       <DependentUpon>ServersOfflineCountWidget.xaml</DependentUpon>
     </Compile>
@@ -224,6 +254,30 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="LightInsightDefinition.cs" />
+    <Page Include="Dashboard\Dashboard\Language\English.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\Dashboard\Language\Vi.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\Dashboard\Themes\Dark.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dashboard\Dashboard\Themes\Light.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dashboard\Dashboard\Workspace\AddWorkspaceWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dashboard\Dashboard\Workspace\WorkspaceWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dashboard\RecordingServer\ServersOfflineCountWidget.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

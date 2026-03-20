@@ -1,20 +1,22 @@
 ﻿<UserControl x:Class="LightInsight.Dashboard.Dashboard.DashboardView"
 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-Background="#1E1E1E"
+xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+ Background="{DynamicResource BgMain}"
     HorizontalAlignment="Stretch"
     VerticalAlignment="Stretch">
     <UserControl.Resources>
+
         <Style x:Key="FilterButton" TargetType="ToggleButton">
             <Setter Property="Margin" Value="2"/>
             <Setter Property="Padding" Value="6 2"/>
-            <Setter Property="Background" Value="#3C3C3C"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="#555"/>
+            <Setter Property="Background" Value="{DynamicResource CardBg}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}"/>
         </Style>
     </UserControl.Resources>
 
-    <Grid>
+    <Grid Background="{DynamicResource BgMain}">
         <!-- ================= MAIN LAYOUT ================= -->
         <Grid.ColumnDefinitions>
             <!-- Sidebar -->
@@ -33,55 +35,186 @@ Background="#1E1E1E"
 
         <!-- ================= TOP BAR ================= -->
 
-        <Border Grid.Column="0"
-            Grid.ColumnSpan="3"
-            Background="#2B2B2B"
-            Padding="10">
+        <Border Grid.Row="0"
+        Grid.Column="0"
+        Grid.ColumnSpan="3"
+        Background="{DynamicResource BgMain}"
+        Padding="10,5">
 
             <DockPanel LastChildFill="False">
+
                 <!-- LEFT AREA -->
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                <StackPanel Orientation="Horizontal"
+                    DockPanel.Dock="Left"
+                    VerticalAlignment="Center">
+
                     <!-- LOGO -->
-                    <Border Height="30" Margin="5,0,20,0" CornerRadius="8" Background="Transparent">
-                        <Image Source="/LightInsight;component/Dashboard/Asset/logo.png" Stretch="Uniform"/>
+                    <Border Height="30"
+                    Margin="5,0,20,0"
+                    CornerRadius="6">
+
+                        <Image Source="/LightInsight;component/Dashboard/Asset/logo.png"
+                       Stretch="Uniform"/>
                     </Border>
+
                     <!-- BREADCRUMB -->
-                    <TextBlock x:Name="BreadcrumbText" Text="Dashboard" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="White"/>
+                    <TextBlock x:Name="BreadcrumbText"
+                       Text="{DynamicResource Breadcrumb_Default}"
+                       FontSize="16"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource TextPrimary}"/>
                 </StackPanel>
+
+
                 <!-- RIGHT AREA -->
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                <StackPanel Orientation="Horizontal"
+                    DockPanel.Dock="Right"
+                    VerticalAlignment="Center">
+
+                    <!-- WORKSPACE -->
+                    <Button x:Name="WorkspaceBtn"
+                            Height="30"
+                            Margin="5"
+                            Click="WorkspaceBtn_Click"
+                            Background="#3498DB"
+                            Foreground="White"
+                            Padding="12,4"
+                            BorderThickness="0">
+
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Center">
+
+                            <TextBlock Text="⚙"
+                                       FontSize="14"
+                                       Margin="0,0,6,0"
+                                       VerticalAlignment="Center"/>
+
+                            <TextBlock Text="{DynamicResource Workspace}"
+                                       VerticalAlignment="Center"/>
+
+                        </StackPanel>
+
+                    </Button>
                     <!-- EDIT LAYOUT -->
-                    <Button x:Name="EditLayoutBtn" Content="Edit Layout" Width="90" Margin="5" Click="EditLayoutBtn_Click" Background="Orange"/>
+                    <Button x:Name="EditLayoutBtn"
+                    Height="30"
+                    Margin="5"
+                    Click="EditLayoutBtn_Click"
+                    Background="#F39C12"
+                    Foreground="White"
+                    Padding="12,4"
+                    BorderThickness="0">
+
+                        <StackPanel Orientation="Horizontal"
+                            VerticalAlignment="Center">
+
+                            <TextBlock Text="✏"
+                               FontSize="14"
+                               Margin="0,0,6,0"
+                               VerticalAlignment="Center"/>
+
+                            <TextBlock Text="{DynamicResource EditLayout}"
+                               VerticalAlignment="Center"/>
+
+                        </StackPanel>
+
+                    </Button>
+
+
                     <!-- SAVE -->
-                    <Button x:Name="SaveBtn" Content="Save" Width="60"  Margin="5" Visibility="Collapsed" Click="SaveBtn_Click" Background="#33CC66"/>
+                    <Button x:Name="SaveBtn"
+                    Content="{DynamicResource Save}"
+                    Height="30"
+                    Margin="5"
+                    Visibility="Collapsed"
+                    Click="SaveBtn_Click"
+                    Background="#33CC66"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Padding="10,4"/>
+
+
                     <!-- CANCEL -->
-                    <Button x:Name="CancelBtn" Content="Cancel" Width="80" Margin="5" Visibility="Collapsed" Click="CancelBtn_Click" Background="OrangeRed"/>
+                    <Button x:Name="CancelBtn"
+                    Content="{DynamicResource Cancel}"
+                    Height="30"
+                    Margin="5"
+                    Visibility="Collapsed"
+                    Click="CancelBtn_Click"
+                    Background="OrangeRed"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Padding="10,4"/>
+
+
                     <!-- TIME RANGE -->
-                    <ComboBox x:Name="TimeRangeCombo" Width="80" Margin="5" SelectedIndex="1" BorderThickness="0"  Background="Transparent">
-                        <ComboBoxItem Content="Last 24h"/>
-                        <ComboBoxItem Content="Last 7 days"/>
-                        <ComboBoxItem Content="Last 30 days"/>
-                        <ComboBoxItem Content="Custom"/>
+                    <ComboBox x:Name="TimeRangeCombo"
+                      Width="95"
+                      Height="30"
+                      Margin="5"
+                      SelectedIndex="1"
+                      BorderThickness="0">
+
+                        <ComboBoxItem Content="{DynamicResource Last24h}"/>
+                        <ComboBoxItem Content="{DynamicResource Last7Days}"/>
+                        <ComboBoxItem Content="{DynamicResource Last30Days}"/>
+                        <ComboBoxItem Content="{DynamicResource Custom}"/>
+
                     </ComboBox>
-                    <!-- THEME BUTTON -->
-                    <Button x:Name="ThemeBtn" Content="🌙" Width="40" Margin="5" Click="ThemeBtn_Click"  BorderThickness="0" MinWidth="0" MinHeight="0"  Background="Transparent"/>
+
+
+                    <!-- THEME -->
+                    <!--<Button x:Name="ThemeBtn"
+                    Content="🌙"
+                    Width="36"
+                    Height="30"
+                    Margin="5"
+                    Click="ThemeBtn_Click"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    MinWidth="0" 
+                    MinHeight="0"
+                    Foreground="White"/>-->
+
+
                     <!-- LANGUAGE -->
-                    <ComboBox x:Name="LanguageCombo" Width="40" Margin="5" SelectionChanged="LanguageCombo_SelectionChanged" BorderThickness="0">
+                    <!--<ComboBox x:Name="LanguageCombo"
+                      Width="40"
+                      Height="30"
+                      Margin="5"
+                      BorderThickness="0"
+                      SelectionChanged="LanguageCombo_SelectionChanged">
                         <ComboBoxItem Content="EN"/>
                         <ComboBoxItem Content="VI"/>
-                    </ComboBox>
+                    </ComboBox>-->
+
+
                     <!-- REFRESH -->
-                    <Button x:Name="RefreshBtn" Content="🔄" Width="35" Margin="5" Click="RefreshBtn_Click" BorderThickness="0" Background="Transparent" Foreground="White" MinWidth="0" MinHeight="0"/>
+                    <Button x:Name="RefreshBtn"
+                    Content="🔄"
+                    Width="36"
+                    Height="30"
+                    Margin="5"
+                    Click="RefreshBtn_Click"
+                    Background="Transparent"
+                    Foreground="White"
+                    BorderThickness="0"
+                    MinWidth="0" 
+                    MinHeight="0"/>
+
                 </StackPanel>
+
             </DockPanel>
+
         </Border>
 
 
         <!-- ================= SIDEBAR ================= -->
 
         <Border Grid.Row="1"
-            Grid.Column="0"
-            Background="#252526">
+        Grid.Column="0"
+        Background="{DynamicResource BgMain}">
 
             <Grid>
 
@@ -90,94 +223,73 @@ Background="#1E1E1E"
                     <RowDefinition Height="50"/>
                 </Grid.RowDefinitions>
 
-
                 <!-- MENU AREA -->
 
                 <StackPanel Grid.Row="0">
 
-                    <Expander Header="Dashboard"
-                          FontSize="16"
-                          x:Name="DashboardExpander"
-                          Foreground="White"
-                          Margin="5"
-                          IsExpanded="True">
+                    <Expander Header="{DynamicResource Dashboard}"
+                      FontSize="16"
+                      x:Name="DashboardExpander"
+                      Foreground="{DynamicResource TextPrimary}"
+                      Margin="5"
+                      IsExpanded="True">
 
-                        <StackPanel Margin="5">
+                        <!-- 🔥 DYNAMIC MENU -->
+                        <ItemsControl ItemsSource="{Binding DashboardMenus}">
 
-                            <!-- OPERATIONS -->
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
 
-                            <Button x:Name="OperationsBtn"
-                                Tag="Operations"
-                                Margin="5"
-                                Click="Menu_Click"
-                                Height="28"
-                                Width="187"
-                                Foreground="White"
-                                BorderThickness="0"
-                                Background="Transparent">
+                                    <Button Click="Menu_Click"
+                                    Margin="5"
+                                    Height="28"
+                                    Width="187"
+                                    Foreground="{DynamicResource TextPrimary}"
+                                    BorderThickness="0"
+                                    Background="{DynamicResource ButtonBg}"
+                                    HorizontalContentAlignment="Left">
 
-                                <StackPanel Orientation="Horizontal" Width="171">
+                                        <StackPanel Orientation="Horizontal" Width="171">
 
-                                    <TextBlock Text="📊"
-                                           FontSize="16" Width="25"/>
+                                            <!-- ICON -->
+                                            <iconPacks:PackIconMaterial 
+                                        Kind="{Binding Icon}" 
+                                        Width="20" Height="20"
+                                        Margin="0,0,10,0"/>
 
-                                    <TextBlock x:Name="OperationsText"
-                                           Text=" Operations"
-                                           Margin="10,-1,2,2"
-                                           Foreground="White"/>
+                                            <!-- TEXT -->
+                                            <TextBlock Text="{Binding Name}"
+                                               Foreground="{DynamicResource TextPrimary}"
+                                               VerticalAlignment="Center"
+                                               Margin="5,0,0,0"/>
 
-                                </StackPanel>
+                                        </StackPanel>
 
-                            </Button>
+                                    </Button>
 
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
 
-                            <!-- ALARM MONITOR -->
-
-                            <Button x:Name="AlarmMonitorBtn"
-                                Tag="AlarmMonitor"
-                                Margin="5"
-                                Click="Menu_Click"
-                                Height="28"
-                                Width="187"
-                                Foreground="White"
-                                BorderThickness="0"
-                                Background="Transparent">
-
-                                <StackPanel Orientation="Horizontal" Width="171">
-
-                                    <TextBlock Text="⚠"
-                                           FontSize="16"/>
-
-                                    <TextBlock x:Name="AlarmMonitorText"
-                                           Text=" Alarm Monitor"
-                                           Foreground="White"
-                                           Margin="10,-1,2,2" Width="139"/>
-
-                                </StackPanel>
-
-                            </Button>
-
-                        </StackPanel>
+                        </ItemsControl>
 
                     </Expander>
 
                 </StackPanel>
 
-
                 <!-- COLLAPSE BUTTON -->
 
                 <Border Grid.Row="1"
-                    BorderBrush="#444"
-                    BorderThickness="0,1,0,0"
-                    Background="#252526">
+                BorderBrush="#444"
+                BorderThickness="0,1,0,0"
+                Background="{DynamicResource BgMain}">
 
-                    <Button Content="☰ Collapse"
-                        HorizontalAlignment="Left"
-                        Margin="10"
-                        Background="Transparent"
-                        Foreground="White"
-                        BorderThickness="0"
-                        Click="ToggleSidebar_Click"/>
+                    <Button Content="{DynamicResource Collapse}"
+                    HorizontalAlignment="Left"
+                    Margin="10"
+                    Background="Transparent"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Click="ToggleSidebar_Click"/>
 
                 </Border>
 
@@ -191,7 +303,7 @@ Background="#1E1E1E"
 
         <Border Grid.Row="1"
         Grid.Column="1"
-        Background="#1E1E1E"
+        Background="{DynamicResource BgMain}"
         Margin="5"
         ClipToBounds="True">
 
@@ -263,9 +375,9 @@ Background="#1E1E1E"
         Grid.Row="1"
         Grid.Column="2"
         Width="280"
-        Background="#2D2D30"
+        Background="{DynamicResource BgMain}"
         Visibility="Collapsed"
-        BorderBrush="#444"
+        BorderBrush="{DynamicResource CardBorder}"
         BorderThickness="1">
 
             <Grid Margin="10">
@@ -279,10 +391,10 @@ Background="#1E1E1E"
 
                 <!-- Header -->
                 <DockPanel Grid.Row="0" Margin="0 0 0 10">
-                    <TextBlock Text="Widget Library"
+                    <TextBlock Text="{DynamicResource WidgetLibrary}"
                        FontSize="16"
                        FontWeight="SemiBold"
-                       Foreground="White"
+                       Foreground="{DynamicResource TextPrimary}"
                        DockPanel.Dock="Left"/>
                 </DockPanel>
 
@@ -292,9 +404,9 @@ Background="#1E1E1E"
                  Height="28"
                  Margin="0 0 0 10"
                  Padding="6"
-                 Background="#3C3C3C"
-                 Foreground="White"
-                 BorderBrush="#555"
+                 Background="{DynamicResource ButtonBg}"
+                 Foreground="{DynamicResource TextPrimary}"
+                 BorderBrush="{DynamicResource CardBorder}"
                  TextChanged="SearchBox_TextChanged"/>
 
                 <!-- Filter -->
@@ -302,10 +414,10 @@ Background="#1E1E1E"
                             Grid.Row="2"
                             Orientation="Horizontal">
 
-                    <ToggleButton Content="KPI" Tag="KPI" Click="Filter_Click" Style="{StaticResource FilterButton}"/>
-                    <ToggleButton Content="Charts" Tag="Charts" Click="Filter_Click" Style="{StaticResource FilterButton}"/>
-                    <ToggleButton Content="Tables" Tag="Tables" Click="Filter_Click" Style="{StaticResource FilterButton}"/>
-                    <ToggleButton Content="Lists" Tag="Lists" Click="Filter_Click" Style="{StaticResource FilterButton}"/>
+                    <ToggleButton Content="{DynamicResource KPI}" Tag="KPI" Click="Filter_Click" Style="{StaticResource FilterButton}"/>
+                    <ToggleButton Content="{DynamicResource Charts}" Tag="Charts" Click="Filter_Click" Style="{StaticResource FilterButton}"/>
+                    <ToggleButton Content="{DynamicResource Tables}" Tag="Tables" Click="Filter_Click" Style="{StaticResource FilterButton}"/>
+                    <ToggleButton Content="{DynamicResource Lists}" Tag="Lists" Click="Filter_Click" Style="{StaticResource FilterButton}"/>
 
                 </StackPanel>
 
@@ -314,7 +426,7 @@ Background="#1E1E1E"
 
                     <ListBox x:Name="WidgetList"
                              Grid.Row="3"
-                             Background="Transparent"
+                             Background="{DynamicResource ButtonBg}"
                              BorderThickness="0"
                              Width="250"
                              ScrollViewer.VerticalScrollBarVisibility="Auto">
@@ -324,12 +436,12 @@ Background="#1E1E1E"
                                 <Setter Property="Padding" Value="0"/>
                                 <Setter Property="Margin" Value="0"/>
                                 <Setter Property="BorderThickness" Value="0"/>
-                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Background" Value="{DynamicResource BgMain}"/>
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
 
                                 <Style.Triggers>
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Setter Property="Background" Value="{DynamicResource TextPrimary}"/>
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
@@ -338,14 +450,14 @@ Background="#1E1E1E"
                         <ListBox.ItemTemplate>
                             <DataTemplate>
 
-                                <Border Background="#3C3C3C"
+                                <Border Background="{DynamicResource BgMain}"
                                         Margin="0 4"
                                         Padding="8"
                                         CornerRadius="4"
                                         MouseMove="WidgetLibrary_MouseMove">
 
                                     <DockPanel LastChildFill="False">
-                                        <Button Content="Add"
+                                        <Button Content="{DynamicResource Add}"
                                                 MinHeight="0"
                                                 MinWidth="0"
                                                 Width="45"
@@ -355,11 +467,11 @@ Background="#1E1E1E"
                                                 Tag="{Binding}"
                                                 Click="AddWidget_Click"
                                                 Background="#FF7A1A"
-                                                Foreground="White"
+                                                Foreground="{DynamicResource TextSecondary}"
                                                 
                                                 />
                                         <TextBlock Text="{Binding Name}"
-                                                   Foreground="White"
+                                                   Foreground="{DynamicResource TextPrimary}"
                                                    VerticalAlignment="Center"/>
 
                                     </DockPanel>

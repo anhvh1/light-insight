@@ -1,74 +1,190 @@
-﻿<UserControl x:Class="LightInsight.Dashboard.RecordingServer.StorageUsageWidget"
+<UserControl x:Class="LightInsight.Dashboard.RecordingServer.StorageUsageWidget"
+             x:Name="RootWidget"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
-             Height="300" Width="570">
+             Width="Auto" Height="Auto"
+             Tag="4x3"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch"
+             UseLayoutRounding="True"
+             SnapsToDevicePixels="True">
 
-    <Border Background="#2D2D30" BorderThickness="1" CornerRadius="6" Padding="15">
-        <Border.BorderBrush>
-            <VisualBrush>
-                <VisualBrush.Visual>
-                    <Rectangle Stroke="#E8751A" StrokeDashArray="4 2" StrokeThickness="1" RadiusX="6" RadiusY="6"
-                               Width="{Binding RelativeSource={RelativeSource AncestorType=Border}, Path=ActualWidth}"
-                               Height="{Binding RelativeSource={RelativeSource AncestorType=Border}, Path=ActualHeight}"/>
-                </VisualBrush.Visual>
-            </VisualBrush>
-        </Border.BorderBrush>
+    <Grid Margin="5,5,0,0">
+        <Border x:Name="MainBorder"
+                Background="{DynamicResource BgMain}"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="10">
 
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+            <!-- DASH BORDER -->
+            <Border.BorderBrush>
+                <VisualBrush Stretch="None">
+                    <VisualBrush.Visual>
+                        <Rectangle Stroke="#E8751A"
+                                   StrokeDashArray="4 2"
+                                   StrokeThickness="1"
+                                   RadiusX="6" RadiusY="6"
+                                   Width="{Binding ElementName=MainBorder, Path=ActualWidth}"
+                                   Height="{Binding ElementName=MainBorder, Path=ActualHeight}"/>
+                    </VisualBrush.Visual>
+                </VisualBrush>
+            </Border.BorderBrush>
 
-            <Grid Grid.Row="0" Margin="0,0,0,15">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                <TextBlock Grid.Column="0" Text="Storage Usage by Server" Foreground="White" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                <!-- HEADER -->
+                <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="1" x:Name="DeleteButton" Content="✕" Width="20" Height="20" FontSize="12" Padding="0"
-                        Background="Transparent" Foreground="#888888" BorderThickness="0" Cursor="Hand"
-                        VerticalAlignment="Center" Click="DeleteWidget_Click" Margin="10,0,0,0" MinWidth="0" MinHeight="0"/>
+                    <TextBlock Grid.Column="0"
+                               Text="{DynamicResource Recording_Title_StorageUsageByServer}"
+                               Foreground="{DynamicResource TextPrimary}"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"/>
+
+                    <Button x:Name="DeleteButton" 
+        Content="X" 
+        Width="20" Height="20" 
+        MinWidth="20" MinHeight="20"
+        MaxWidth="20" MaxHeight="20"
+        HorizontalAlignment="Right" 
+        VerticalAlignment="Top" 
+        Margin="0,3,3,0"
+        Padding="0"
+        FontSize="12"
+        FontWeight="Bold"
+        Foreground="{DynamicResource TextPrimary}"
+        Background="{DynamicResource ButtonBg}"
+        BorderThickness="0"
+        HorizontalContentAlignment="Center"
+        VerticalContentAlignment="Center"
+        Click="DeleteWidget_Click">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="2"/>
+                            </Style>
+                        </Button.Resources>
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="btnBorder"
+                    
+                    Background="{TemplateBinding Background}" 
+                    BorderBrush="{TemplateBinding BorderBrush}" 
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="3">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="btnBorder" Property="Background" Value="{DynamicResource ButtonBg}"/>
+                                    </Trigger>
+
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter TargetName="btnBorder" Property="Background" Value="{DynamicResource ButtonBg}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Grid>
+
+                <!-- CHART -->
+                <Grid Grid.Row="1">
+
+                    <lvc:CartesianChart x:Name="UsageChart"
+                                        Margin="0"
+                                        Hoverable="True"
+                                        DataTooltip="{x:Null}"
+                                        DataHover="Chart_DataHover"
+                                        MouseLeave="Chart_MouseLeave">
+
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis x:Name="UsageAxisX"
+                                      Foreground="{DynamicResource TextPrimary}"
+                                      FontSize="12">
+                                <lvc:Axis.Separator>
+                                    <lvc:Separator Step="1" Stroke="Transparent"/>
+                                </lvc:Axis.Separator>
+
+                                <lvc:Axis.Sections>
+                                    <lvc:AxisSection x:Name="HoverSection"
+                                                     Value="0"
+                                                     SectionWidth="1"
+                                                     Fill="#33E0E0E0"
+                                                     Visibility="Hidden"/>
+                                </lvc:Axis.Sections>
+                            </lvc:Axis>
+                        </lvc:CartesianChart.AxisX>
+
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis MinValue="0"
+                                      MaxValue="100"
+                                      Foreground="{DynamicResource TextPrimary}"
+                                      FontSize="12">
+                                <lvc:Axis.Separator>
+                                    <lvc:Separator Step="25"
+                                                   Stroke="#333"
+                                                   StrokeThickness="1"
+                                                   StrokeDashArray="4"/>
+                                </lvc:Axis.Separator>
+                            </lvc:Axis>
+                        </lvc:CartesianChart.AxisY>
+
+                    </lvc:CartesianChart>
+
+                    <!-- RESIZE HANDLE -->
+                    <Thumb x:Name="InternalResizeThumb"
+                           Width="12"
+                           Height="12"
+                           Cursor="SizeNWSE"
+                           VerticalAlignment="Bottom"
+                           HorizontalAlignment="Right"
+                           Background="Transparent">
+                        <Thumb.Template>
+                            <ControlTemplate>
+                                <Path Data="M 12,0 L 12,12 L 0,12 Z"
+                                      Fill="#888"
+                                      Opacity="0.5"/>
+                            </ControlTemplate>
+                        </Thumb.Template>
+                    </Thumb>
+
+                </Grid>
+
+                <!-- TOOLTIP -->
+                <Popup x:Name="HoverPopup"
+                       AllowsTransparency="True"
+                       IsHitTestVisible="False">
+                    <Border Background="{DynamicResource BgMain}"
+                            BorderBrush="{DynamicResource CardBorder}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10">
+                        <StackPanel>
+                            <TextBlock x:Name="TooltipServer"
+                                       Foreground="{DynamicResource TextPrimary}"
+                                       FontSize="14"
+                                       FontWeight="Bold"/>
+                            <TextBlock x:Name="TooltipPercent"
+                                       Foreground="{DynamicResource TextPrimary}"
+                                       FontSize="13"/>
+                        </StackPanel>
+                    </Border>
+                </Popup>
+
             </Grid>
-
-            <lvc:CartesianChart x:Name="UsageChart" Grid.Row="1" Margin="10,0,10,0"
-                                Hoverable="True" 
-                                DataTooltip="{x:Null}"
-                                DataHover="Chart_DataHover"
-                                MouseLeave="Chart_MouseLeave">
-
-                <lvc:CartesianChart.AxisX>
-                    <lvc:Axis x:Name="UsageAxisX" Foreground="#888888" FontSize="12">
-                        <lvc:Axis.Separator>
-                            <lvc:Separator Step="1" Stroke="Transparent" />
-                        </lvc:Axis.Separator>
-
-                        <lvc:Axis.Sections>
-                            <lvc:AxisSection x:Name="HoverSection" Value="0" SectionWidth="1" Fill="#33E0E0E0" StrokeThickness="0" Visibility="Hidden" />
-                        </lvc:Axis.Sections>
-                    </lvc:Axis>
-                </lvc:CartesianChart.AxisX>
-
-                <lvc:CartesianChart.AxisY>
-                    <lvc:Axis MinValue="0" MaxValue="100" Foreground="#888888" FontSize="12">
-                        <lvc:Axis.Separator>
-                            <lvc:Separator Step="25" Stroke="#333333" StrokeThickness="1" StrokeDashArray="4" />
-                        </lvc:Axis.Separator>
-                    </lvc:Axis>
-                </lvc:CartesianChart.AxisY>
-            </lvc:CartesianChart>
-
-            <Popup x:Name="HoverPopup" AllowsTransparency="True" IsHitTestVisible="False">
-                <Border Background="#2A2B31" BorderBrush="#444444" BorderThickness="1" CornerRadius="4" Padding="12">
-                    <StackPanel>
-                        <TextBlock x:Name="TooltipServer" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
-                        <TextBlock x:Name="TooltipPercent" Foreground="#2ECC71" FontSize="13"/>
-                    </StackPanel>
-                </Border>
-            </Popup>
-        </Grid>
-    </Border>
+        </Border>
+    </Grid>
 </UserControl>

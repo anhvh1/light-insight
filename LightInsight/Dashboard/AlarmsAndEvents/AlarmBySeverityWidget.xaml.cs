@@ -1,16 +1,20 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using LiveCharts;
 using LiveCharts.Wpf;
 using LightInsight.Dashboard.Dashboard;
+using VideoOS.Platform;
+using VideoOS.Platform.Client;
+using VideoOS.Platform.Messaging;
+using System.Threading;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {
-    // 1. NHÚNG MODEL VÀO ĐÂY
     public class SeverityData
     {
         public string Title { get; set; }
@@ -32,17 +36,42 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         }
     }
 
-    public partial class AlarmBySeverityWidget : UserControl, IDashboardWidget
+    public partial class AlarmBySeverityWidget : UserControl, IResizableWidget
     {
+        private ResourceDictionary _currentThemeDictionary;
+        private object _themeChangedRegistration;
+        public int MinCol => 3;
+        public int MinRow => 3;
+        public Thumb ResizeThumb => this.InternalResizeThumb;
+
         public event EventHandler DeleteRequested;
         public SeriesCollection ChartSeries { get; set; } = new SeriesCollection();
 
         public AlarmBySeverityWidget()
         {
+            ApplySmartClientLanguage(Thread.CurrentThread.CurrentUICulture.Name);
             InitializeComponent();
+            ApplySmartClientTheme(ClientControl.Instance?.Theme);
+            _themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
+                new MessageReceiver(OnThemeChanged),
+                new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
             DeleteButton.Visibility = Visibility.Collapsed;
             this.Loaded += AlarmBySeverityWidget_Loaded;
             this.DataContext = this;
+        }
+        private void ApplySmartClientLanguage(string name)
+        {
+            var uri = name == "vi-VN"
+                       ? "/LightInsight;component/Dashboard/Dashboard/Language/Vi.xaml"
+                       : "/LightInsight;component/Dashboard/Dashboard/Language/English.xaml";
+
+            var dict = new ResourceDictionary
+            {
+                Source = new Uri(uri, UriKind.Relative)
+            };
+
+            Resources.MergedDictionaries.Clear();
+            Resources.MergedDictionaries.Add(dict);
         }
 
         private void AlarmBySeverityWidget_Loaded(object sender, RoutedEventArgs e)
@@ -55,13 +84,12 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
 
         private void LoadChartData()
         {
-            // 2. NHÚNG FAKE DATA VÀO ĐÂY (Thay vì gọi AlarmDataProvider)
             var rawData = new List<SeverityData>
             {
                 new SeverityData { Title = "Minor", Count = 45 },
-                new SeverityData { Title = "Warning", Count = 66 },
                 new SeverityData { Title = "Major", Count = 27 },
-                new SeverityData { Title = "Critical", Count = 12 }
+                new SeverityData { Title = "Warning", Count = 66 },
+                new SeverityData { Title = "Critical", Count = 22 }
             };
 
             foreach (var item in rawData)
@@ -72,34 +100,55 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
                 {
                     Title = item.Title,
                     Values = new ChartValues<int> { item.Count },
-
                     DataLabels = true,
                     LabelPosition = PieLabelPosition.OutsideSlice,
                     LabelPoint = chartPoint => $" {item.Title} {chartPoint.Participation:P0} ",
-
                     Fill = sliceColor,
                     Foreground = sliceColor,
                     FontSize = 13,
                     FontWeight = FontWeights.Medium,
-
-                    PushOut = 2,
+                    PushOut = 0,
                     StrokeThickness = 1,
                     Stroke = Brushes.White
                 });
             }
         }
 
-        // HÀM XỬ LÝ KHI RÊ CHUỘT VÀO VẠCH
         private void Chart_DataHover(object sender, ChartPoint chartPoint)
         {
             HoverText.Text = $"{chartPoint.SeriesView.Title} : {chartPoint.Instance}";
-            HoverPopup.IsOpen = true; // Mở bảng đen
+            HoverPopup.IsOpen = true;
         }
 
-        // HÀM XỬ LÝ KHI RÚT CHUỘT RA NGOÀI
         private void Chart_MouseLeave(object sender, MouseEventArgs e)
         {
-            HoverPopup.IsOpen = false; // Tắt bảng đen
+            HoverPopup.IsOpen = false;
+        }
+
+        private object OnThemeChanged(Message message, FQID dest, FQID sender)
+        {
+            var theme = message?.Data as Theme;
+            ApplySmartClientTheme(theme);
+            return null;
+        }
+
+        private void ApplySmartClientTheme(Theme scTheme)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                var themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Dark.xaml";
+                var crTheme = ClientControl.Instance.Theme.ThemeType;
+                if (crTheme == ThemeType.Light)
+                    themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Light.xaml";
+
+                var newDict = new ResourceDictionary { Source = new Uri(themeUri, UriKind.RelativeOrAbsolute) };
+
+                if (_currentThemeDictionary != null)
+                    Resources.MergedDictionaries.Remove(_currentThemeDictionary);
+
+                Resources.MergedDictionaries.Insert(0, newDict);
+                _currentThemeDictionary = newDict;
+            });
         }
 
         public void SetEditMode(bool isEdit)

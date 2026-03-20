@@ -1,0 +1,100 @@
+<ResourceDictionary  x:Class="LightInsight.Dashboard.Dashboard.Language.English"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Top -->
+    <sys:String x:Key="Breadcrumb_Default">Dashboard &gt; Default Workspace</sys:String>
+    <sys:String x:Key="Workspace">Workspace</sys:String>
+    <sys:String x:Key="EditLayout">Edit Layout</sys:String>
+    <sys:String x:Key="Save">Save</sys:String>
+    <sys:String x:Key="Cancel">Cancel</sys:String>
+
+    <!-- Time -->
+    <sys:String x:Key="Last24h">Last 24h</sys:String>
+    <sys:String x:Key="Last7Days">Last 7 days</sys:String>
+    <sys:String x:Key="Last30Days">Last 30 days</sys:String>
+    <sys:String x:Key="Custom">Custom</sys:String>
+
+    <!-- Sidebar -->
+    <sys:String x:Key="Dashboard">Dashboard</sys:String>
+    <sys:String x:Key="Collapse">☰ Collapse</sys:String>
+
+    <!-- Widget -->
+    <sys:String x:Key="WidgetLibrary">Widget Library</sys:String>
+    <sys:String x:Key="Add">Add</sys:String>
+
+    <!-- Filter -->
+    <sys:String x:Key="KPI">KPI</sys:String>
+    <sys:String x:Key="Charts">Charts</sys:String>
+    <sys:String x:Key="Tables">Tables</sys:String>
+    <sys:String x:Key="Lists">Lists</sys:String>
+
+    <!-- DashboardView widget names (from DashboardView.xaml.cs) -->
+    <sys:String x:Key="WidgetName_CameraOnlineCount">Camera Online Count</sys:String>
+    <sys:String x:Key="WidgetName_CameraOfflineCount">Camera Offline Count</sys:String>
+    <sys:String x:Key="WidgetName_CameraTotalCount">Camera Total Count</sys:String>
+    <sys:String x:Key="WidgetName_CameraOnlinePlusOffline">Camera Online + Offline</sys:String>
+    <sys:String x:Key="WidgetName_CameraStatusDonut">Camera Status Donut</sys:String>
+    <sys:String x:Key="WidgetName_CameraOfflineDurationTop10">Camera Offline Duration top 10</sys:String>
+    <sys:String x:Key="WidgetName_CameraDisconnectionTrend">Camera Disconnection Trend</sys:String>
+    <sys:String x:Key="WidgetName_CameraAnalyticsSummary">Camera Analytics Summary</sys:String>
+    <sys:String x:Key="WidgetName_CameraList">Camera List</sys:String>
+    <sys:String x:Key="WidgetName_CameraHealthScore">Camera Health Score</sys:String>
+    <sys:String x:Key="WidgetName_LiveAlarmFeed">Live Alarm Feed</sys:String>
+    <sys:String x:Key="WidgetName_AlarmBySeverity">Alarm by Severity</sys:String>
+    <sys:String x:Key="WidgetName_AlarmDailyCount">Alarm Daily Count</sys:String>
+    <sys:String x:Key="WidgetName_AlarmBySource">Alarm by Source</sys:String>
+    <sys:String x:Key="WidgetName_AlarmByType">Alarm by Type</sys:String>
+    <sys:String x:Key="WidgetName_AlarmSLABreach">Alarm SLA Breach</sys:String>
+    <sys:String x:Key="WidgetName_EventTrendChart">Event Trend Chart</sys:String>
+    <sys:String x:Key="WidgetName_ServersOnlineCount">Servers Online Count</sys:String>
+    <sys:String x:Key="WidgetName_ServersOfflineCount">Servers Offline Count</sys:String>
+    <sys:String x:Key="WidgetName_ServersTotal">Servers Total</sys:String>
+    <sys:String x:Key="WidgetName_StorageUsageByServer">Storage Usage by Server</sys:String>
+    <sys:String x:Key="WidgetName_Template">Template</sys:String>
+
+    <!-- Camera labels -->
+    <sys:String x:Key="Camera_Title_AnalyticsSummary">Camera Analytics Summary</sys:String>
+    <sys:String x:Key="Camera_Title_DisconnectionTrend">Camera Disconnection Trend</sys:String>
+    <sys:String x:Key="Camera_Title_OfflineDurationTop10">Camera Offline Duration Top 10</sys:String>
+    <sys:String x:Key="Camera_Title_StatusDonut">Camera Status Donut</sys:String>
+    <sys:String x:Key="Camera_Label_HealthScore">Health Score</sys:String>
+    <sys:String x:Key="Camera_Label_TotalCameras">Total Cameras</sys:String>
+    <sys:String x:Key="Camera_Label_CamerasOnline">Cameras Online</sys:String>
+    <sys:String x:Key="Camera_Label_CamerasOffline">Cameras Offline</sys:String>
+    <sys:String x:Key="Camera_Label_OnlineOffline">Online / Offline</sys:String>
+    <sys:String x:Key="Camera_Filter_All8">All (8)</sys:String>
+    <sys:String x:Key="Camera_Filter_Online6">Online (6)</sys:String>
+    <sys:String x:Key="Camera_Filter_Offline2">Offline (2)</sys:String>
+    <sys:String x:Key="Camera_GridHeader_ID">ID</sys:String>
+    <sys:String x:Key="Camera_GridHeader_NAME">NAME</sys:String>
+    <sys:String x:Key="Camera_GridHeader_STATUS">STATUS</sys:String>
+    <sys:String x:Key="Camera_GridHeader_IP">IP</sys:String>
+    <sys:String x:Key="Camera_GridHeader_RECORDING">RECORDING</sys:String>
+    <sys:String x:Key="Camera_GridHeader_UPTIME">UPTIME</sys:String>
+    <sys:String x:Key="Camera_Label_Showing0Of0">Showing 0 of 0</sys:String>
+    <sys:String x:Key="Camera_Template_Title">Resizable template widget</sys:String>
+    <sys:String x:Key="Camera_Template_Text">Text</sys:String>
+    <sys:String x:Key="Camera_Template_Widget">Template Widget</sys:String>
+
+    <!-- Alarms and Events labels -->
+    <sys:String x:Key="Alarm_Title_LiveAlarmsFeed">Live Alarms Feed</sys:String>
+    <sys:String x:Key="Alarm_Title_BySeverity">Alarms by Severity</sys:String>
+    <sys:String x:Key="Alarm_Title_ByType">Alarms by Type</sys:String>
+    <sys:String x:Key="Alarm_Title_BySource">Alarms by Source</sys:String>
+    <sys:String x:Key="Alarm_Title_DailyCount">Alarms Daily Count</sys:String>
+    <sys:String x:Key="Alarm_Title_SLABreach">Alarm SLA Breach</sys:String>
+    <sys:String x:Key="Alarm_Title_EventTrendChart">Event Trend Chart</sys:String>
+    <sys:String x:Key="Alarm_Label_SLABreaches">SLA Breaches</sys:String>
+
+    <!-- Recording Server labels -->
+    <sys:String x:Key="Recording_Title_ServersOnlineCount">Servers Online Count</sys:String>
+    <sys:String x:Key="Recording_Title_ServersOfflineCount">Servers Offline Count</sys:String>
+    <sys:String x:Key="Recording_Title_TotalServers">Total Servers</sys:String>
+    <sys:String x:Key="Recording_Title_StorageUsageByServer">Storage Usage by Server</sys:String>
+    <sys:String x:Key="Recording_Label_ServersOnline">Servers Online</sys:String>
+    <sys:String x:Key="Recording_Label_ServersOffline">Servers Offline</sys:String>
+    <sys:String x:Key="Recording_Label_TotalServers">Total Servers</sys:String>
+
+</ResourceDictionary>
