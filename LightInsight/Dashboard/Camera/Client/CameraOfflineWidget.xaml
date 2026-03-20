@@ -25,7 +25,7 @@
 
 		    <Grid>
 			    <Border Background="{DynamicResource BgMain}" Height="25" VerticalAlignment="Top" CornerRadius="6,6,6,6">
-				    <TextBlock Text="Camera Offline" Foreground="{DynamicResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
+                    <TextBlock Text="{DynamicResource Camera_Label_CamerasOffline}" Foreground="{DynamicResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
 			    </Border>
 
                 <Button x:Name="DeleteButton" 
@@ -83,7 +83,8 @@
                                         VerticalAlignment="Center"
                                         Margin="0 0 10 0"/>
 
-                            <TextBlock Text="8"
+                            <TextBlock  x:Name="TxtOfflineCount"
+                                        Text="0"
                                         FontSize="32"
                                         FontWeight="Bold"
                                         Foreground="#F87171"
@@ -93,7 +94,6 @@
                             <TextBlock Text="{DynamicResource Camera_Label_CamerasOffline}"
                                         Foreground="{DynamicResource TextPrimary}"
                                         FontSize="16"/>
-
                             <TextBlock Text="↘ 15% vs last period"
                                         Foreground="#F87171" 
                                         FontSize="12"/>

@@ -22,6 +22,7 @@ namespace LightInsight.Dashboard.Camera.Client
 		public int MinCol => 2;
 		public int MinRow => 2;
 		public Thumb ResizeThumb => this.InternalResizeThumb;
+		private readonly CameraServices _cServices;
 		public CameraStatusDonut()
 		{
 			ApplySmartClientLanguage(Thread.CurrentThread.CurrentUICulture.Name);
@@ -31,7 +32,17 @@ namespace LightInsight.Dashboard.Camera.Client
 				new MessageReceiver(OnThemeChanged),
 				new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
 			DeleteButton.Visibility = Visibility.Collapsed;
-			UpdateStatus(142, 8);
+			_cServices = new CameraServices();
+			_cServices.StatusUpdated += (online, offline, totalCount) => {
+				//TxtOnlineCount.Text = online.ToString();
+				UpdateStatus(online, offline);
+			};
+			_cServices.Start();
+
+			this.Unloaded += (s, e) => {
+				_cServices?.Dispose();
+			};
+			//UpdateStatus(142, 8);
 		}
 		private void ApplySmartClientLanguage(string name)
 		{
@@ -117,6 +128,7 @@ namespace LightInsight.Dashboard.Camera.Client
 		private void DeleteWidget_Click(object sender, RoutedEventArgs e)
 		{
 			DeleteRequested?.Invoke(this, EventArgs.Empty);
+			_cServices?.Dispose();
 		}
 
 		private object OnThemeChanged(Message message, FQID dest, FQID sender)

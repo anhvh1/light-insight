@@ -25,7 +25,7 @@
 
 		    <Grid>
 			    <Border Background="{DynamicResource BgMain}" Height="25" VerticalAlignment="Top" CornerRadius="6,6,6,6">
-				    <TextBlock Text="Total Camera" Foreground="{DynamicResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
+                    <TextBlock Text="{DynamicResource Camera_Label_TotalCameras}" Foreground="{DynamicResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
 			    </Border>
 
                 <Button x:Name="DeleteButton" 
@@ -84,7 +84,8 @@
                                        VerticalAlignment="Center"
                                        Margin="0 0 10 0"/>
 
-                            <TextBlock Text="150"
+                            <TextBlock x:Name="TxtTotalCount"
+                                       Text="0"
                                        FontSize="32"
                                        FontWeight="Bold"
                                        Foreground="#60A5FA"

@@ -22,6 +22,8 @@ namespace LightInsight.Dashboard.Camera.Client
 		public int MinCol => 2;
 		public int MinRow => 2;
 		public Thumb ResizeThumb => this.InternalResizeThumb;
+		private readonly CameraServices _cServices;
+
 		public CameraOfflineWidget()
         {
             ApplySmartClientLanguage(Thread.CurrentThread.CurrentUICulture.Name);
@@ -31,6 +33,18 @@ namespace LightInsight.Dashboard.Camera.Client
                 new MessageReceiver(OnThemeChanged),
                 new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
             DeleteButton.Visibility = Visibility.Collapsed;
+
+            _cServices = new CameraServices();
+            _cServices.StatusUpdated += (online, offline, totalCount) => {
+                TxtOfflineCount.Text = offline.ToString();
+            };
+            _cServices.Start();
+
+            this.Unloaded += (s, e) => {
+                _cServices?.Dispose();
+            };
+
+
         }
         private void ApplySmartClientLanguage(string name)
         {
@@ -45,7 +59,7 @@ namespace LightInsight.Dashboard.Camera.Client
 
             Resources.MergedDictionaries.Clear();
             Resources.MergedDictionaries.Add(dict);
-        }
+		}
         public void SetEditMode(bool isEdit)
         {
             DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;

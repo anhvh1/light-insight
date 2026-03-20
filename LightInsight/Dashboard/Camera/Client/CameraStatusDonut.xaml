@@ -77,9 +77,9 @@
                 <Viewbox Stretch="Uniform" Margin="10,35,10,10" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <StackPanel Width="220">
                     	<lvc:PieChart x:Name="StatusChart" 
-                              InnerRadius="25" 
+                              InnerRadius="35" 
                               LegendLocation="None" 
-                              Margin="10,5,10,5"/>
+                              Margin="10,10,10,5"/>
                     </StackPanel>
                 </Viewbox>
 

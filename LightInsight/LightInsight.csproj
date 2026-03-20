@@ -121,6 +121,7 @@
     <Compile Include="Dashboard\AlarmsAndEvents\LiveAlarmsFeedWidget.xaml.cs">
       <DependentUpon>LiveAlarmsFeedWidget.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dashboard\Camera\api.cs" />
     <Compile Include="Dashboard\Camera\CameraServices.cs" />
     <Compile Include="Dashboard\Camera\Client\CameraAnalyticsSummaryWidget.xaml.cs">
       <DependentUpon>CameraAnalyticsSummaryWidget.xaml</DependentUpon>

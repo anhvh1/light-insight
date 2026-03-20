@@ -1,12 +1,11 @@
 using System;
-using System.Collections.ObjectModel;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using LightInsight.Dashboard.Dashboard;
 using VideoOS.Platform;
 using VideoOS.Platform.Client;
 using VideoOS.Platform.Messaging;
-using System.Threading;
 
 namespace LightInsight.Dashboard.Camera.Client
 {
@@ -19,7 +18,7 @@ namespace LightInsight.Dashboard.Camera.Client
         public int MinCol => 2;
         public int MinRow => 2;
         public Thumb ResizeThumb => this.InternalResizeThumb;
-		private CameraServices _cServices;
+		private readonly CameraServices _cServices;
         public CameraOnlineWidget()
         {
             ApplySmartClientLanguage(Thread.CurrentThread.CurrentUICulture.Name);
@@ -29,14 +28,17 @@ namespace LightInsight.Dashboard.Camera.Client
                 new MessageReceiver(OnThemeChanged),
                 new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
             DeleteButton.Visibility = Visibility.Collapsed;
-			//this.Loaded += (s, e) => {
-			//	GetCameraStatus();
-			//};
 			_cServices = new CameraServices();
-			_cServices.StatusUpdated += (online, offline) => {
-					TxtOnlineCount.Text = online.ToString();
+			_cServices.StatusUpdated += (online, offline, totalCount) => {
+				TxtOnlineCount.Text = online.ToString();
 			};
             _cServices.Start();
+
+			TestApiButton_Click();
+
+			this.Unloaded += (s, e) => {
+				_cServices?.Dispose();
+			};
 		}
 
         private void ApplySmartClientLanguage(string name)
@@ -62,6 +64,7 @@ namespace LightInsight.Dashboard.Camera.Client
         private void DeleteWidget_Click(object sender, RoutedEventArgs e)
         {
             DeleteRequested?.Invoke(this, EventArgs.Empty);
+			_cServices?.Dispose();
 		}
 
         private object OnThemeChanged(Message message, FQID dest, FQID sender)
@@ -93,63 +96,16 @@ namespace LightInsight.Dashboard.Camera.Client
         // ==============================================================================
   //      private MessageCommunication _messageCommunication;
   //      private object _registration;
+		private async void TestApiButton_Click()
+		{
+			var myApi = new Api();
 
-  //      public void GetCameraStatus()
-  //      {
-  //          // 1. Khởi tạo giao tiếp tin nhắn với Server hiện tại
-  //          MessageCommunicationManager.Start(EnvironmentManager.Instance.MasterSite.ServerId);
-  //          _messageCommunication = MessageCommunicationManager.Get(EnvironmentManager.Instance.MasterSite.ServerId);
-  //          // 2. Đăng ký nhận phản hồi trạng thái
-  //          _registration = _messageCommunication.RegisterCommunicationFilter(CurrentStateResponseHandler,
-  //              new CommunicationIdFilter(MessageCommunication.ProvideCurrentStateResponse));
-  //          // 3. Gửi yêu cầu lấy trạng thái của TẤT CẢ các item
-  //          _messageCommunication.TransmitMessage(
-  //              new VideoOS.Platform.Messaging.Message(MessageCommunication.ProvideCurrentStateRequest),
-  //              null, null, null);
-  //      }
+			// 1. Test lấy Token thô
+			myApi.GetMilestoneAccessToken();
 
-  //      private object CurrentStateResponseHandler(VideoOS.Platform.Messaging.Message message, FQID dest, FQID source)
-  //      {
-		//	// Nhận danh sách trạng thái từ Server
-		//	if (message.Data is Collection<ItemState> states)
-		//	{
-		//		int onlineCount = 0;
-		//		int offlineCount = 0;
+			// 2. Test gọi REST API (Asynchronous)
+			await myApi.TestRestApiCall();
 
-		//		foreach (ItemState itemState in states)
-		//		{
-		//			// Chỉ lọc những item là Camera
-		//			if (itemState.FQID.Kind == Kind.Camera)
-		//			{
-		//				// Trạng thái thường là "Responding", "Not Responding", "Disabled"
-		//				if (itemState.State == "Responding")
-		//				{
-		//					onlineCount++;
-		//				}
-		//				else if (itemState.State == "Not Responding")
-		//				{
-		//					offlineCount++;
-		//				}
-		//			}
-		//		}
-
-		//		// Ở đây bạn có thể cập nhật lên UI của Smart Client
-		//		//System.Diagnostics.Debug.WriteLine($"Online: {onlineCount}, Offline: {offlineCount}");
-		//		Dispatcher.BeginInvoke(new Action(() =>
-		//		{
-		//			// Cập nhật con số Online
-		//			TxtOnlineCount.Text = onlineCount.ToString();
-		//		}));
-		//	}
-		//	return null;
-  //      }
-
-		//public void Dispose()
-		//{
-  //          if (_messageCommunication != null && _registration != null)
-  //              _messageCommunication.UnRegisterCommunicationFilter(_registration);
-		//	    _registration = null;
-		//	    _messageCommunication = null;
-		//}
+		}
 	}
 }
