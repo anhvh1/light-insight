@@ -12,23 +12,20 @@
     <Grid Margin="5,5,0,0">
         <Border x:Name="MainBorder"
                 Background="{DynamicResource BgMain}"
+                BorderBrush="{DynamicResource CardBorder}"
                 BorderThickness="1"
                 CornerRadius="6">
 
-            <Border.BorderBrush>
-                <VisualBrush Stretch="None">
-                    <VisualBrush.Visual>
-                        <Rectangle Stroke="#E8751A"
-                                   StrokeDashArray="4 2"
-                                   StrokeThickness="1"
-                                   RadiusX="6" RadiusY="6"
-                                   Width="{Binding ElementName=MainBorder, Path=ActualWidth}"
-                                   Height="{Binding ElementName=MainBorder, Path=ActualHeight}"/>
-                    </VisualBrush.Visual>
-                </VisualBrush>
-            </Border.BorderBrush>
-
             <Grid>
+                <!-- Viền cam dashed chỉ hiện khi ở chế độ edit -->
+                <Grid x:Name="EditOutlineLayer" Visibility="Collapsed" IsHitTestVisible="False">
+                    <Rectangle Stroke="#E8751A"
+                               StrokeDashArray="4 2"
+                               StrokeThickness="1"
+                               RadiusX="6" RadiusY="6"
+                               Width="{Binding ElementName=MainBorder, Path=ActualWidth}"
+                               Height="{Binding ElementName=MainBorder, Path=ActualHeight}"/>
+                </Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="25"/>
                     <RowDefinition Height="*"/>

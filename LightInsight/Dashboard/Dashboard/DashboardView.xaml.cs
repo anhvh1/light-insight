@@ -462,9 +462,12 @@ namespace LightInsight.Dashboard.Dashboard
             SaveBtn.Visibility = Visibility.Visible;
             CancelBtn.Visibility = Visibility.Visible;
 
-            foreach (var widget in DashboardGrid.Children.OfType<IDashboardWidget>())
+            foreach (var widget in DashboardGrid.Children.OfType<FrameworkElement>())
             {
-                widget.SetEditMode(true);
+                if (widget is IDashboardWidget dashboardWidget)
+                    dashboardWidget.SetEditMode(true);
+
+                UpdateWidgetEditVisuals(widget, isEdit: true);
             }
         }
 
@@ -522,10 +525,29 @@ namespace LightInsight.Dashboard.Dashboard
             SaveBtn.Visibility = Visibility.Collapsed;
             CancelBtn.Visibility = Visibility.Collapsed;
 
-            foreach (var widget in DashboardGrid.Children.OfType<IDashboardWidget>())
+            foreach (var widget in DashboardGrid.Children.OfType<FrameworkElement>())
             {
-                widget.SetEditMode(false);
+                if (widget is IDashboardWidget dashboardWidget)
+                    dashboardWidget.SetEditMode(false);
+
+                UpdateWidgetEditVisuals(widget, isEdit: false);
             }
+        }
+
+        private void UpdateWidgetEditVisuals(FrameworkElement widget, bool isEdit)
+        {
+            // 1) Resize thumb (chỉ hiện trong edit mode)
+            if (widget is IResizableWidget resizable)
+            {
+                var thumb = resizable.ResizeThumb;
+                if (thumb != null)
+                    thumb.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            // 2) Viền cam dashed chỉ hiện trong edit mode
+            var outline = widget.FindName("EditOutlineLayer") as UIElement;
+            if (outline != null)
+                outline.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
         }
         private void DashboardGrid_DragOver(object sender, DragEventArgs e)
         {
