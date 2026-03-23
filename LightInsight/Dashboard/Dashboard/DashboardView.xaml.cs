@@ -93,45 +93,46 @@ namespace LightInsight.Dashboard.Dashboard
 			new WidgetItem{ Name="Event Trend Chart", Category="Charts", WidgetType = typeof(EventTrendChartWidget)},
 
 
-			new WidgetItem{ Name="Servers Online Count", Category="KPI", WidgetType = typeof(ServersOnlineCountWidget)},
-			new WidgetItem{ Name="Servers Offline Count", Category="KPI",WidgetType = typeof(ServersOfflineCountWidget)},
-			new WidgetItem{ Name="Servers Total", Category="KPI",WidgetType = typeof(TotalServersWidget)},
-			new WidgetItem{ Name="Storage Usage by Server", Category="KPI",WidgetType = typeof(StorageUsageWidget)},
-			new WidgetItem{ Name="Template", Category="Tables",WidgetType = typeof(Temp)},
-		};
-		public DashboardView()
-		{
-			ApplySmartClientLanguage(Thread.CurrentThread.CurrentUICulture.Name);
+            new WidgetItem{ Name="Servers Online Count", Category="KPI", WidgetType = typeof(ServersOnlineCountWidget)},
+            new WidgetItem{ Name="Servers Offline Count", Category="KPI",WidgetType = typeof(ServersOfflineCountWidget)},
+            new WidgetItem{ Name="Servers Total", Category="KPI",WidgetType = typeof(TotalServersWidget)},
+            new WidgetItem{ Name="Storage Usage by Server", Category="KPI",WidgetType = typeof(StorageUsageWidget)},
+            new WidgetItem{ Name="Template", Category="Tables",WidgetType = typeof(Temp)},
+        };
+        public DashboardView()
+        {
+            InitializeComponent();
+            TimeRangeCombo.SelectedIndex = 0;
+            LocalizeWidgetNames();
+            LoadSidebar();
+            // nạp dữ liệu ngôn ngữ
+            ApplySmartClientLanguage(Thread.CurrentThread.CurrentUICulture.Name);
 
-			// nạp theme hiện tại ngay lúc mở
-			ApplySmartClientTheme(ClientControl.Instance?.Theme);
-			// đăng ký nghe sự kiện đổi theme
-			_themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
-				new MessageReceiver(OnThemeChanged),
-				new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
-			LoadSidebar();
-			InitializeComponent();
-			//OpenDashboard(OperationsBtn);
-			TimeRangeCombo.SelectedIndex = 0;
-			//LanguageCombo.SelectedIndex = 0;
-			//ThemeBtn.Content = "🌙";
-			LocalizeWidgetNames();
-			WidgetList.ItemsSource = allWidgets;
-			LoadLayout();
-			WorkspaceService.Instance.OnWorkspaceChanged += () =>
-			{
-				Application.Current.Dispatcher.Invoke(() =>
-				{
-					LoadSidebar();
-				});
-			};
-		}
-		private void LocalizeWidgetNames()
-		{
-			string GetText(string key, string fallback)
-			{
-				return TryFindResource(key) as string ?? fallback;
-			}
+            WorkspaceService.Instance.OnWorkspaceChanged += () =>
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    LoadSidebar();
+                });
+            };
+            // nạp theme hiện tại ngay lúc mở
+            ApplySmartClientTheme(ClientControl.Instance?.Theme);
+            // đăng ký nghe sự kiện đổi theme
+            _themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
+                new MessageReceiver(OnThemeChanged),
+                new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
+            WidgetList.ItemsSource = allWidgets;
+            EnsureDashboardFile();
+            // đọc lại dữ liệu widget đang có
+            LoadLayout();
+
+        }
+        private void LocalizeWidgetNames()
+        {
+            string GetText(string key, string fallback)
+            {
+                return TryFindResource(key) as string ?? fallback;
+            }
 
 			foreach (var w in allWidgets)
 			{
@@ -712,19 +713,22 @@ namespace LightInsight.Dashboard.Dashboard
 
 			allLayouts.AddRange(newLayouts);
 
-			string json = JsonSerializer.Serialize(allLayouts, new JsonSerializerOptions
-			{
-				WriteIndented = true
-			});
-			File.WriteAllText(filePath, json);
-			SetFilePermissionForAllUsers(filePath);
-		}
-		/// <summary>
-		/// Load layout từ file JSON và hiển thị trên dashboard
-		/// </summary>
-		void LoadLayout()
-		{
-			DashboardGrid.Children.Clear();
+            string json = JsonSerializer.Serialize(allLayouts, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+            File.WriteAllText(filePath, json);
+            SetFilePermissionForAllUsers(filePath);
+        }
+        /// <summary>
+        /// Load layout từ file JSON và hiển thị trên dashboard
+        /// </summary>
+        void LoadLayout()
+        {
+            if (DashboardGrid.Children.Count > 0)
+            {
+                DashboardGrid.Children.Clear();
+            }
 
 			string folder = Path.Combine(
 				Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
@@ -1262,22 +1266,22 @@ namespace LightInsight.Dashboard.Dashboard
 					   ? "/LightInsight;component/Dashboard/Dashboard/Language/Vi.xaml"
 					   : "/LightInsight;component/Dashboard/Dashboard/Language/English.xaml";
 
-			var dict = new ResourceDictionary
-			{
-				Source = new Uri(uri, UriKind.Relative)
-			};
+            var dict = new ResourceDictionary
+            {
+                Source = new Uri(uri, UriKind.Relative)
+            };
 
-			Resources.MergedDictionaries.Clear();
-			Resources.MergedDictionaries.Add(dict);
-		}
-		//public void SetThemeResources(ResourceDictionary resources)
-		//{
-		//    _currentThemeDictionary = resources;
-		//}
-		private bool ConfirmBeforeLeave()
-		{
-			if (!editMode || !_isDirty)
-				return true;
+            Resources.MergedDictionaries.Clear();
+            Resources.MergedDictionaries.Add(dict);
+        }
+        //public void SetThemeResources(ResourceDictionary resources)
+        //{
+        //    _currentThemeDictionary = resources;
+        //}
+        private bool ConfirmBeforeLeave()
+        {
+            if (!editMode || !_isDirty)
+                return true;
 
 			var result = MessageBox.Show(
 				"Bạn có thay đổi chưa lưu. Bạn muốn lưu không?",
@@ -1353,14 +1357,108 @@ namespace LightInsight.Dashboard.Dashboard
 
 				fileSecurity.AddAccessRule(rule);
 
-				fileInfo.SetAccessControl(fileSecurity);
-			}
-			catch (Exception ex)
-			{
-				// log nếu cần
-				System.Diagnostics.Debug.WriteLine("Set permission failed: " + ex.Message);
-			}
-		}
+                fileInfo.SetAccessControl(fileSecurity);
+            }
+            catch (Exception ex)
+            {
+                // log nếu cần
+                System.Diagnostics.Debug.WriteLine("Set permission failed: " + ex.Message);
+            }
+        }
+        void EnsureDashboardFile()
+        {
+            string folder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                "LightInsight");
 
-	}
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
+            string filePath = Path.Combine(folder, "dashboard_layout.json");
+
+            // 🔥 CHỈ tạo khi chưa có file
+            if (!File.Exists(filePath))
+            {
+                string defaultJson = @"
+                                        [
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""CameraOnlineWidget"",
+                                            ""Row"": 0,
+                                            ""Column"": 0,
+                                            ""RowSpan"": 2,
+                                            ""ColumnSpan"": 2
+                                          },
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""CameraOfflineWidget"",
+                                            ""Row"": 0,
+                                            ""Column"": 2,
+                                            ""RowSpan"": 2,
+                                            ""ColumnSpan"": 2
+                                          },
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""TotalCameraCount"",
+                                            ""Row"": 0,
+                                            ""Column"": 4,
+                                            ""RowSpan"": 2,
+                                            ""ColumnSpan"": 2
+                                          },
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""CameraListWidget"",
+                                            ""Row"": 5,
+                                            ""Column"": 0,
+                                            ""RowSpan"": 4,
+                                            ""ColumnSpan"": 12
+                                          },
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""CameraHealthScoreWidget"",
+                                            ""Row"": 0,
+                                            ""Column"": 6,
+                                            ""RowSpan"": 2,
+                                            ""ColumnSpan"": 2
+                                          },
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""StorageUsageWidget"",
+                                            ""Row"": 0,
+                                            ""Column"": 8,
+                                            ""RowSpan"": 3,
+                                            ""ColumnSpan"": 4
+                                          },
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""TotalServersWidget"",
+                                            ""Row"": 2,
+                                            ""Column"": 0,
+                                            ""RowSpan"": 2,
+                                            ""ColumnSpan"": 2
+                                          },
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""AlarmSLABreachWidget"",
+                                            ""Row"": 2,
+                                            ""Column"": 2,
+                                            ""RowSpan"": 2,
+                                            ""ColumnSpan"": 2
+                                          },
+                                          {
+                                            ""Dashboard"": ""Default Workspace"",
+                                            ""Type"": ""AlarmBySeverityWidget"",
+                                            ""Row"": 2,
+                                            ""Column"": 4,
+                                            ""RowSpan"": 3,
+                                            ""ColumnSpan"": 3
+                                          }
+                                        ]";
+
+                File.WriteAllText(filePath, defaultJson);
+
+                SetFilePermissionForAllUsers(filePath);
+            }
+        }
+    }
 }

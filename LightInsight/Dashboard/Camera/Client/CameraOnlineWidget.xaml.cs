@@ -1,11 +1,11 @@
 using System;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using LightInsight.Dashboard.Dashboard;
 using VideoOS.Platform;
 using VideoOS.Platform.Client;
 using VideoOS.Platform.Messaging;
-using System.Threading;
 
 namespace LightInsight.Dashboard.Camera.Client
 {
@@ -67,23 +67,12 @@ namespace LightInsight.Dashboard.Camera.Client
 			_cServices?.Dispose();
 		}
 
-		private async void TestApiButton_Click()
-		{
-			var myApi = new Api();
-
-			// 1. Test lấy Token thô
-			myApi.GetMilestoneAccessToken();
-
-			// 2. Test gọi REST API (Asynchronous)
-			await myApi.TestRestApiCall();
-
-		}
-		private object OnThemeChanged(Message message, FQID dest, FQID sender)
-		{
-			var theme = message?.Data as Theme;
-			ApplySmartClientTheme(theme);
-			return null;
-		}
+        private object OnThemeChanged(Message message, FQID dest, FQID sender)
+        {
+            var theme = message?.Data as Theme;
+            ApplySmartClientTheme(theme);
+            return null;
+        }
 
 		private void ApplySmartClientTheme(Theme scTheme)
 		{
@@ -104,31 +93,12 @@ namespace LightInsight.Dashboard.Camera.Client
 			});
 		}
 
-		// ==============================================================================
-		//      private MessageCommunication _messageCommunication;
-		//      private object _registration;
-
-		//      public void GetCameraStatus()
-		//      {
-		//          // 1. Khởi tạo giao tiếp tin nhắn với Server hiện tại
-		//          MessageCommunicationManager.Start(EnvironmentManager.Instance.MasterSite.ServerId);
-		//          _messageCommunication = MessageCommunicationManager.Get(EnvironmentManager.Instance.MasterSite.ServerId);
-		//          // 2. Đăng ký nhận phản hồi trạng thái
-		//          _registration = _messageCommunication.RegisterCommunicationFilter(CurrentStateResponseHandler,
-		//              new CommunicationIdFilter(MessageCommunication.ProvideCurrentStateResponse));
-		//          // 3. Gửi yêu cầu lấy trạng thái của TẤT CẢ các item
-		//          _messageCommunication.TransmitMessage(
-		//              new VideoOS.Platform.Messaging.Message(MessageCommunication.ProvideCurrentStateRequest),
-		//              null, null, null);
-		//      }
-
-		//      private object CurrentStateResponseHandler(VideoOS.Platform.Messaging.Message message, FQID dest, FQID source)
-		//      {
-		//	// Nhận danh sách trạng thái từ Server
-		//	if (message.Data is Collection<ItemState> states)
-		//	{
-		//		int onlineCount = 0;
-		//		int offlineCount = 0;
+        // ==============================================================================
+  //      private MessageCommunication _messageCommunication;
+  //      private object _registration;
+		private async void TestApiButton_Click()
+		{
+			var myApi = new Api();
 
 		//		foreach (ItemState itemState in states)
 		//		{
