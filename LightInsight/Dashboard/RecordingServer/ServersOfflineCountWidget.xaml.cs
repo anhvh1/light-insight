@@ -23,12 +23,6 @@ using System.Threading;
 
 namespace LightInsight.Dashboard.RecordingServer
 {
-    public class ServersOfflineData
-    {
-        public int Count { get; set; }
-        public int TrendPercentage { get; set; }
-        public bool IsTrendUp { get; set; }
-    }
 
     public partial class ServersOfflineCountWidget : UserControl, IResizableWidget
     {
@@ -41,6 +35,7 @@ namespace LightInsight.Dashboard.RecordingServer
         public Thumb ResizeThumb => this.InternalResizeThumb;
 
         public event EventHandler DeleteRequested;
+        private readonly ServerServices _sServices;
 
         public ServersOfflineCountWidget()
         {
@@ -52,7 +47,22 @@ namespace LightInsight.Dashboard.RecordingServer
                 new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
             DeleteButton.Visibility = Visibility.Collapsed;
 
-            LoadData();
+            // Khởi tạo service lắng nghe Milestone
+            _sServices = new ServerServices();
+
+            // Chỉ cập nhật đúng con số Offline lên UI
+            _sServices.StatusUpdated += (online, offline, totalCount) =>
+            {
+                CountText.Text = offline.ToString();
+            };
+
+            // Bắt đầu chạy
+            _sServices.Start();
+
+            // Dọn dẹp memory khi Widget bị tắt
+            this.Unloaded += (s, e) => {
+                _sServices?.Dispose();
+            };
         }
         private void ApplySmartClientLanguage(string name)
         {
@@ -99,23 +109,6 @@ namespace LightInsight.Dashboard.RecordingServer
             });
         }
 
-        private void LoadData()
-        {
-            // FAKE DATA NHƯ ẢNH MẪU
-            var data = new ServersOfflineData
-            {
-                Count = 1,
-                TrendPercentage = 50,
-                IsTrendUp = false // Trend giảm
-            };
-
-            // Gán dữ liệu lên UI
-            CountText.Text = data.Count.ToString();
-
-            // Text hiển thị
-            TrendText.Text = $"{data.TrendPercentage}% vs last period";
-        }
-
         public void SetEditMode(bool isEdit)
         {
             DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
@@ -125,6 +118,7 @@ namespace LightInsight.Dashboard.RecordingServer
         private void DeleteWidget_Click(object sender, RoutedEventArgs e)
         {
             DeleteRequested?.Invoke(this, EventArgs.Empty);
+            _sServices?.Dispose();
         }
 
         // lấy dữ liệu recording server offline từ server và cập nhật UI
