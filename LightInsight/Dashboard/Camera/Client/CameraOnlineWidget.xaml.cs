@@ -59,6 +59,14 @@ namespace LightInsight.Dashboard.Camera.Client
         public void SetEditMode(bool isEdit)
         {
             DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
+            if (InternalResizeThumb != null)
+                InternalResizeThumb.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
+
+            var mainBorder = FindName("MainBorder") as System.Windows.Controls.Border;
+            if (mainBorder != null)
+            {
+                mainBorder.BorderThickness = isEdit ? new Thickness(1) : new Thickness(0);
+            }
             this.Cursor = isEdit ? System.Windows.Input.Cursors.SizeAll : System.Windows.Input.Cursors.Arrow;
         }
         private void DeleteWidget_Click(object sender, RoutedEventArgs e)

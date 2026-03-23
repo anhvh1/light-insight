@@ -111,6 +111,14 @@ namespace LightInsight.Dashboard.RecordingServer
         public void SetEditMode(bool isEdit)
         {
             DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
+            if (InternalResizeThumb != null)
+                InternalResizeThumb.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
+
+            var mainBorder = FindName("MainBorder") as Border;
+            if (mainBorder != null)
+            {
+                mainBorder.BorderThickness = isEdit ? new Thickness(1) : new Thickness(0);
+            }
             this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
         }
 
