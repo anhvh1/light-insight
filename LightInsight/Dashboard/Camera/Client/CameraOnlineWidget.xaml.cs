@@ -74,24 +74,24 @@ namespace LightInsight.Dashboard.Camera.Client
             return null;
         }
 
-        private void ApplySmartClientTheme(Theme scTheme)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                var themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Dark.xaml";
-                var crTheme = ClientControl.Instance.Theme.ThemeType;
-                if (crTheme == ThemeType.Light)
-                    themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Light.xaml";
+		private void ApplySmartClientTheme(Theme scTheme)
+		{
+			Dispatcher.Invoke(() =>
+			{
+				var themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Dark.xaml";
+				var crTheme = ClientControl.Instance.Theme.ThemeType;
+				if (crTheme == ThemeType.Light)
+					themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Light.xaml";
 
-                var newDict = new ResourceDictionary { Source = new Uri(themeUri, UriKind.RelativeOrAbsolute) };
+				var newDict = new ResourceDictionary { Source = new Uri(themeUri, UriKind.RelativeOrAbsolute) };
 
-                if (_currentThemeDictionary != null)
-                    Resources.MergedDictionaries.Remove(_currentThemeDictionary);
+				if (_currentThemeDictionary != null)
+					Resources.MergedDictionaries.Remove(_currentThemeDictionary);
 
-                Resources.MergedDictionaries.Insert(0, newDict);
-                _currentThemeDictionary = newDict;
-            });
-        }
+				Resources.MergedDictionaries.Insert(0, newDict);
+				_currentThemeDictionary = newDict;
+			});
+		}
 
         // ==============================================================================
   //      private MessageCommunication _messageCommunication;
@@ -100,12 +100,41 @@ namespace LightInsight.Dashboard.Camera.Client
 		{
 			var myApi = new Api();
 
-			// 1. Test lấy Token thô
-			myApi.GetMilestoneAccessToken();
+		//		foreach (ItemState itemState in states)
+		//		{
+		//			// Chỉ lọc những item là Camera
+		//			if (itemState.FQID.Kind == Kind.Camera)
+		//			{
+		//				// Trạng thái thường là "Responding", "Not Responding", "Disabled"
+		//				if (itemState.State == "Responding")
+		//				{
+		//					onlineCount++;
+		//				}
+		//				else if (itemState.State == "Not Responding")
+		//				{
+		//					offlineCount++;
+		//				}
+		//			}
+		//		}
 
-			// 2. Test gọi REST API (Asynchronous)
-			await myApi.TestRestApiCall();
+		//		// Ở đây bạn có thể cập nhật lên UI của Smart Client
+		//		//System.Diagnostics.Debug.WriteLine($"Online: {onlineCount}, Offline: {offlineCount}");
+		//		Dispatcher.BeginInvoke(new Action(() =>
+		//		{
+		//			// Cập nhật con số Online
+		//			TxtOnlineCount.Text = onlineCount.ToString();
+		//		}));
+		//	}
+		//	return null;
+		//      }
 
-		}
+		//public void Dispose()
+		//{
+		//          if (_messageCommunication != null && _registration != null)
+		//              _messageCommunication.UnRegisterCommunicationFilter(_registration);
+		//	    _registration = null;
+		//	    _messageCommunication = null;
+		//}
 	}
+}
 }

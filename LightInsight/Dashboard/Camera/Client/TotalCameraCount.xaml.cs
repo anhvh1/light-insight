@@ -50,10 +50,10 @@ namespace LightInsight.Dashboard.Camera.Client
                        ? "/LightInsight;component/Dashboard/Dashboard/Language/Vi.xaml"
                        : "/LightInsight;component/Dashboard/Dashboard/Language/English.xaml";
 
-            var dict = new ResourceDictionary
-            {
-                Source = new Uri(uri, UriKind.Relative)
-            };
+			var dict = new ResourceDictionary
+			{
+				Source = new Uri(uri, UriKind.Relative)
+			};
 
             Resources.MergedDictionaries.Clear();
             Resources.MergedDictionaries.Add(dict);
@@ -78,19 +78,19 @@ namespace LightInsight.Dashboard.Camera.Client
             return null;
         }
 
-        private void ApplySmartClientTheme(Theme scTheme)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                var themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Dark.xaml";
-                var crTheme = ClientControl.Instance.Theme.ThemeType;
-                if (crTheme == ThemeType.Light)
-                    themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Light.xaml";
+		private void ApplySmartClientTheme(Theme scTheme)
+		{
+			Dispatcher.Invoke(() =>
+			{
+				var themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Dark.xaml";
+				var crTheme = ClientControl.Instance.Theme.ThemeType;
+				if (crTheme == ThemeType.Light)
+					themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Light.xaml";
 
-                var newDict = new ResourceDictionary { Source = new Uri(themeUri, UriKind.RelativeOrAbsolute) };
+				var newDict = new ResourceDictionary { Source = new Uri(themeUri, UriKind.RelativeOrAbsolute) };
 
-                if (_currentThemeDictionary != null)
-                    Resources.MergedDictionaries.Remove(_currentThemeDictionary);
+				if (_currentThemeDictionary != null)
+					Resources.MergedDictionaries.Remove(_currentThemeDictionary);
 
                 Resources.MergedDictionaries.Insert(0, newDict);
                 _currentThemeDictionary = newDict;

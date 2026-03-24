@@ -48,11 +48,24 @@ namespace LightInsight.Dashboard.Camera.Client
 			Resources.MergedDictionaries.Clear();
 			Resources.MergedDictionaries.Add(dict);
 		}
+		//public void SetEditMode(bool isEdit)
+		//{
+		//	DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
+		//          this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
+		//      }
 		public void SetEditMode(bool isEdit)
 		{
+			// Hiện/Ẩn nút xóa
 			DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
-            this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
-        }
+
+			// Hiện/Ẩn nút Resize (Thumb) - ĐÂY LÀ DÒNG QUAN TRỌNG
+			if (InternalResizeThumb != null)
+			{
+				InternalResizeThumb.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
+			}
+
+			this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
+		}
 		private void DeleteWidget_Click(object sender, RoutedEventArgs e)
 		{
 			DeleteRequested?.Invoke(this, EventArgs.Empty);
