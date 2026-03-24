@@ -197,7 +197,17 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
             var mainBorder = FindName("MainBorder") as Border;
             if (mainBorder != null)
             {
-                mainBorder.BorderThickness = isEdit ? new Thickness(1) : new Thickness(0.8);
+                if (isEdit)
+                {
+                    mainBorder.ClearValue(Border.BorderBrushProperty);
+                    mainBorder.BorderThickness = new Thickness(1);
+                }
+                else
+                {
+                    mainBorder.BorderBrush = TryFindResource("CardBorder") as System.Windows.Media.Brush
+                        ?? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(60, 60, 60));
+                    mainBorder.BorderThickness = new Thickness(1);
+                }
             }
             this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
         }
