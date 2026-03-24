@@ -36,7 +36,7 @@
 
     <!-- ===== Widget (riêng cho card + label/header) ===== -->
     <SolidColorBrush x:Key="WidgetCardBg"        Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="WidgetHeaderBg"      Color="#F5F5F5"/>
+    <SolidColorBrush x:Key="WidgetHeaderBg"      Color="#E8E8E8"/>
     <SolidColorBrush x:Key="WidgetHeaderText"    Color="#101828"/>
     <SolidColorBrush x:Key="WidgetBorder"        Color="#E0E0E0"/>
     <SolidColorBrush x:Key="WidgetAccentBorder"  Color="#E8751A"/>
