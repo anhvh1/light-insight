@@ -52,10 +52,10 @@ namespace LightInsight.Dashboard.Camera.Client
                        ? "/LightInsight;component/Dashboard/Dashboard/Language/Vi.xaml"
                        : "/LightInsight;component/Dashboard/Dashboard/Language/English.xaml";
 
-            var dict = new ResourceDictionary
-            {
-                Source = new Uri(uri, UriKind.Relative)
-            };
+			var dict = new ResourceDictionary
+			{
+				Source = new Uri(uri, UriKind.Relative)
+			};
 
             Resources.MergedDictionaries.Clear();
             Resources.MergedDictionaries.Add(dict);
@@ -63,6 +63,27 @@ namespace LightInsight.Dashboard.Camera.Client
         public void SetEditMode(bool isEdit)
         {
             DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
+            if (InternalResizeThumb != null)
+                InternalResizeThumb.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
+
+            var mainBorder = FindName("MainBorder") as Border;
+            if (mainBorder != null)
+            {
+                if (isEdit)
+                {
+                    if (mainBorder.Tag is System.Windows.Media.Brush originalBorderBrush)
+                        mainBorder.BorderBrush = originalBorderBrush;
+                    mainBorder.BorderThickness = new Thickness(1);
+                }
+                else
+                {
+                    if (!(mainBorder.Tag is System.Windows.Media.Brush))
+                        mainBorder.Tag = mainBorder.BorderBrush;
+                    mainBorder.BorderBrush = TryFindResource("CardBorder") as System.Windows.Media.Brush
+                        ?? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(60, 60, 60));
+                    mainBorder.BorderThickness = new Thickness(1);
+                }
+            }
             this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
         }
         private void DeleteWidget_Click(object sender, RoutedEventArgs e)
@@ -77,19 +98,19 @@ namespace LightInsight.Dashboard.Camera.Client
             return null;
         }
 
-        private void ApplySmartClientTheme(Theme scTheme)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                var themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Dark.xaml";
-                var crTheme = ClientControl.Instance.Theme.ThemeType;
-                if (crTheme == ThemeType.Light)
-                    themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Light.xaml";
+		private void ApplySmartClientTheme(Theme scTheme)
+		{
+			Dispatcher.Invoke(() =>
+			{
+				var themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Dark.xaml";
+				var crTheme = ClientControl.Instance.Theme.ThemeType;
+				if (crTheme == ThemeType.Light)
+					themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Light.xaml";
 
-                var newDict = new ResourceDictionary { Source = new Uri(themeUri, UriKind.RelativeOrAbsolute) };
+				var newDict = new ResourceDictionary { Source = new Uri(themeUri, UriKind.RelativeOrAbsolute) };
 
-                if (_currentThemeDictionary != null)
-                    Resources.MergedDictionaries.Remove(_currentThemeDictionary);
+				if (_currentThemeDictionary != null)
+					Resources.MergedDictionaries.Remove(_currentThemeDictionary);
 
                 Resources.MergedDictionaries.Insert(0, newDict);
                 _currentThemeDictionary = newDict;
