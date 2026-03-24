@@ -48,7 +48,62 @@ namespace LightInsight.Dashboard.Dashboard
         private Point startPoint;
         Button currentMenu = null;
         string currentDashboard = "Default Workspace";
-        bool sidebarCollapsed = false;
+        private bool _isSidebarCollapsed = false;
+        public bool IsSidebarCollapsed
+        {
+            get => _isSidebarCollapsed;
+            set
+            {
+                _isSidebarCollapsed = value;
+                OnPropertyChanged(nameof(IsSidebarCollapsed));
+            }
+        }
+
+        private CancellationTokenSource _popupCloseCancellation;
+
+        private async void Expander_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (!IsSidebarCollapsed) return;
+
+            // Hủy lệnh đóng đang chờ (nếu có)
+            _popupCloseCancellation?.Cancel();
+            SubMenuPopup.IsOpen = true;
+        }
+
+        private async void Expander_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (!IsSidebarCollapsed) return;
+
+            // Bắt đầu đếm ngược 300ms trước khi đóng
+            _popupCloseCancellation?.Cancel();
+            _popupCloseCancellation = new CancellationTokenSource();
+            var token = _popupCloseCancellation.Token;
+
+            try
+            {
+                await Task.Delay(300, token);
+                if (!token.IsCancellationRequested)
+                {
+                    // Kiểm tra lại lần cuối xem chuột có đang nằm trên Popup không
+                    if (!SubMenuPopup.IsMouseOver && !DashboardExpander.IsMouseOver)
+                    {
+                        SubMenuPopup.IsOpen = false;
+                    }
+                }
+            }
+            catch (TaskCanceledException) { }
+        }
+
+        private void Popup_MouseEnter(object sender, MouseEventArgs e)
+        {
+            _popupCloseCancellation?.Cancel();
+        }
+
+        private void Popup_MouseLeave(object sender, MouseEventArgs e)
+        {
+            Expander_MouseLeave(sender, e);
+        }
+
         FrameworkElement selectedWidget = null;
         bool isDraggingWidget = false;
         bool isDark = true;
@@ -123,6 +178,14 @@ namespace LightInsight.Dashboard.Dashboard
                 new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
             WidgetList.ItemsSource = allWidgets;
             EnsureDashboardFile();
+
+            // Thiết lập Dashboard mặc định ban đầu nếu có danh sách menu
+            if (DashboardMenus != null && DashboardMenus.Any())
+            {
+                currentDashboard = DashboardMenus[0].Name;
+                BreadcrumbText.Text = $"Dashboard > {currentDashboard}";
+            }
+
             // đọc lại dữ liệu widget đang có
             LoadLayout();
 
@@ -409,6 +472,12 @@ namespace LightInsight.Dashboard.Dashboard
 
             OpenDashboard(item);
             ExitEditMode();
+
+            // Đóng popup nếu đang ở chế độ thu gọn
+            if (IsSidebarCollapsed)
+            {
+                SubMenuPopup.IsOpen = false;
+            }
         }
         //void OpenDashboard(Button btn)
         //{
@@ -761,13 +830,6 @@ namespace LightInsight.Dashboard.Dashboard
             // lưu tất cả cell đã dùng
             HashSet<string> usedCells = new HashSet<string>();
 
-            // nếu không có thì lấy default nếu có rồi thì lấy phần tử đầu tiên
-            if (DashboardMenus.Any())
-            {
-                currentDashboard = DashboardMenus[0].Name;
-                BreadcrumbText.Text = $"Dashboard > {currentDashboard}";
-            }
-
 
             foreach (var layout in layouts)
             {
@@ -972,24 +1034,16 @@ namespace LightInsight.Dashboard.Dashboard
         }
         private void ToggleSidebar_Click(object sender, RoutedEventArgs e)
         {
-            if (sidebarCollapsed)
+            if (IsSidebarCollapsed)
             {
                 SidebarColumn.Width = new GridLength(220);
-
-                //OperationsText.Visibility = Visibility.Visible;
-                //AlarmMonitorText.Visibility = Visibility.Visible;
-                DashboardExpander.Header = "Dashboard";
             }
             else
             {
-                SidebarColumn.Width = new GridLength(60);
-
-                //OperationsText.Visibility = Visibility.Collapsed;
-                //AlarmMonitorText.Visibility = Visibility.Collapsed;
-                DashboardExpander.Header = "";
+                SidebarColumn.Width = new GridLength(40);
             }
 
-            sidebarCollapsed = !sidebarCollapsed;
+            IsSidebarCollapsed = !IsSidebarCollapsed;
         }
         private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
         {

@@ -22,11 +22,25 @@ xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                         <Border Background="{TemplateBinding Background}">
                             <StackPanel>
 
-                                <!-- HEADER FIX -->
-                                <ContentPresenter 
-                            Content="{TemplateBinding Header}"
-                            ContentTemplate="{TemplateBinding HeaderTemplate}"
-                            RecognizesAccessKey="True"/>
+                                <!-- HEADER FIX - Thêm ToggleButton để toàn bộ vùng header có thể click -->
+                                <ToggleButton x:Name="HeaderSite"
+                                              IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                              Background="Transparent"
+                                              BorderThickness="0"
+                                              Cursor="Hand">
+                                    <ToggleButton.Template>
+                                        <ControlTemplate TargetType="ToggleButton">
+                                            <Border Background="{TemplateBinding Background}" Padding="2">
+                                                <ContentPresenter />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </ToggleButton.Template>
+                                    
+                                    <ContentPresenter 
+                                        Content="{TemplateBinding Header}"
+                                        ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                        RecognizesAccessKey="True"/>
+                                </ToggleButton>
 
                                 <!-- CONTENT -->
                                 <ContentPresenter x:Name="ExpandSite"
@@ -40,6 +54,7 @@ xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsExpanded" Value="True">
                                 <Setter TargetName="ExpandSite" Property="Visibility" Value="Visible"/>
+                                <!-- Highlight header khi mở rộng nếu cần -->
                             </Trigger>
                         </ControlTemplate.Triggers>
 
@@ -262,11 +277,13 @@ xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
 
                     <Expander x:Name="DashboardExpander"
                               Style="{StaticResource NoArrowExpander}"
-              FontSize="14"
-              Margin="5"
-              IsExpanded="True"
-              Background="Transparent"
-              BorderThickness="0">
+                              FontSize="14"
+                              Margin="5"
+                              IsExpanded="True"
+                              Background="Transparent"
+                              BorderThickness="0"
+                              MouseEnter="Expander_MouseEnter"
+                              MouseLeave="Expander_MouseLeave">
 
                         <!-- 🔥 HEADER CUSTOM -->
                         <Expander.Header>
@@ -291,7 +308,17 @@ xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                            Text="{DynamicResource Dashboard}"
                            VerticalAlignment="Center"
                            Foreground="{DynamicResource TextPrimary}"
-                           FontWeight="SemiBold"/>
+                           FontWeight="SemiBold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
 
                                 <!-- ARROW RIGHT -->
                                 <iconPacks:PackIconMaterial 
@@ -307,7 +334,11 @@ xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                                         <Style TargetType="iconPacks:PackIconMaterial">
                                             <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
                                             <Style.Triggers>
-
+                                                <!-- COLLAPSE SIDEBAR -->
+                                                <DataTrigger Binding="{Binding IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                                
                                                 <!-- COLLAPSE -->
                                                 <DataTrigger Binding="{Binding IsExpanded, RelativeSource={RelativeSource AncestorType=Expander}}" Value="False">
                                                     <Setter Property="RenderTransform">
@@ -337,32 +368,82 @@ xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
 
                         <!-- 🔥 CONTENT -->
                         <ItemsControl ItemsSource="{Binding DashboardMenus}">
+                            <ItemsControl.Style>
+                                <Style TargetType="ItemsControl">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ItemsControl.Style>
 
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
 
                                     <Button Click="Menu_Click"
-                            Margin="5"
-                            Height="28"
-                            Width="187"
-                            Foreground="{DynamicResource TextPrimary}"
-                            BorderThickness="0"
-                            Background="{DynamicResource ButtonBg}"
-                            HorizontalContentAlignment="Left">
+                                            Margin="5"
+                                            Height="32"
+                                            Foreground="{DynamicResource TextPrimary}"
+                                            BorderThickness="0"
+                                            Background="{DynamicResource ButtonBg}">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Width" Value="187"/>
+                                                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                                                        <Setter Property="Width" Value="45"/>
+                                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
 
-                                        <StackPanel Orientation="Horizontal" Width="171">
+                                        <StackPanel Orientation="Horizontal">
+                                            <StackPanel.Style>
+                                                <Style TargetType="StackPanel">
+                                                    <Setter Property="Width" Value="171"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                                                            <Setter Property="Width" Value="Auto"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </StackPanel.Style>
 
                                             <!-- ICON -->
                                             <iconPacks:PackIconMaterial 
-                                Kind="{Binding Icon}" 
-                                Width="20" Height="20"
-                                Margin="0,0,10,0"/>
+                                                Kind="{Binding Icon}" 
+                                                Width="20" Height="20"
+                                                VerticalAlignment="Center">
+                                                <iconPacks:PackIconMaterial.Style>
+                                                    <Style TargetType="iconPacks:PackIconMaterial">
+                                                        <Setter Property="Margin" Value="0,0,10,0"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                                                                <Setter Property="Margin" Value="0"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </iconPacks:PackIconMaterial.Style>
+                                            </iconPacks:PackIconMaterial>
 
                                             <!-- TEXT -->
                                             <TextBlock Text="{Binding Name}"
-                                       Foreground="{DynamicResource TextPrimary}"
-                                       VerticalAlignment="Center"
-                                       Margin="5,0,0,0"/>
+                                                       Foreground="{DynamicResource TextPrimary}"
+                                                       VerticalAlignment="Center"
+                                                       Margin="5,0,0,0">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
 
                                         </StackPanel>
 
@@ -375,22 +456,113 @@ xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
 
                     </Expander>
 
+                    <!-- 🔥 POPUP FOR COLLAPSED MODE -->
+                    <Popup x:Name="SubMenuPopup" 
+                           Placement="Right" 
+                           PlacementTarget="{Binding ElementName=DashboardExpander}"
+                           AllowsTransparency="True"
+                           PopupAnimation="Fade"
+                           HorizontalOffset="0">
+                        <Popup.Style>
+                            <Style TargetType="Popup">
+                                <Setter Property="IsOpen" Value="False"/>
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True"/>
+                                            <Condition Binding="{Binding IsMouseOver, ElementName=DashboardExpander}" Value="True"/>
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="IsOpen" Value="True"/>
+                                    </MultiDataTrigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="IsOpen" Value="True"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Popup.Style>
+
+                        <!-- Cầu nối hit-test (Transparent Border) để không bị mất hover khi di chuyển chuột qua gap -->
+                        <Border Background="Transparent" Padding="5,0,20,20">
+                            <Border Background="{DynamicResource ButtonBg}" 
+                                    BorderBrush="{DynamicResource CardBorder}" 
+                                    BorderThickness="1" 
+                                    CornerRadius="4" 
+                                    Padding="5">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="15" Opacity="0.4" ShadowDepth="3"/>
+                                </Border.Effect>
+
+                                <ItemsControl ItemsSource="{Binding DashboardMenus}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Click="Menu_Click"
+                                                    Margin="2"
+                                                    Height="32"
+                                                    Width="180"
+                                                    Foreground="{DynamicResource TextPrimary}"
+                                                    BorderThickness="0"
+                                                    HorizontalContentAlignment="Left">
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="Background" Value="Transparent"/>
+                                                        <Style.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" Value="{DynamicResource CardBg}"/>
+                                                            </Trigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <iconPacks:PackIconMaterial Kind="{Binding Icon}" Width="18" Height="18" Margin="5,0,10,0" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </Border>
+                    </Popup>
+
                 </StackPanel>
 
-                <!-- COLLAPSE BUTTON -->
+                <!-- COLLAPSE AREA -->
 
                 <Border Grid.Row="1"
-                BorderBrush="#444"
-                BorderThickness="0,1,0,0"
-                Background="{DynamicResource BgMain}">
+                        BorderBrush="#444"
+                        BorderThickness="0,1,0,0"
+                        Background="{DynamicResource BgMain}"
+                        Cursor="Hand"
+                        PreviewMouseLeftButtonDown="ToggleSidebar_Click">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#333"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
 
-                    <Button Content="{DynamicResource Collapse}"
-                    HorizontalAlignment="Left"
-                    Margin="10"
-                    Background="Transparent"
-                    Foreground="White"
-                    BorderThickness="0"
-                    Click="ToggleSidebar_Click"/>
+                    <Button HorizontalAlignment="Left"
+                            Margin="10"
+                            Background="Transparent"
+                            Foreground="White"
+                            BorderThickness="0"
+                            IsHitTestVisible="False">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Content" Value="{DynamicResource Collapse}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                                        <Setter Property="Content" Value="☰"/>
+                                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                                        <Setter Property="Margin" Value="0"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
 
                 </Border>
 

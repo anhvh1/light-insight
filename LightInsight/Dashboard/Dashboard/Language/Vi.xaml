@@ -4,7 +4,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <!-- Top -->
-    <sys:String x:Key="Breadcrumb_Default">Bảng điều khiển &gt; mặc định giao diện</sys:String>
+    <sys:String x:Key="Breadcrumb_Default">Bảng điều khiển &gt; Giao diện mặc định</sys:String>
     <sys:String x:Key="Workspace">Không gian làm việc</sys:String>
     <sys:String x:Key="EditLayout">Chỉnh sửa layout</sys:String>
     <sys:String x:Key="Save">Lưu</sys:String>
