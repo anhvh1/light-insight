@@ -190,14 +190,15 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
             {
                 if (isEdit)
                 {
-                    mainBorder.BorderBrush = TryFindResource("WidgetAccentBorder") as System.Windows.Media.Brush
-                        ?? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(232, 117, 26));
+                    if (mainBorder.Tag is System.Windows.Media.Brush originalBorderBrush)
+                        mainBorder.BorderBrush = originalBorderBrush;
                     mainBorder.BorderThickness = new Thickness(1);
                 }
                 else
                 {
-                    mainBorder.BorderBrush = TryFindResource("WidgetBorder") as System.Windows.Media.Brush
-                        ?? TryFindResource("CardBorder") as System.Windows.Media.Brush
+                    if (!(mainBorder.Tag is System.Windows.Media.Brush))
+                        mainBorder.Tag = mainBorder.BorderBrush;
+                    mainBorder.BorderBrush = TryFindResource("CardBorder") as System.Windows.Media.Brush
                         ?? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(60, 60, 60));
                     mainBorder.BorderThickness = new Thickness(1);
                 }
