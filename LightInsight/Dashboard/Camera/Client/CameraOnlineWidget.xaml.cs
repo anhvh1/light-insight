@@ -137,3 +137,4 @@ namespace LightInsight.Dashboard.Camera.Client
 		//}
 	}
 }
+}
