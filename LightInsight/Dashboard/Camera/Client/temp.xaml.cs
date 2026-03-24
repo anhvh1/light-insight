@@ -57,15 +57,29 @@ namespace LightInsight.Dashboard.Camera.Client
 		{
 			// Hiện/Ẩn nút xóa
 			DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
-
-			// Hiện/Ẩn nút Resize (Thumb) - ĐÂY LÀ DÒNG QUAN TRỌNG
 			if (InternalResizeThumb != null)
-			{
 				InternalResizeThumb.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
-			}
 
-			this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
-		}
+			var mainBorder = FindName("MainBorder") as Border;
+			if (mainBorder != null)
+			{
+				if (isEdit)
+				{
+					if (mainBorder.Tag is System.Windows.Media.Brush originalBorderBrush)
+						mainBorder.BorderBrush = originalBorderBrush;
+					mainBorder.BorderThickness = new Thickness(1);
+				}
+				else
+				{
+					if (!(mainBorder.Tag is System.Windows.Media.Brush))
+						mainBorder.Tag = mainBorder.BorderBrush;
+					mainBorder.BorderBrush = TryFindResource("CardBorder") as System.Windows.Media.Brush
+						?? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(60, 60, 60));
+					mainBorder.BorderThickness = new Thickness(1);
+				}
+			}
+            this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
+        }
 		private void DeleteWidget_Click(object sender, RoutedEventArgs e)
 		{
 			DeleteRequested?.Invoke(this, EventArgs.Empty);
