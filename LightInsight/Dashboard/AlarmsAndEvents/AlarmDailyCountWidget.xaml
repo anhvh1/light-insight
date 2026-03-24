@@ -11,14 +11,14 @@
 
     <Grid Margin="5,5,0,0">
         <Border x:Name="MainBorder"
-                Background="{DynamicResource BgMain}"
+                Background="{DynamicResource WidgetCardBg}"
                 BorderThickness="1"
                 CornerRadius="6">
 
             <Border.BorderBrush>
                 <VisualBrush Stretch="None">
                     <VisualBrush.Visual>
-                        <Rectangle Stroke="#E8751A"
+                        <Rectangle Stroke="{DynamicResource WidgetAccentBorder}"
                                    StrokeDashArray="4 2"
                                    StrokeThickness="1"
                                    RadiusX="6" RadiusY="6"
@@ -34,9 +34,9 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0" Background="{DynamicResource BgMain}">
+                <Grid Grid.Row="0" Background="{DynamicResource WidgetHeaderBg}">
                     <TextBlock Text="{DynamicResource Alarm_Title_DailyCount}"
-                               Foreground="{DynamicResource TextPrimary}"
+                               Foreground="{DynamicResource WidgetHeaderText}"
                                FontSize="14"
                                VerticalAlignment="Center"
                                Margin="10,0"/>
@@ -132,7 +132,7 @@
                         <Thumb.Template>
                             <ControlTemplate>
                                 <Path Data="M 12,0 L 12,12 L 0,12 Z"
-                                      Fill="#888"
+                                      Fill="{DynamicResource WidgetResizeThumb}"
                                       Opacity="0.5"/>
                             </ControlTemplate>
                         </Thumb.Template>
