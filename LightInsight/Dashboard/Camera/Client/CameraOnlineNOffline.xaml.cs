@@ -104,7 +104,7 @@ namespace LightInsight.Dashboard.Camera.Client
             var mainBorder = FindName("MainBorder") as Border;
             if (mainBorder != null)
             {
-                mainBorder.BorderThickness = isEdit ? new Thickness(1) : new Thickness(0);
+                mainBorder.BorderThickness = isEdit ? new Thickness(1) : new Thickness(0.8);
             }
             this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
         }
