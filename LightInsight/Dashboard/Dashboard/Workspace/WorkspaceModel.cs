@@ -39,8 +39,19 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
 
         public string ParentId { get; set; }
 
-        public ObservableCollection<WorkspaceModel> Children { get; set; }
-            = new ObservableCollection<WorkspaceModel>();
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                _isSelected = value;
+                OnPropertyChanged(nameof(IsSelected));
+            }
+        }
+
+        public ObservableCollection<WorkspaceModel> Children { get; set; } = new ObservableCollection<WorkspaceModel>();
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
