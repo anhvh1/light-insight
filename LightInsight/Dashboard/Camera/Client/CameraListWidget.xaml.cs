@@ -62,9 +62,12 @@ namespace LightInsight.Dashboard.Camera.Client
 
             _cameraServices = new CameraServices();
             _cameraServices.Start();
-            _cameraServices.StatusUpdated += (on, off, total) => {
-                // Khi có cập nhật trạng thái từ SDK, ta có thể làm mới danh sách nếu muốn
-                // Ở đây ta chỉ nạp lại dữ liệu nếu danh sách đang trống hoặc cần refresh
+			_cameraServices.StatusUpdated += (on, off, total) => {
+                Dispatcher.Invoke(() =>
+                {
+                    _allCameras = _cameraServices.GetCameraList();
+                    UpdateTable(_currentPage.ToString());
+                });
             };
 
             LoadRealData();
