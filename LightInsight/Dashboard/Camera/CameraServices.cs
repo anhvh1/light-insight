@@ -90,12 +90,19 @@ namespace LightInsight.Dashboard.Camera
 
 			try
 			{
-				// Sử dụng GetItemsByKind để lấy danh sách Camera chuẩn và duy nhất từ Milestone SDK
-				var cameraItems = Configuration.Instance.GetItemsByKind(Kind.Camera);
+				// 1. Lấy toàn bộ Item trong hệ thống (bao gồm cả phân cấp hệ thống và người dùng định nghĩa)
+				var allItems = Configuration.Instance.GetItems(ItemHierarchy.Both);
 
-				if (cameraItems != null)
+				if (allItems != null)
 				{
-					foreach (var item in cameraItems)
+					// 2. Lọc ra các Item là Camera và dùng GroupBy để đảm bảo mỗi Camera vật lý chỉ xuất hiện 1 lần
+					var uniqueCameras = allItems
+						.Where(i => i.FQID.Kind == Kind.Camera)
+						.GroupBy(i => i.FQID.ObjectId)
+						.Select(g => g.First())
+						.ToList();
+
+					foreach (var item in uniqueCameras)
 					{
 						// Lấy trạng thái từ cache
 						_cameraStatusCache.TryGetValue(item.FQID.ObjectId, out string status);
@@ -126,23 +133,31 @@ namespace LightInsight.Dashboard.Camera
 		{
 			try
 			{
-				// Cách 1: Thử lấy trực tiếp từ thuộc tính Address của Camera (nếu có)
-				if (cameraItem.Properties.ContainsKey("Address") && !string.IsNullOrEmpty(cameraItem.Properties["Address"]))
-				{
-					return cameraItem.Properties["Address"];
-				}
-
-				// Cách 2: Tìm Hardware cha và lấy IP từ đó
+				// Trong Milestone, Camera con của Hardware. Hardware chứa IP trong thuộc tính Address.
 				var hardwareItem = Configuration.Instance.GetItem(cameraItem.FQID.ParentId, Kind.Hardware);
 				if (hardwareItem != null)
 				{
-					if (hardwareItem.Properties.ContainsKey("Address") && !string.IsNullOrEmpty(hardwareItem.Properties["Address"]))
+					string addr = string.Empty;
+
+					if (hardwareItem.Properties.ContainsKey("Address"))
 					{
-						return hardwareItem.Properties["Address"];
+						addr = hardwareItem.Properties["Address"];
 					}
-					
-					// Một số trường hợp Hardware name chính là IP hoặc chứa IP
-					return hardwareItem.Name; 
+
+					if (string.IsNullOrEmpty(addr))
+					{
+						addr = hardwareItem.Name; // Đôi khi tên Hardware là IP
+					}
+
+					// Làm sạch chuỗi để lấy IPv4/Host (bỏ http, port, ...)
+					if (!string.IsNullOrEmpty(addr))
+					{
+						addr = addr.Replace("http://", "").Replace("https://", "");
+						int colonIndex = addr.IndexOf(':');
+						if (colonIndex > 0) addr = addr.Substring(0, colonIndex);
+						addr = addr.TrimEnd('/');
+						return addr;
+					}
 				}
 			}
 			catch { }
