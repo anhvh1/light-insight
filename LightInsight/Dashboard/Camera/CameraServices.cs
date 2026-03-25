@@ -90,74 +90,80 @@ namespace LightInsight.Dashboard.Camera
 
 			try
 			{
-				// 1. Lấy toàn bộ Item trong hệ thống (bao gồm cả phân cấp hệ thống và người dùng định nghĩa)
-				var allItems = Configuration.Instance.GetItems(ItemHierarchy.Both);
+				// 1. Sử dụng HashSet để đảm bảo không trùng lặp camera giữa các Site/Folder
+				var processedIds = new HashSet<Guid>();
+				
+				// 2. Lấy các Site/Server ở mức cao nhất từ SystemDefined hierarchy
+				var topLevelItems = Configuration.Instance.GetItems(ItemHierarchy.SystemDefined);
 
-				if (allItems != null)
+				if (topLevelItems != null)
 				{
-					// 2. Lọc ra các Item là Camera và dùng GroupBy để đảm bảo mỗi Camera vật lý chỉ xuất hiện 1 lần
-					var uniqueCameras = allItems
-						.Where(i => i.FQID.Kind == Kind.Camera)
-						.GroupBy(i => i.FQID.ObjectId)
-						.Select(g => g.First())
-						.ToList();
-
-					foreach (var item in uniqueCameras)
+					foreach (var item in topLevelItems)
 					{
-						// Lấy trạng thái từ cache
-						_cameraStatusCache.TryGetValue(item.FQID.ObjectId, out string status);
-						if (string.IsNullOrEmpty(status)) status = "Responding";
-
-						cameras.Add(new CameraInfo
-						{
-							ID = item.FQID.ObjectId.ToString().Substring(0, 8).ToUpper(),
-							Name = item.Name,
-							Status = status.Equals("Responding", StringComparison.OrdinalIgnoreCase) ? "Online" : "Offline",
-							IP = GetCameraIp(item),
-							Recording = "Yes", 
-							Uptime = "99.9%"
-						});
+						FindCamerasInHierarchy(item, cameras, processedIds);
 					}
 				}
 
-				System.Diagnostics.Debug.WriteLine($"[CameraServices] Total unique cameras found: {cameras.Count}");
+				System.Diagnostics.Debug.WriteLine($"[CameraServices] Final unique cameras discovered: {cameras.Count}");
 			}
 			catch (Exception ex)
 			{
-				System.Diagnostics.Debug.WriteLine($"[CameraServices] Error: {ex.Message}");
+				System.Diagnostics.Debug.WriteLine($"[CameraServices] Error in GetCameraList: {ex.Message}");
 			}
 			return cameras;
 		}
 
-		private string GetCameraIp(Item cameraItem)
+		private void FindCamerasInHierarchy(Item parentItem, List<CameraInfo> resultList, HashSet<Guid> processedIds)
+		{
+			// Nếu là Camera và chưa được xử lý
+			if (parentItem.FQID.Kind == Kind.Camera && !processedIds.Contains(parentItem.FQID.ObjectId))
+			{
+				processedIds.Add(parentItem.FQID.ObjectId);
+
+				// Lấy trạng thái từ cache
+				_cameraStatusCache.TryGetValue(parentItem.FQID.ObjectId, out string status);
+				if (string.IsNullOrEmpty(status)) status = "Responding";
+
+				resultList.Add(new CameraInfo
+				{
+					ID = parentItem.FQID.ObjectId.ToString().Substring(0, 8).ToUpper(),
+					Name = parentItem.Name,
+					Status = status.Equals("Responding", StringComparison.OrdinalIgnoreCase) ? "Online" : "Offline",
+					IP = GetCameraIpUsingMessage(parentItem.FQID),
+					Recording = "Yes",
+					Uptime = "99.9%"
+				});
+			}
+
+			// Đệ quy tìm con (Milestone tự động tải cấu hình Site con khi gọi GetChildren)
+			var children = parentItem.GetChildren();
+			if (children != null)
+			{
+				foreach (var child in children)
+				{
+					FindCamerasInHierarchy(child, resultList, processedIds);
+				}
+			}
+		}
+
+		private string GetCameraIpUsingMessage(FQID cameraFqid)
 		{
 			try
 			{
-				// Trong Milestone, Camera con của Hardware. Hardware chứa IP trong thuộc tính Address.
-				var hardwareItem = Configuration.Instance.GetItem(cameraItem.FQID.ParentId, Kind.Hardware);
-				if (hardwareItem != null)
+				// Cách chuẩn nhất trong MIP SDK để lấy IP của Camera trong Smart Client
+				var result = VideoOS.Platform.SDK.Environment.SendMessage(
+					new VideoOS.Platform.Messaging.Message(MessageId.Server.GetIPAddressRequest),
+					cameraFqid,
+					null
+				);
+
+				if (result is string ip && !string.IsNullOrEmpty(ip))
 				{
-					string addr = string.Empty;
-
-					if (hardwareItem.Properties.ContainsKey("Address"))
-					{
-						addr = hardwareItem.Properties["Address"];
-					}
-
-					if (string.IsNullOrEmpty(addr))
-					{
-						addr = hardwareItem.Name; // Đôi khi tên Hardware là IP
-					}
-
-					// Làm sạch chuỗi để lấy IPv4/Host (bỏ http, port, ...)
-					if (!string.IsNullOrEmpty(addr))
-					{
-						addr = addr.Replace("http://", "").Replace("https://", "");
-						int colonIndex = addr.IndexOf(':');
-						if (colonIndex > 0) addr = addr.Substring(0, colonIndex);
-						addr = addr.TrimEnd('/');
-						return addr;
-					}
+					// Làm sạch chuỗi (loại bỏ http, port...)
+					ip = ip.Replace("http://", "").Replace("https://", "");
+					int colonIndex = ip.IndexOf(':');
+					if (colonIndex > 0) ip = ip.Substring(0, colonIndex);
+					return ip.TrimEnd('/');
 				}
 			}
 			catch { }
