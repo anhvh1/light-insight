@@ -139,10 +139,10 @@ namespace LightInsight.Dashboard.Camera
 			try
 			{
 				var hardware = Configuration.Instance.GetItem(cameraItem.FQID.ParentId, Kind.Hardware);
-                foreach (var kv in hardware.Properties)
-                {
-                    System.Diagnostics.Debug.WriteLine($"{kv.Key} = {kv.Value}");
-                }
+                //foreach (var kv in hardware.Properties)
+                //{
+                //    System.Diagnostics.Debug.WriteLine($"{kv.Key} = {kv.Value}");
+                //}
                 if (hardware == null) return "N/A";
 
 				if (hardware.Properties != null)
@@ -174,6 +174,32 @@ namespace LightInsight.Dashboard.Camera
 			}
 
 			return "N/A";
+		}
+
+		public void CheckRecordingStatus(Guid cameraId)
+		{
+		    // Tạo 1 FQID cho Camera
+		    FQID cameraFqid = new FQID(EnvironmentManager.Instance.MasterSite.ServerId, Guid.Empty, cameraId, FolderType.No, Kind.Camera);
+		    // Gửi yêu cầu lấy trạng thái CHI TIẾT
+		    // Server sẽ trả về một tin nhắn có tên là MessageId.Server.GetItemStatusResponse
+		    var msg = new VideoOS.Platform.Messaging.Message(MessageId.Server.GetIPAddressResponse);
+		    _messageCommunication.TransmitMessage(msg, cameraFqid, null, null);
+		}
+		// Trong Handler nhận tin nhắn:
+		private object StatusResponseHandler(Message message, FQID dest, FQID source)
+		{
+		    if (message.MessageId == MessageId.Server.GetIPAddressResponse)
+		    {
+		        // Data trả về là một đối tượng ItemStatus
+		        var status = message.Data;
+		        if (status != null)
+		        {
+					// Kiểm tra xem trong danh sách status có chữ "Recording" không
+					string statusString = status.ToString();
+		            System.Diagnostics.Debug.WriteLine($"Camera {source.ObjectId} ip {statusString}");
+		        }
+		    }
+		    return null;
 		}
 
 		#endregion
