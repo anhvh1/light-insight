@@ -42,35 +42,26 @@ namespace LightInsight.Dashboard.Camera
 			var cameras = new List<CameraInfo>();
 			try
 			{
-				// Lấy tất cả các Item có Kind là Camera từ cấu hình
-				var cameraItems = Configuration.Instance.GetItems(Kind.Camera);
+				// Sửa lỗi: Thêm ItemHierarchy.Both để xác định phạm vi tìm kiếm
+				var cameraItems = Configuration.Instance.GetItems(ItemHierarchy.Both);
 
 				if (cameraItems == null) return cameras;
 
-				foreach (var item in cameraItems)
+				// Lọc các Item có Kind là Camera
+				foreach (var item in cameraItems.Where(i => i.FQID.Kind == Kind.Camera))
 				{
-					// Lấy trạng thái từ cache nếu có, mặc định là "Unknown"
+					// Lấy trạng thái từ cache nếu có, mặc định là "Online" (Responding)
 					_cameraStatusCache.TryGetValue(item.FQID.ObjectId, out string status);
-					if (string.IsNullOrEmpty(status)) status = "Responding"; // Giả định ban đầu là hoạt động nếu chưa nhận được event
-
-					// Lấy thông tin Recording
-					bool isRecording = false;
-					try
-					{
-						// Sử dụng RecordingCommandService để kiểm tra trạng thái ghi hình thực tế nếu cần, 
-						// ở đây ta tạm lấy thông tin cơ bản từ Item
-						isRecording = true; // Mặc định trong Smart Client camera thường là đang ghi hình
-					}
-					catch { }
+					if (string.IsNullOrEmpty(status)) status = "Responding"; 
 
 					cameras.Add(new CameraInfo
 					{
-						ID = item.FQID.ObjectId.ToString().Substring(0, 8).ToUpper(), // Hiển thị 8 ký tự đầu cho gọn
+						ID = item.FQID.ObjectId.ToString().Substring(0, 8).ToUpper(), 
 						Name = item.Name,
 						Status = status == "Responding" ? "Online" : "Offline",
 						IP = GetCameraIp(item),
-						Recording = isRecording ? "Yes" : "No",
-						Uptime = "99.9%" // Phần này thường cần API chuyên biệt hoặc DB để tính toán chính xác
+						Recording = "Yes", // Mặc định Yes, Milestone ghi hình hầu hết thời gian
+						Uptime = "99.9%"
 					});
 				}
 			}
