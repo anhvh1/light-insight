@@ -143,30 +143,39 @@
                               CanUserAddRows="False" IsReadOnly="True" RowHeaderWidth="0"
                               HeadersVisibility="Column"
                               HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                        <DataGrid.Resources>
+                            <!-- Style chung cho toàn bộ Header của DataGrid này -->
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="{DynamicResource TableHeaderBg}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TableHeaderText}"/>
+                                <Setter Property="Padding" Value="10,5"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                            </Style>
+                        </DataGrid.Resources>
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding ID}" Width="80">
                                 <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
+                                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                                         <Setter Property="Content" Value="{DynamicResource Camera_GridHeader_ID}" />
-                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
                                     </Style>
                                 </DataGridTextColumn.HeaderStyle>
                             </DataGridTextColumn>
 
                             <DataGridTextColumn Binding="{Binding Name}" Width="*">
                                 <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
+                                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                                         <Setter Property="Content" Value="{DynamicResource Camera_GridHeader_NAME}" />
-                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
                                     </Style>
                                 </DataGridTextColumn.HeaderStyle>
                             </DataGridTextColumn>
 
                             <DataGridTemplateColumn Width="90">
                                 <DataGridTemplateColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
+                                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                                         <Setter Property="Content" Value="{DynamicResource Camera_GridHeader_STATUS}" />
-                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
                                     </Style>
                                 </DataGridTemplateColumn.HeaderStyle>
                                 <DataGridTemplateColumn.CellTemplate>
@@ -180,27 +189,24 @@
 
                             <DataGridTextColumn Binding="{Binding IP}" Width="120">
                                 <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
+                                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                                         <Setter Property="Content" Value="{DynamicResource Camera_GridHeader_IP}" />
-                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
                                     </Style>
                                 </DataGridTextColumn.HeaderStyle>
                             </DataGridTextColumn>
 
                             <DataGridTextColumn Binding="{Binding Recording}" Width="90">
                                 <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
+                                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                                         <Setter Property="Content" Value="{DynamicResource Camera_GridHeader_RECORDING}" />
-                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
                                     </Style>
                                 </DataGridTextColumn.HeaderStyle>
                             </DataGridTextColumn>
 
                             <DataGridTextColumn Binding="{Binding Uptime}" Width="70">
                                 <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
+                                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                                         <Setter Property="Content" Value="{DynamicResource Camera_GridHeader_UPTIME}" />
-                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
                                     </Style>
                                 </DataGridTextColumn.HeaderStyle>
                             </DataGridTextColumn>
