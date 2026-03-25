@@ -131,14 +131,14 @@
                         <ComboBox.Resources>
                             <Style TargetType="Border"><Setter Property="CornerRadius" Value="4"/></Style>
                         </ComboBox.Resources>
-                        <ComboBoxItem Content="Last 24h"/>
-                        <ComboBoxItem Content="Last 7 Days"/>
-                        <ComboBoxItem Content="Last 30 Days"/>
-                        <ComboBoxItem Content="Custom"/>
+                        <ComboBoxItem Content="{DynamicResource Last24h}"/>
+                        <ComboBoxItem Content="{DynamicResource Last7Days}"/>
+                        <ComboBoxItem Content="{DynamicResource Last30Days}"/>
+                        <ComboBoxItem Content="{DynamicResource Custom}"/>
                     </ComboBox>
 
-                    <Button x:Name="RefreshBtn" Width="32" Height="32" Margin="5" Click="RefreshBtn_Click" Background="Transparent" BorderThickness="0" Cursor="Hand">
-                        <iconPacks:PackIconMaterial Kind="Refresh" Foreground="{DynamicResource TextSecondary}" Width="18" Height="18"/>
+                    <Button x:Name="RefreshBtn" Width="32" Height="32" Margin="5" Click="RefreshBtn_Click" Background="Transparent" BorderThickness="0" Cursor="Hand" MinHeight="0" MinWidth="20">
+                        <iconPacks:PackIconMaterial Kind="Refresh" Foreground="{DynamicResource TextSecondary}" Width="12" Height="12"/>
                     </Button>
                 </StackPanel>
             </DockPanel>
