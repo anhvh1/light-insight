@@ -194,6 +194,11 @@
                                                 <Setter TargetName="StatusBadge" Property="Background" Value="{DynamicResource StatusOfflineBg}"/>
                                                 <Setter TargetName="StatusText" Property="Foreground" Value="{DynamicResource StatusOfflineText}"/>
                                             </DataTrigger>
+                                            <!-- Trạng thái Unknown -->
+                                            <DataTrigger Binding="{Binding Status}" Value="Unknown">
+                                                <Setter TargetName="StatusBadge" Property="Background" Value="#FCD34D"/>
+                                                <Setter TargetName="StatusText" Property="Foreground" Value="Black"/>
+                                            </DataTrigger>
                                         </DataTemplate.Triggers>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>

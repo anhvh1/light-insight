@@ -139,7 +139,11 @@ namespace LightInsight.Dashboard.Camera
 			try
 			{
 				var hardware = Configuration.Instance.GetItem(cameraItem.FQID.ParentId, Kind.Hardware);
-				if (hardware == null) return "N/A";
+                foreach (var kv in hardware.Properties)
+                {
+                    System.Diagnostics.Debug.WriteLine($"{kv.Key} = {kv.Value}");
+                }
+                if (hardware == null) return "N/A";
 
 				if (hardware.Properties != null)
 				{
