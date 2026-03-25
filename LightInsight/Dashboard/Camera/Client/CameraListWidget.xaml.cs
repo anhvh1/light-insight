@@ -36,7 +36,7 @@ namespace LightInsight.Dashboard.Camera.Client
 		public override string ToString() => Content;
 	}
 
-	public partial class CameraListWidget : UserControl, IResizableWidget
+	public partial class CameraListWidget : UserControl, IResizableWidget, IDisposable
 	{
 		private ResourceDictionary _currentThemeDictionary;
 		private object _themeChangedRegistration;
@@ -48,6 +48,7 @@ namespace LightInsight.Dashboard.Camera.Client
 		private List<CameraInfo> _allCameras;
 		public int _currentPage = 1;
 		private const int MaxPages = 2;
+        private CameraServices _cameraServices;
 
 		public CameraListWidget()
 		{
@@ -58,13 +59,30 @@ namespace LightInsight.Dashboard.Camera.Client
 				new MessageReceiver(OnThemeChanged),
 				new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
 			DeleteButton.Visibility = Visibility.Collapsed;
-			LoadMockData();
+
+            _cameraServices = new CameraServices();
+            _cameraServices.Start();
+            _cameraServices.StatusUpdated += (on, off, total) => {
+                // Khi có cập nhật trạng thái từ SDK, ta có thể làm mới danh sách nếu muốn
+                // Ở đây ta chỉ nạp lại dữ liệu nếu danh sách đang trống hoặc cần refresh
+            };
+
+			LoadRealData();
 
 			// Thay vì gọi trực tiếp, hãy đợi Widget load xong kích thước
 			this.Loaded += (s, e) => {
 				UpdateTable("1");
 			};
 		}
+
+        public void Dispose()
+        {
+            if (_cameraServices != null)
+            {
+                _cameraServices.Dispose();
+            }
+        }
+
 		private void ApplySmartClientLanguage(string name)
 		{
 			var uri = name == "vi-VN"
@@ -110,22 +128,16 @@ namespace LightInsight.Dashboard.Camera.Client
 			DeleteRequested?.Invoke(this, EventArgs.Empty);
 		}
 
-		private void LoadMockData()
+		private void LoadRealData()
 		{
-			_allCameras = new List<CameraInfo>();
-			for (int i = 1; i <= 30; i++)
-			{
-				_allCameras.Add(new CameraInfo
-				{
-					ID = $"CAM-00{i}",
-					Name = $"Camera Khu vực {i}",
-					Status = i % 3 == 0 ? "Offline" : "Online",
-					StatusColor = i % 3 == 0 ? "#4D1F1F" : "#1A3A26", // Đỏ đậm hoặc Xanh đậm
-					IP = $"192.168.1.{100 + i}",
-					Recording = "Yes",
-					Uptime = "99.9%"
-				});
-			}
+            if (_cameraServices != null)
+            {
+                _allCameras = _cameraServices.GetCameraList();
+            }
+            else
+            {
+                _allCameras = new List<CameraInfo>();
+            }
 		}
 
 		private int _totalPages = 1; // Thay cho MaxPages
