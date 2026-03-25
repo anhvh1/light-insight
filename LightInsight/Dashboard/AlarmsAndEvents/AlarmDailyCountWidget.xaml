@@ -34,12 +34,15 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0" Background="{DynamicResource BgMain}">
+                <Grid Grid.Row="0" Background="{DynamicResource WidgetHeaderBg}">
                     <TextBlock Text="{DynamicResource Alarm_Title_DailyCount}"
-                               Foreground="{DynamicResource TextPrimary}"
+                               Foreground="{DynamicResource WidgetHeaderText}"
                                FontSize="14"
                                VerticalAlignment="Center"
                                Margin="10,0"/>
+                    <Border Height="1"
+                            VerticalAlignment="Bottom"
+                            Background="{DynamicResource WidgetBorder}"/>
 
                     <Button x:Name="DeleteButton" 
                             Content="X" 

@@ -24,8 +24,8 @@
             </Border.BorderBrush>
 
 		    <Grid>
-			    <Border Background="{DynamicResource BgMain}" Height="25" VerticalAlignment="Top" CornerRadius="6,6,6,6">
-				    <TextBlock Text="{DynamicResource Camera_Title_AnalyticsSummary}" Foreground="{DynamicResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
+			    <Border Background="{DynamicResource WidgetHeaderBg}" Height="25" VerticalAlignment="Top" CornerRadius="6,6,6,6" BorderBrush="{DynamicResource WidgetBorder}" BorderThickness="0,0,0,1">
+				    <TextBlock Text="{DynamicResource Camera_Title_AnalyticsSummary}" Foreground="{DynamicResource WidgetHeaderText}" FontSize="14" VerticalAlignment="Center"/>
 			    </Border>
 
                 <Button x:Name="DeleteButton" 

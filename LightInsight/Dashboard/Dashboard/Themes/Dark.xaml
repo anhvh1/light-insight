@@ -18,27 +18,79 @@
     <SolidColorBrush x:Key="TextSecondary" Color="#9CA3AF"/>
     <SolidColorBrush x:Key="TextMuted" Color="#7A8090"/>
 
+
+    <!-- Accents -->
+    <SolidColorBrush x:Key="AccentBlue"    Color="#60A5FA"/>
+    <SolidColorBrush x:Key="AccentGreen"   Color="#22C55E"/>
+    <SolidColorBrush x:Key="AccentPurple"  Color="#7A8090"/>
+    <SolidColorBrush x:Key="AccentOrange"  Color="#E8751A"/>
+    <SolidColorBrush x:Key="AccentCyan"    Color="#60A5FA"/>
+
+    <!-- Status -->
+    <SolidColorBrush x:Key="StatusOnline"  Color="#22C55E"/>
+    <SolidColorBrush x:Key="StatusOffline" Color="#EF4444"/>
+
+    <!-- Buttons & states -->
+    <SolidColorBrush x:Key="ButtonBg"        Color="#2C3039"/>
+    <SolidColorBrush x:Key="ButtonBgHover"   Color="#333842"/>
+    <SolidColorBrush x:Key="ButtonBgPressed" Color="#363B46"/>
+
+    <!-- Hover / separators -->
+    <SolidColorBrush x:Key="ItemHoverBg"    Color="#333842"/>
+    <SolidColorBrush x:Key="RowHoverBg"     Color="#333842"/>
+    <SolidColorBrush x:Key="SeparatorBrush" Color="#363B46"/>
+
     <!-- Màu điểm nhấn (Accent - Cam #E8751A) -->
     <SolidColorBrush x:Key="AccentColor" Color="#E8751A"/>
     <SolidColorBrush x:Key="AccentHover" Color="#F2943B"/>
     
     <!-- Trạng thái -->
-    <SolidColorBrush x:Key="StatusOnline" Color="#22C55E"/>
-    <SolidColorBrush x:Key="StatusOffline" Color="#EF4444"/>
     <SolidColorBrush x:Key="StatusWarning" Color="#F59E0B"/>
+    <!-- Card viền & bóng (dark dùng viền mảnh, không bóng) -->
+    <Thickness      x:Key="CardBorderThickness">1</Thickness>
+    <x:Null         x:Key="CardShadow"/>
+
+    <!-- Widget (riêng cho card + label/header) -->
+    <SolidColorBrush x:Key="WidgetCardBg"        Color="#272B34"/>
+    <SolidColorBrush x:Key="WidgetHeaderBg"      Color="#2C3039"/>
+    <SolidColorBrush x:Key="WidgetHeaderText"    Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="WidgetBorder"        Color="#363B46"/>
+    <SolidColorBrush x:Key="WidgetAccentBorder"  Color="#E8751A"/>
+    <SolidColorBrush x:Key="WidgetResizeThumb"   Color="#7A8090"/>
+
+    <!-- Icon tile -->
+    <SolidColorBrush x:Key="IconBgDevices"  Color="#2C3039"/>
+    <SolidColorBrush x:Key="IconBgVisitor"  Color="#2A2518"/>
+    <SolidColorBrush x:Key="IconBgVehicles" Color="#1E2128"/>
+    <SolidColorBrush x:Key="IconBgWarning"  Color="#2A2518"/>
 
     <!-- Buttons & Backgrounds -->
-    <SolidColorBrush x:Key="ButtonBg" Color="#1E2128"/>
     <SolidColorBrush x:Key="ToolbarBg" Color="#272B34"/>
-    <SolidColorBrush x:Key="ItemHoverBg" Color="#333842"/>
     <SolidColorBrush x:Key="SidebarHeaderBackgroundBrush" Color="#2A2F3A"/>
+    <!-- Status tiles / badges -->
+    <SolidColorBrush x:Key="StatusTileOkBg"     Color="#2C3039"/>
+    <SolidColorBrush x:Key="StatusTileErrorBg"  Color="#2A2518"/>
+    <SolidColorBrush x:Key="BadgeErrorBg"       Color="#EF4444"/>
+    <SolidColorBrush x:Key="BadgeErrorText"     Color="#FFFFFF"/>
 
     <!-- Charts -->
     <SolidColorBrush x:Key="ChartLineColor" Color="#EF4444"/>
     <SolidColorBrush x:Key="ChartGridBrush" Color="#363B46"/>
+    <!-- Table -->
+    <SolidColorBrush x:Key="TableHeaderBg"   Color="#2C3039"/>
+    <SolidColorBrush x:Key="TableHeaderText" Color="#9CA3AF"/>
+    <SolidColorBrush x:Key="TableRowAltBg"   Color="#272B34"/>
+
+    <!-- LiveCharts -->
+    <SolidColorBrush x:Key="ChartGuestStroke"    Color="#EF4444"/>
+    <SolidColorBrush x:Key="ChartGuestFill"      Color="#00000000"/>
+    <SolidColorBrush x:Key="ChartVehicleStroke"  Color="#22C55E"/>
+    <SolidColorBrush x:Key="ChartVehicleFill"    Color="#6622C55E"/>
+    <SolidColorBrush x:Key="ChartEventStroke"    Color="#E8751A"/>
+    <SolidColorBrush x:Key="ChartEventFill"      Color="#66E8751A"/>
 
     <!-- Logo & Khác -->
-    <ImageSource x:Key="CompanyLogo">/LightInsight;component/Dashboard/Asset/logo.png</ImageSource>
-    <SolidColorBrush x:Key="LogoPlateBg" Color="Transparent"/>
+    <ImageSource x:Key="CompanyLogo">/LightInsight;component/Dashboard/Asset/logo.png"</ImageSource>
+    <SolidColorBrush x:Key="LogoPlateBg" Color="#272B34"/>
 
 </ResourceDictionary>

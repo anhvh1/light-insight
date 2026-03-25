@@ -722,7 +722,7 @@ namespace LightInsight.Dashboard.Dashboard
 				GridOverlay.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 				DashboardGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 			}
-			for (int i = 0; i < 7; i++)
+			for (int i = 0; i < 10; i++)
 			{
 				GridOverlay.RowDefinitions.Add(new RowDefinition { Height = new GridLength(80) });
 				DashboardGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(80) });
