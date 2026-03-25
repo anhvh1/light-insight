@@ -108,6 +108,7 @@ namespace LightInsight.Dashboard.Dashboard
 
         FrameworkElement selectedWidget = null;
         bool isDraggingWidget = false;
+        private Point _clickOffset;
         public event PropertyChangedEventHandler PropertyChanged;
 
 		void OnPropertyChanged(string name)
@@ -528,19 +529,34 @@ namespace LightInsight.Dashboard.Dashboard
         private void Widget_MouseMove(object sender, MouseEventArgs e)
         {
             if (!editMode || !isDraggingWidget || selectedWidget == null) return;
+
+            Point currentPoint = e.GetPosition(DashboardGrid);
+            Vector diff = startPoint - currentPoint;
+
+            // Chỉ bắt đầu di chuyển nếu chuột đã di chuyển một khoảng nhất định (tránh click vô tình)
+            if (Math.Abs(diff.X) < SystemParameters.MinimumHorizontalDragDistance && 
+                Math.Abs(diff.Y) < SystemParameters.MinimumVerticalDragDistance) return;
+
             HandleAutoScroll(e);
-            FrameworkElement widget = sender as FrameworkElement;
-            Point pos = e.GetPosition(DashboardGrid);
+            FrameworkElement widget = selectedWidget;
             int columnCount = 12; double cellWidth = DashboardGrid.ActualWidth / columnCount; double cellHeight = 80;
-            int column = (int)(pos.X / cellWidth); int row = (int)(pos.Y / cellHeight);
-            int colSpan = Grid.GetColumnSpan(widget); int rowSpan = Grid.GetRowSpan(widget);
             
-            column = Math.Max(0, Math.Min(column, columnCount - colSpan)); row = Math.Max(0, row);
+            // Tính toán vị trí mới dựa trên điểm click ban đầu (trừ đi offset để giữ nguyên vị trí chuột trên widget)
+            double adjustedX = currentPoint.X - _clickOffset.X;
+            double adjustedY = currentPoint.Y - _clickOffset.Y;
+            
+            int column = (int)Math.Round(adjustedX / cellWidth); 
+            int row = (int)Math.Round(adjustedY / cellHeight);
+            
+            int colSpan = Grid.GetColumnSpan(widget); 
+            int rowSpan = Grid.GetRowSpan(widget);
+            
+            column = Math.Max(0, Math.Min(column, columnCount - colSpan)); 
+            row = Math.Max(0, row);
 
             if (Grid.GetColumn(widget) != column || Grid.GetRow(widget) != row)
             {
                 Grid.SetColumn(widget, column); Grid.SetRow(widget, row);
-                // Không gọi SmartCascadePush ở đây để tránh đẩy widget liên tục khi đang kéo
                 _isDirty = true;
             }
         }
@@ -622,6 +638,7 @@ namespace LightInsight.Dashboard.Dashboard
 			if (!editMode) return;
 			selectedWidget = sender as FrameworkElement;
 			startPoint = e.GetPosition(DashboardGrid);
+            _clickOffset = e.GetPosition(selectedWidget); // Lưu vị trí click tương đối trong widget
 			isDraggingWidget = true;
 			selectedWidget.CaptureMouse();
 
