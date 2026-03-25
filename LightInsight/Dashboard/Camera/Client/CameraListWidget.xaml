@@ -180,9 +180,21 @@
                                 </DataGridTemplateColumn.HeaderStyle>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Border Background="{Binding StatusColor}" CornerRadius="2" Padding="5,1" HorizontalAlignment="Left">
-                                            <TextBlock Text="{Binding Status}" Foreground="{DynamicResource TextPrimary}" FontSize="10"/>
+                                        <Border x:Name="StatusBadge" CornerRadius="10" Padding="8,2" HorizontalAlignment="Center" MinWidth="60">
+                                            <TextBlock x:Name="StatusText" Text="{Binding Status}" FontSize="10" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                                         </Border>
+                                        <DataTemplate.Triggers>
+                                            <!-- Trạng thái Online -->
+                                            <DataTrigger Binding="{Binding Status}" Value="Online">
+                                                <Setter TargetName="StatusBadge" Property="Background" Value="{DynamicResource StatusOnlineBg}"/>
+                                                <Setter TargetName="StatusText" Property="Foreground" Value="{DynamicResource StatusOnlineText}"/>
+                                            </DataTrigger>
+                                            <!-- Trạng thái Offline -->
+                                            <DataTrigger Binding="{Binding Status}" Value="Offline">
+                                                <Setter TargetName="StatusBadge" Property="Background" Value="{DynamicResource StatusOfflineBg}"/>
+                                                <Setter TargetName="StatusText" Property="Foreground" Value="{DynamicResource StatusOfflineText}"/>
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
