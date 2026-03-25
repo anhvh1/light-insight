@@ -90,37 +90,33 @@ namespace LightInsight.Dashboard.Camera
 
 			try
 			{
-				// 1. Sử dụng HashSet để đảm bảo không trùng lặp camera giữa các Site/Folder
-				var processedIds = new HashSet<Guid>();
-				
-				// 2. Lấy các Site/Server ở mức cao nhất từ SystemDefined hierarchy
-				var topLevelItems = Configuration.Instance.GetItems(ItemHierarchy.SystemDefined);
+				// 1. Lấy tất cả các Item ở mức cao nhất
+				var topLevelItems = Configuration.Instance.GetItems(ItemHierarchy.Both);
 
 				if (topLevelItems != null)
 				{
 					foreach (var item in topLevelItems)
 					{
-						FindCamerasInHierarchy(item, cameras, processedIds);
+						// 2. Gọi hàm đệ quy để tìm camera trong từng nhánh
+						FindCamerasRecursive(item, cameras);
 					}
 				}
 
-				System.Diagnostics.Debug.WriteLine($"[CameraServices] Final unique cameras discovered: {cameras.Count}");
+				System.Diagnostics.Debug.WriteLine($"[CameraServices] Total cameras found: {cameras.Count}");
 			}
 			catch (Exception ex)
 			{
-				System.Diagnostics.Debug.WriteLine($"[CameraServices] Error in GetCameraList: {ex.Message}");
+				System.Diagnostics.Debug.WriteLine($"[CameraServices] Error: {ex.Message}");
 			}
 			return cameras;
 		}
 
-		private void FindCamerasInHierarchy(Item parentItem, List<CameraInfo> resultList, HashSet<Guid> processedIds)
+		// Hàm đệ quy để quét toàn bộ cây cấu hình
+		private void FindCamerasRecursive(Item parentItem, List<CameraInfo> resultList)
 		{
-			// Nếu là Camera và chưa được xử lý
-			if (parentItem.FQID.Kind == Kind.Camera && !processedIds.Contains(parentItem.FQID.ObjectId))
+			// Nếu Item này là Camera, thêm vào danh sách
+			if (parentItem.FQID.Kind == Kind.Camera)
 			{
-				processedIds.Add(parentItem.FQID.ObjectId);
-
-				// Lấy trạng thái từ cache
 				_cameraStatusCache.TryGetValue(parentItem.FQID.ObjectId, out string status);
 				if (string.IsNullOrEmpty(status)) status = "Responding";
 
@@ -129,41 +125,33 @@ namespace LightInsight.Dashboard.Camera
 					ID = parentItem.FQID.ObjectId.ToString().Substring(0, 8).ToUpper(),
 					Name = parentItem.Name,
 					Status = status.Equals("Responding", StringComparison.OrdinalIgnoreCase) ? "Online" : "Offline",
-					IP = GetCameraIpUsingMessage(parentItem.FQID),
+					IP = GetCameraIp(parentItem),
 					Recording = "Yes",
 					Uptime = "99.9%"
 				});
 			}
 
-			// Đệ quy tìm con (Milestone tự động tải cấu hình Site con khi gọi GetChildren)
+			// Lấy các Item con và tiếp tục tìm kiếm
 			var children = parentItem.GetChildren();
 			if (children != null)
 			{
 				foreach (var child in children)
 				{
-					FindCamerasInHierarchy(child, resultList, processedIds);
+					FindCamerasRecursive(child, resultList);
 				}
 			}
 		}
-
-		private string GetCameraIpUsingMessage(FQID cameraFqid)
+		private string GetCameraIp(Item cameraItem)
 		{
 			try
 			{
-				// Cách chuẩn nhất trong MIP SDK để lấy IP của Camera trong Smart Client
-				var result = VideoOS.Platform.SDK.Environment.SendMessage(
-					new VideoOS.Platform.Messaging.Message(MessageId.Server.GetIPAddressRequest),
-					cameraFqid,
-					null
-				);
-
-				if (result is string ip && !string.IsNullOrEmpty(ip))
+				// Trong Milestone, Camera thuộc về một Hardware, Hardware chứa thông tin Address (IP)
+				var hardwareItem = Configuration.Instance.GetItem(cameraItem.FQID.ParentId, Kind.Hardware);
+				if (hardwareItem != null && !string.IsNullOrEmpty(hardwareItem.Name))
 				{
-					// Làm sạch chuỗi (loại bỏ http, port...)
-					ip = ip.Replace("http://", "").Replace("https://", "");
-					int colonIndex = ip.IndexOf(':');
-					if (colonIndex > 0) ip = ip.Substring(0, colonIndex);
-					return ip.TrimEnd('/');
+					// Thông thường Address nằm trong Hardware name hoặc metadata của Hardware
+					// Ở mức SDK Smart Client, ta có thể lấy qua Hardware Item
+					return hardwareItem.Properties.ContainsKey("Address") ? hardwareItem.Properties["Address"] : "N/A";
 				}
 			}
 			catch { }
