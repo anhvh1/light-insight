@@ -37,41 +37,110 @@ namespace LightInsight.Dashboard.Camera
 			null, null, null);
 		}
 
+		//public List<CameraInfo> GetCameraList()
+		//{
+		//	var cameras = new List<CameraInfo>();
+		//	if (Configuration.Instance == null) return cameras;
+		//	try
+		//	{
+		//		// Sửa lỗi: Thêm ItemHierarchy.Both để xác định phạm vi tìm kiếm
+		//		var cameraItems = Configuration.Instance.GetItems(ItemHierarchy.Both);
+
+		//		if (cameraItems == null || cameraItems.Count == 0)
+		//		{
+		//			System.Diagnostics.Debug.WriteLine("[CameraServices] Configuration.Instance returned no items.");
+
+		//			if (cameraItems == null) return cameras;
+		//		}
+		//		else
+		//		{
+		//			System.Diagnostics.Debug.WriteLine("[CameraServices] Configuration.Instance returned some items:.");
+		//			System.Diagnostics.Debug.WriteLine(cameraItems);
+		//		}
+		//		// Lọc các Item có Kind là Camera
+		//		foreach (var item in cameraItems.Where(i => i.FQID.Kind == Kind.Camera))
+		//		{
+		//			// Lấy trạng thái từ cache nếu có, mặc định là "Online" (Responding)
+		//			_cameraStatusCache.TryGetValue(item.FQID.ObjectId, out string status);
+		//			if (string.IsNullOrEmpty(status)) status = "Responding"; 
+
+		//			cameras.Add(new CameraInfo
+		//			{
+		//				ID = item.FQID.ObjectId.ToString().Substring(0, 8).ToUpper(), 
+		//				Name = item.Name,
+		//				Status = status.Equals("Responding", StringComparison.OrdinalIgnoreCase) ? "Online" : "Offline",
+		//				IP = GetCameraIp(item),
+		//				Recording = "Yes", // Mặc định Yes, Milestone ghi hình hầu hết thời gian
+		//				Uptime = "99.9%"
+		//			});
+		//		}
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		System.Diagnostics.Debug.WriteLine($"[CameraServices] Error getting camera list: {ex.Message}");
+		//	}
+		//	return cameras;
+		//}
+
+
 		public List<CameraInfo> GetCameraList()
 		{
 			var cameras = new List<CameraInfo>();
+			if (Configuration.Instance == null) return cameras;
+
 			try
 			{
-				// Sửa lỗi: Thêm ItemHierarchy.Both để xác định phạm vi tìm kiếm
-				var cameraItems = Configuration.Instance.GetItems(ItemHierarchy.Both);
+				// 1. Lấy tất cả các Item ở mức cao nhất
+				var topLevelItems = Configuration.Instance.GetItems(ItemHierarchy.Both);
 
-				if (cameraItems == null) return cameras;
-
-				// Lọc các Item có Kind là Camera
-				foreach (var item in cameraItems.Where(i => i.FQID.Kind == Kind.Camera))
+				if (topLevelItems != null)
 				{
-					// Lấy trạng thái từ cache nếu có, mặc định là "Online" (Responding)
-					_cameraStatusCache.TryGetValue(item.FQID.ObjectId, out string status);
-					if (string.IsNullOrEmpty(status)) status = "Responding"; 
-
-					cameras.Add(new CameraInfo
+					foreach (var item in topLevelItems)
 					{
-						ID = item.FQID.ObjectId.ToString().Substring(0, 8).ToUpper(), 
-						Name = item.Name,
-						Status = status == "Responding" ? "Online" : "Offline",
-						IP = GetCameraIp(item),
-						Recording = "Yes", // Mặc định Yes, Milestone ghi hình hầu hết thời gian
-						Uptime = "99.9%"
-					});
+						// 2. Gọi hàm đệ quy để tìm camera trong từng nhánh
+						FindCamerasRecursive(item, cameras);
+					}
 				}
+
+				System.Diagnostics.Debug.WriteLine($"[CameraServices] Total cameras found: {cameras.Count}");
 			}
 			catch (Exception ex)
 			{
-				System.Diagnostics.Debug.WriteLine($"[CameraServices] Error getting camera list: {ex.Message}");
+				System.Diagnostics.Debug.WriteLine($"[CameraServices] Error: {ex.Message}");
 			}
 			return cameras;
 		}
 
+		// Hàm đệ quy để quét toàn bộ cây cấu hình
+		private void FindCamerasRecursive(Item parentItem, List<CameraInfo> resultList)
+		{
+			// Nếu Item này là Camera, thêm vào danh sách
+			if (parentItem.FQID.Kind == Kind.Camera)
+			{
+				_cameraStatusCache.TryGetValue(parentItem.FQID.ObjectId, out string status);
+				if (string.IsNullOrEmpty(status)) status = "Responding";
+
+				resultList.Add(new CameraInfo
+				{
+					ID = parentItem.FQID.ObjectId.ToString().Substring(0, 8).ToUpper(),
+					Name = parentItem.Name,
+					Status = status.Equals("Responding", StringComparison.OrdinalIgnoreCase) ? "Online" : "Offline",
+					IP = GetCameraIp(parentItem),
+					Recording = "Yes",
+					Uptime = "99.9%"
+				});
+			}
+
+			// Lấy các Item con và tiếp tục tìm kiếm
+			var children = parentItem.GetChildren();
+			if (children != null)
+			{
+				foreach (var child in children)
+				{
+					FindCamerasRecursive(child, resultList);
+				}
+			}
+		}
 		private string GetCameraIp(Item cameraItem)
 		{
 			try
