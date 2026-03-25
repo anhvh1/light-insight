@@ -69,7 +69,7 @@
 
 		    <Grid>
 			    <Border Background="{DynamicResource BgMain}" Height="25" VerticalAlignment="Top" CornerRadius="6,6,6,6">
-				    <TextBlock Text="Camera List" Foreground="{DynamicResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
+				    <TextBlock Text="{DynamicResource WidgetName_CameraList}" Foreground="{DynamicResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
 			    </Border>
 
                 <Button x:Name="DeleteButton" 
@@ -152,7 +152,23 @@
                                     </Style>
                                 </DataGridTextColumn.HeaderStyle>
                             </DataGridTextColumn>
-                            <DataGridTextColumn Header="{DynamicResource Camera_GridHeader_NAME}" Binding="{Binding Name}" Width="*"/> <DataGridTemplateColumn Header="{DynamicResource Camera_GridHeader_STATUS}" Width="90">
+
+                            <DataGridTextColumn Binding="{Binding Name}" Width="*">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Content" Value="{DynamicResource Camera_GridHeader_NAME}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+                                    </Style>
+                                </DataGridTextColumn.HeaderStyle>
+                            </DataGridTextColumn>
+
+                            <DataGridTemplateColumn Width="90">
+                                <DataGridTemplateColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Content" Value="{DynamicResource Camera_GridHeader_STATUS}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+                                    </Style>
+                                </DataGridTemplateColumn.HeaderStyle>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border Background="{Binding StatusColor}" CornerRadius="2" Padding="5,1" HorizontalAlignment="Center">
@@ -161,9 +177,33 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="{DynamicResource Camera_GridHeader_IP}" Binding="{Binding IP}" Width="120"/>
-                            <DataGridTextColumn Header="{DynamicResource Camera_GridHeader_RECORDING}" Binding="{Binding Recording}" Width="90"/>
-                            <DataGridTextColumn Header="{DynamicResource Camera_GridHeader_UPTIME}" Binding="{Binding Uptime}" Width="70"/>
+
+                            <DataGridTextColumn Binding="{Binding IP}" Width="120">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Content" Value="{DynamicResource Camera_GridHeader_IP}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+                                    </Style>
+                                </DataGridTextColumn.HeaderStyle>
+                            </DataGridTextColumn>
+
+                            <DataGridTextColumn Binding="{Binding Recording}" Width="90">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Content" Value="{DynamicResource Camera_GridHeader_RECORDING}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+                                    </Style>
+                                </DataGridTextColumn.HeaderStyle>
+                            </DataGridTextColumn>
+
+                            <DataGridTextColumn Binding="{Binding Uptime}" Width="70">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Content" Value="{DynamicResource Camera_GridHeader_UPTIME}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+                                    </Style>
+                                </DataGridTextColumn.HeaderStyle>
+                            </DataGridTextColumn>
                         </DataGrid.Columns>
                     </DataGrid>
 
