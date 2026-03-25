@@ -180,7 +180,7 @@
                                 </DataGridTemplateColumn.HeaderStyle>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Border Background="{Binding StatusColor}" CornerRadius="2" Padding="5,1" HorizontalAlignment="Center">
+                                        <Border Background="{Binding StatusColor}" CornerRadius="2" Padding="5,1" HorizontalAlignment="Left">
                                             <TextBlock Text="{Binding Status}" Foreground="{DynamicResource TextPrimary}" FontSize="10"/>
                                         </Border>
                                     </DataTemplate>
