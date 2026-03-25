@@ -144,7 +144,14 @@
                               HeadersVisibility="Column"
                               HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="{DynamicResource Camera_GridHeader_ID}" Binding="{Binding ID}" Width="80"/>
+                            <DataGridTextColumn Binding="{Binding ID}" Width="80">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Content" Value="{DynamicResource Camera_GridHeader_ID}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+                                    </Style>
+                                </DataGridTextColumn.HeaderStyle>
+                            </DataGridTextColumn>
                             <DataGridTextColumn Header="{DynamicResource Camera_GridHeader_NAME}" Binding="{Binding Name}" Width="*"/> <DataGridTemplateColumn Header="{DynamicResource Camera_GridHeader_STATUS}" Width="90">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
