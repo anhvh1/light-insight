@@ -31,36 +31,7 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
 
         private void LoadWorkspaces()
         {
-            var list = WorkspaceStorage.LoadWorkspaces();
-
-            WorkspaceService.Instance.Workspaces.Clear();
-
-            if (list == null || list.Count == 0)
-                return;
-
-            var dict = list.ToDictionary(x => x.Id);
-
-            // reset children
-            foreach (var item in list)
-            {
-                item.Children.Clear();
-            }
-
-            // build tree
-            foreach (var item in list)
-            {
-                if (string.IsNullOrEmpty(item.ParentId))
-                {
-                    WorkspaceService.Instance.Workspaces.Add(item);
-                }
-                else
-                {
-                    if (dict.TryGetValue(item.ParentId, out var parent))
-                    {
-                        parent.Children.Add(item);
-                    }
-                }
-            }
+            WorkspaceService.Instance.Load();
         }
 
         //private void AddWorkspace_Click(object sender, RoutedEventArgs e)

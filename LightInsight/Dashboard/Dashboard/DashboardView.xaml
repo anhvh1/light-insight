@@ -2,30 +2,21 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:local="clr-namespace:LightInsight.Dashboard.Dashboard"
+             xmlns:ws="clr-namespace:LightInsight.Dashboard.Dashboard.Workspace"
              Background="{DynamicResource BgMain}"
              HorizontalAlignment="Stretch"
-             VerticalAlignment="Stretch">
+             VerticalAlignment="Stretch"
+             x:Name="RootControl">
     
     <UserControl.Resources>
-        <Style x:Key="FilterButton" TargetType="ToggleButton">
-            <Setter Property="Margin" Value="2"/>
-            <Setter Property="Padding" Value="6,2"/>
-            <Setter Property="Background" Value="{DynamicResource CardBg}"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}"/>
-        </Style>
-
         <Style x:Key="NoArrowExpander" TargetType="Expander">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Expander">
                         <Border Background="{TemplateBinding Background}">
                             <StackPanel>
-                                <ToggleButton x:Name="HeaderSite"
-                                              IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                                              Background="Transparent"
-                                              BorderThickness="0"
-                                              Cursor="Hand">
+                                <ToggleButton x:Name="HeaderSite" IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" Background="Transparent" BorderThickness="0" Cursor="Hand">
                                     <ToggleButton.Template>
                                         <ControlTemplate TargetType="ToggleButton">
                                             <Border Background="{TemplateBinding Background}" Padding="2">
@@ -33,14 +24,9 @@
                                             </Border>
                                         </ControlTemplate>
                                     </ToggleButton.Template>
-                                    <ContentPresenter Content="{TemplateBinding Header}"
-                                                      ContentTemplate="{TemplateBinding HeaderTemplate}"
-                                                      RecognizesAccessKey="True"/>
+                                    <ContentPresenter Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}"/>
                                 </ToggleButton>
-                                <ContentPresenter x:Name="ExpandSite"
-                                                  Visibility="Collapsed"
-                                                  Margin="0,5,0,0"
-                                                  Content="{TemplateBinding Content}"/>
+                                <ContentPresenter x:Name="ExpandSite" Visibility="Collapsed" Content="{TemplateBinding Content}"/>
                             </StackPanel>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -52,6 +38,61 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <HierarchicalDataTemplate x:Key="SidebarItemTemplate" ItemsSource="{Binding Children}">
+            <StackPanel>
+                <Border x:Name="ItemBorder" Height="40" Cursor="Hand" Background="Transparent" MouseLeftButtonDown="Menu_Click">
+                    <Grid x:Name="ItemGrid">
+                        <Border x:Name="SelectedAccent" Width="3" HorizontalAlignment="Left" Background="{DynamicResource AccentColor}" Visibility="Collapsed"/>
+
+                        <Grid x:Name="ContentGrid" Margin="12,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <iconPacks:PackIconMaterial Kind="{Binding Icon}" Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource TextSecondary}"/>
+
+                            <TextBlock Grid.Column="1" x:Name="ItemText" Text="{Binding DisplayTitle}" VerticalAlignment="Center" Margin="12,0" Foreground="{DynamicResource TextPrimary}" FontSize="13" TextTrimming="CharacterEllipsis"/>
+
+                            <iconPacks:PackIconMaterial Grid.Column="2" x:Name="ArrowIcon" Kind="ChevronRight" Width="10" Height="10" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource TextMuted}" Visibility="Collapsed"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <ItemsControl x:Name="ChildrenPresenter" 
+                              ItemsSource="{Binding Children}" 
+                              Margin="25,0,0,0" 
+                              Visibility="Collapsed"
+                              ItemTemplate="{DynamicResource SidebarItemTemplate}">
+                </ItemsControl>
+            </StackPanel>
+
+            <HierarchicalDataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsGroup}" Value="True">
+                    <Setter TargetName="ArrowIcon" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsExpanded}" Value="True">
+                    <Setter TargetName="ArrowIcon" Property="Kind" Value="ChevronDown"/>
+                    <Setter TargetName="ChildrenPresenter" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                    <Setter TargetName="SelectedAccent" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource SidebarHeaderBackgroundBrush}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSidebarCollapsed, ElementName=RootControl}" Value="True">
+                    <Setter TargetName="ItemText" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ArrowIcon" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ChildrenPresenter" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ContentGrid" Property="Margin" Value="0"/>
+                    <Setter TargetName="ContentGrid" Property="HorizontalAlignment" Value="Center"/>
+                </DataTrigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource ItemHoverBg}"/>
+                </Trigger>
+            </HierarchicalDataTemplate.Triggers>
+        </HierarchicalDataTemplate>
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource BgMain}">
@@ -67,86 +108,62 @@
         </Grid.RowDefinitions>
 
         <!-- ================= TOP BAR ================= -->
-        <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" 
-                Background="{DynamicResource BgMain}" 
-                Padding="10,5"
-                BorderBrush="{DynamicResource CardBorder}"
-                BorderThickness="0,0,0,1">
-            <DockPanel LastChildFill="False">
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+        <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BgMain}" Padding="10,5" BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,0,1">
+            <Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                     <Border Height="30" Margin="5,0,20,0" CornerRadius="6">
-                        <Image Source="/LightInsight;component/Dashboard/Asset/logo.png" Stretch="Uniform"/>
+                        <Image Source="../Asset/logo.png" Stretch="Uniform"/>
                     </Border>
-                    <TextBlock x:Name="BreadcrumbText" Text="{DynamicResource Breadcrumb_Default}"
-                               FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}"/>
+                    <TextBlock x:Name="BreadcrumbText" Text="{DynamicResource Breadcrumb_Default}" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}"/>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
-                    <Button x:Name="WorkspaceBtn" Height="32" Margin="5" Click="WorkspaceBtn_Click" 
-                            Background="#3498DB" Foreground="White" Padding="12,0" BorderThickness="0" Cursor="Hand">
-                        <Button.Resources>
-                            <Style TargetType="Border"><Setter Property="CornerRadius" Value="4"/></Style>
-                        </Button.Resources>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button x:Name="WorkspaceBtn" Height="32" Margin="5" Click="WorkspaceBtn_Click" Background="#3498DB" Foreground="White" Padding="12,0" BorderThickness="0" Cursor="Hand">
+                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="4"/></Style></Button.Resources>
                         <StackPanel Orientation="Horizontal">
                             <iconPacks:PackIconMaterial Kind="Cog" Width="14" Height="14" Margin="0,0,6,0" VerticalAlignment="Center"/>
                             <TextBlock Text="{DynamicResource Workspace}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
-                    <Button x:Name="EditLayoutBtn" Height="32" Margin="5" Click="EditLayoutBtn_Click" 
-                            Background="{DynamicResource AccentColor}" Foreground="White" Padding="12,0" BorderThickness="0" Cursor="Hand">
-                        <Button.Resources>
-                            <Style TargetType="Border"><Setter Property="CornerRadius" Value="4"/></Style>
-                        </Button.Resources>
+                    <Button x:Name="EditLayoutBtn" Height="32" Margin="5" Click="EditLayoutBtn_Click" Background="{DynamicResource AccentColor}" Foreground="White" Padding="12,0" BorderThickness="0" Cursor="Hand">
+                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="4"/></Style></Button.Resources>
                         <StackPanel Orientation="Horizontal">
                             <iconPacks:PackIconMaterial Kind="Pencil" Width="14" Height="14" Margin="0,0,6,0" VerticalAlignment="Center"/>
                             <TextBlock Text="{DynamicResource EditLayout}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
-                    <Button x:Name="SaveBtn" Height="32" Margin="5" Visibility="Collapsed" Click="SaveBtn_Click" 
-                            Background="{DynamicResource StatusOnline}" Foreground="White" Padding="12,0" BorderThickness="0" Cursor="Hand">
-                        <Button.Resources>
-                            <Style TargetType="Border"><Setter Property="CornerRadius" Value="4"/></Style>
-                        </Button.Resources>
+                    <Button x:Name="SaveBtn" Height="32" Margin="5" Visibility="Collapsed" Click="SaveBtn_Click" Background="{DynamicResource StatusOnline}" Foreground="White" Padding="12,0" BorderThickness="0" Cursor="Hand">
+                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="4"/></Style></Button.Resources>
                         <StackPanel Orientation="Horizontal">
                             <iconPacks:PackIconMaterial Kind="ContentSave" Width="14" Height="14" Margin="0,0,6,0" VerticalAlignment="Center"/>
                             <TextBlock Text="{DynamicResource Save}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
-                    <Button x:Name="CancelBtn" Height="32" Margin="5" Visibility="Collapsed" Click="CancelBtn_Click" 
-                            Background="{DynamicResource StatusOffline}" Foreground="White" Padding="12,0" BorderThickness="0" Cursor="Hand">
-                        <Button.Resources>
-                            <Style TargetType="Border"><Setter Property="CornerRadius" Value="4"/></Style>
-                        </Button.Resources>
+                    <Button x:Name="CancelBtn" Height="32" Margin="5" Visibility="Collapsed" Click="CancelBtn_Click" Background="{DynamicResource StatusOffline}" Foreground="White" Padding="12,0" BorderThickness="0" Cursor="Hand">
+                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="4"/></Style></Button.Resources>
                         <StackPanel Orientation="Horizontal">
                             <iconPacks:PackIconMaterial Kind="Close" Width="14" Height="14" Margin="0,0,6,0" VerticalAlignment="Center"/>
                             <TextBlock Text="{DynamicResource Cancel}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
-                    <ComboBox x:Name="TimeRangeCombo" Width="110" Height="32" Margin="5" SelectedIndex="0" 
-                              Background="{DynamicResource ButtonBg}" Foreground="{DynamicResource TextPrimary}" BorderBrush="{DynamicResource CardBorder}">
-                        <ComboBox.Resources>
-                            <Style TargetType="Border"><Setter Property="CornerRadius" Value="4"/></Style>
-                        </ComboBox.Resources>
-                        <ComboBoxItem Content="{DynamicResource Last24h}"/>
-                        <ComboBoxItem Content="{DynamicResource Last7Days}"/>
-                        <ComboBoxItem Content="{DynamicResource Last30Days}"/>
-                        <ComboBoxItem Content="{DynamicResource Custom}"/>
+                    <ComboBox x:Name="TimeRangeCombo" Width="110" Height="32" Margin="5" SelectedIndex="0" Background="{DynamicResource ButtonBg}" Foreground="{DynamicResource TextPrimary}" BorderBrush="{DynamicResource CardBorder}">
+                        <ComboBox.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="4"/></Style></ComboBox.Resources>
+                        <ComboBoxItem Content="{DynamicResource Last24h}"/><ComboBoxItem Content="{DynamicResource Last7Days}"/><ComboBoxItem Content="{DynamicResource Last30Days}"/><ComboBoxItem Content="{DynamicResource Custom}"/>
                     </ComboBox>
 
                     <Button x:Name="RefreshBtn" Width="32" Height="32" Margin="5" Click="RefreshBtn_Click" Background="Transparent" BorderThickness="0" Cursor="Hand" MinHeight="0" MinWidth="20">
-                        <iconPacks:PackIconMaterial Kind="Refresh" Foreground="{DynamicResource TextSecondary}" Width="12" Height="12"/>
+                        <iconPacks:PackIconMaterial Kind="Refresh" Foreground="{DynamicResource TextSecondary}" Width="14" Height="14"/>
                     </Button>
                 </StackPanel>
-            </DockPanel>
+            </Grid>
         </Border>
 
         <!-- ================= SIDEBAR ================= -->
-        <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource ButtonBg}" 
-                BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,1,0">
+        <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource ButtonBg}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,1,0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -154,146 +171,41 @@
                 </Grid.RowDefinitions>
 
                 <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-                        <Expander x:Name="DashboardExpander" Style="{StaticResource NoArrowExpander}" Margin="0,5" IsExpanded="True" 
-                                  Background="Transparent" BorderThickness="0" MouseEnter="Expander_MouseEnter" MouseLeave="Expander_MouseLeave">
-                            <Expander.Header>
-                                <Grid Height="40" Margin="10,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <iconPacks:PackIconMaterial Kind="ViewDashboard" Width="16" Height="16" Margin="0,0,10,0" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}"/>
-                                    <TextBlock Grid.Column="1" Text="{DynamicResource Dashboard}" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" FontWeight="SemiBold">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
-                                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                    <iconPacks:PackIconMaterial Grid.Column="2" Kind="ChevronDown" Width="16" Height="16" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}">
-                                        <iconPacks:PackIconMaterial.Style>
-                                            <Style TargetType="iconPacks:PackIconMaterial">
-                                                <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
-                                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding IsExpanded, RelativeSource={RelativeSource AncestorType=Expander}}" Value="False">
-                                                        <Setter Property="RenderTransform"><Setter.Value><RotateTransform Angle="-90"/></Setter.Value></Setter>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding IsExpanded, RelativeSource={RelativeSource AncestorType=Expander}}" Value="True">
-                                                        <Setter Property="RenderTransform"><Setter.Value><RotateTransform Angle="0"/></Setter.Value></Setter>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </iconPacks:PackIconMaterial.Style>
-                                    </iconPacks:PackIconMaterial>
-                                </Grid>
-                            </Expander.Header>
-
-                            <ItemsControl ItemsSource="{Binding DashboardMenus}">
-                                <ItemsControl.Style>
-                                    <Style TargetType="ItemsControl">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ItemsControl.Style>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid x:Name="ItemGrid" Height="36">
-                                            <!-- ACCENT BORDER -->
-                                            <Border x:Name="SelectedAccent" Width="3" HorizontalAlignment="Left" Background="{DynamicResource AccentColor}" Visibility="Collapsed"/>
-
-                                            <Button Click="Menu_Click" Padding="15,0,0,0" Foreground="{DynamicResource TextPrimary}" BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Left">
-                                                <Button.Style>
-                                                    <Style TargetType="Button">
-                                                        <Style.Triggers>
-                                                            <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{DynamicResource ItemHoverBg}"/></Trigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Button.Style>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <iconPacks:PackIconMaterial Kind="{Binding Icon}" Width="16" Height="16" Margin="0,0,10,0" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}"/>
-                                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontSize="13"/>
-                                                </StackPanel>
-                                            </Button>
-                                        </Grid>
-                                        <DataTemplate.Triggers>
-                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                <Setter TargetName="SelectedAccent" Property="Visibility" Value="Visible"/>
-                                                <Setter TargetName="ItemGrid" Property="Background" Value="{DynamicResource SidebarHeaderBackgroundBrush}"/>
-                                            </DataTrigger>
-                                        </DataTemplate.Triggers>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </Expander>
-
-                        <Popup x:Name="SubMenuPopup" Placement="Right" PlacementTarget="{Binding ElementName=DashboardExpander}" AllowsTransparency="True" PopupAnimation="Fade" HorizontalOffset="0">
-                            <Border Background="Transparent" Padding="5,0,20,20">
-                                <Border Background="{DynamicResource CardBg}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="4" Padding="5">
-                                    <Border.Effect><DropShadowEffect BlurRadius="15" Opacity="0.4" ShadowDepth="3"/></Border.Effect>
-                                    <ItemsControl ItemsSource="{Binding DashboardMenus}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Button Click="Menu_Click" Margin="2" Height="32" Width="180" Foreground="{DynamicResource TextPrimary}" BorderThickness="0" HorizontalContentAlignment="Left">
-                                                    <Button.Style>
-                                                        <Style TargetType="Button">
-                                                            <Setter Property="Background" Value="Transparent"/>
-                                                            <Style.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{DynamicResource ItemHoverBg}"/></Trigger></Style.Triggers>
-                                                        </Style>
-                                                    </Button.Style>
-                                                    <StackPanel Orientation="Horizontal">
-                                                        <iconPacks:PackIconMaterial Kind="{Binding Icon}" Width="16" Height="16" Margin="5,0,10,0" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondary}"/>
-                                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontSize="13"/>
-                                                    </StackPanel>
-                                                </Button>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </Border>
-                            </Border>
-                        </Popup>
-                    </StackPanel>
+                    <ItemsControl ItemsSource="{Binding NavigationItems}" 
+                                  ItemTemplate="{DynamicResource SidebarItemTemplate}"
+                                  Margin="0,5">
+                    </ItemsControl>
                 </ScrollViewer>
 
-                <Border Grid.Row="1" BorderBrush="#444" BorderThickness="0,1,0,0" Background="{DynamicResource BgMain}" Cursor="Hand" PreviewMouseLeftButtonDown="ToggleSidebar_Click">
-                    <Border.Style>
-                        <Style TargetType="Border"><Style.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#333"/></Trigger></Style.Triggers></Style>
-                    </Border.Style>
-                    <Button HorizontalAlignment="Left" Margin="10" Background="Transparent" Foreground="White" BorderThickness="0" IsHitTestVisible="False">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Content" Value="{DynamicResource Collapse}"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
-                                        <Setter Property="Content" Value="☰"/><Setter Property="HorizontalAlignment" Value="Center"/><Setter Property="Margin" Value="0"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
+                <Border Grid.Row="1" BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,1,0,0" Background="Transparent" Cursor="Hand" PreviewMouseLeftButtonDown="ToggleSidebar_Click">
+                    <Grid Margin="12,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" x:Name="ToggleStack">
+                            <iconPacks:PackIconMaterial x:Name="CollapseIcon" Kind="ChevronLeft" Width="16" Height="16" Foreground="{DynamicResource TextPrimary}"/>
+                            <TextBlock x:Name="ToggleText" Text="{DynamicResource Collapse}" Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSidebarCollapsed, ElementName=RootControl}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
                 </Border>
             </Grid>
         </Border>
 
         <!-- ================= DASHBOARD AREA ================= -->
-        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource BgMain}" Margin="5" ClipToBounds="True">
-            <ScrollViewer x:Name="DashboardScroll" VerticalScrollBarVisibility="Auto" PanningMode="VerticalOnly" PreviewMouseWheel="DashboardScroll_PreviewMouseWheel" ScrollChanged="DashboardScroll_ScrollChanged">
+        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource BgMain}" Margin="5">
+            <ScrollViewer x:Name="DashboardScroll" VerticalScrollBarVisibility="Auto">
                 <Grid>
-                    <Grid x:Name="DashboardGrid" Background="Transparent" MinHeight="1000" AllowDrop="True" IsHitTestVisible="True" Drop="DashboardGrid_Drop" DragOver="DashboardGrid_DragOver">
+                    <Grid x:Name="GridOverlay" Visibility="Collapsed" IsHitTestVisible="False">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/>
                         </Grid.ColumnDefinitions>
                     </Grid>
-                    <Grid x:Name="GridOverlay" Visibility="Collapsed" IsHitTestVisible="False">
+                    <Grid x:Name="DashboardGrid" Background="Transparent" MinHeight="1000" AllowDrop="True" Drop="DashboardGrid_Drop" DragOver="DashboardGrid_DragOver">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/>
                         </Grid.ColumnDefinitions>
@@ -311,7 +223,6 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- HEADER -->
                 <Grid Grid.Row="0" Margin="0,0,0,20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                     <StackPanel>
@@ -319,11 +230,10 @@
                         <TextBlock Text="Click a widget to add it to the dashboard" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,2,0,0"/>
                     </StackPanel>
                     <Button Grid.Column="1" Background="Transparent" BorderThickness="0" Click="ExitEditModeBtn_Click" Cursor="Hand">
-                        <iconPacks:PackIconMaterial Kind="Clipboard" Foreground="{DynamicResource TextSecondary}" Width="18" Height="18"/>
+                        <iconPacks:PackIconMaterial Kind="Close" Foreground="{DynamicResource TextSecondary}" Width="18" Height="18"/>
                     </Button>
                 </Grid>
 
-                <!-- SEARCH -->
                 <Border Grid.Row="1" Background="{DynamicResource ButtonBg}" CornerRadius="4" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" Margin="0,0,0,15">
                     <Grid Height="32">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="32"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
@@ -332,45 +242,29 @@
                     </Grid>
                 </Border>
 
-                <!-- GROUPED LIST -->
                 <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
                     <ItemsControl ItemsSource="{Binding WidgetGroups}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Margin="0,0,0,20">
-                                    <!-- GROUP TITLE -->
                                     <TextBlock Text="{Binding Title}" Foreground="{DynamicResource TextPrimary}" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,10"/>
-                                    
-                                    <!-- ITEMS IN GROUP -->
                                     <ItemsControl ItemsSource="{Binding Items}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Border Margin="0,0,0,10" 
-                                                        Background="Transparent" 
-                                                        Cursor="Hand" 
-                                                        x:Name="ItemContainer"
+                                                <Border Margin="0,0,0,10" Background="Transparent" Cursor="Hand" x:Name="ItemContainer"
                                                         PreviewMouseLeftButtonDown="WidgetLibrary_PreviewMouseLeftButtonDown" 
                                                         PreviewMouseMove="WidgetLibrary_MouseMove"
                                                         PreviewMouseLeftButtonUp="WidgetLibrary_Item_PreviewMouseLeftButtonUp">
                                                     <Grid x:Name="ItemGrid">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="36"/>
-                                                            <ColumnDefinition Width="*"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        
-                                                        <!-- ICON -->
+                                                        <Grid.ColumnDefinitions><ColumnDefinition Width="36"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                                                         <Border Width="28" Height="28" CornerRadius="14" Background="{DynamicResource SidebarHeaderBackgroundBrush}" VerticalAlignment="Center">
                                                             <iconPacks:PackIconMaterial Kind="{Binding Icon}" Foreground="{DynamicResource AccentColor}" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                         </Border>
-
-                                                        <!-- TEXT -->
                                                         <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="10,0,0,0" Foreground="{DynamicResource TextPrimary}" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap"/>
                                                     </Grid>
                                                 </Border>
                                                 <DataTemplate.Triggers>
-                                                    <Trigger Property="IsMouseOver" SourceName="ItemContainer" Value="True">
-                                                        <Setter TargetName="ItemGrid" Property="Opacity" Value="0.7"/>
-                                                    </Trigger>
+                                                    <Trigger Property="IsMouseOver" SourceName="ItemContainer" Value="True"><Setter TargetName="ItemGrid" Property="Opacity" Value="0.7"/></Trigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>

@@ -30,25 +30,35 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
         private bool _isLoaded = false;
         public void Load()
         {
-            if (_isLoaded && Workspaces != null)
-                return;
-
             var list = WorkspaceStorage.LoadWorkspaces();
-
             BuildTree(list);
-
             var roots = list.Where(x => string.IsNullOrEmpty(x.ParentId)).ToList();
 
-            Workspaces = new ObservableCollection<WorkspaceModel>(roots);
+            Workspaces.Clear();
+            foreach (var root in roots)
+            {
+                Workspaces.Add(root);
+            }
 
             _isLoaded = true;
+        }
+
+        public void Refresh()
+        {
+            _isLoaded = false;
+            Load();
         }
         private void BuildTree(List<WorkspaceModel> list)
         {
             // 🔥 Clear children trước để tránh bị duplicate khi load lại
             foreach (var item in list)
             {
-                item.Children = new ObservableCollection<WorkspaceModel>();
+                if (item.Children == null)
+                    item.Children = new ObservableCollection<WorkspaceModel>();
+                else
+                    item.Children.Clear();
+                
+                item.IsGroup = false; // Reset trước khi dựng lại
             }
 
             // 🔥 Tạo lookup để tìm nhanh
@@ -65,6 +75,8 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
                     if (parent != item)
                     {
                         parent.Children.Add(item);
+                        parent.IsGroup = true; // Có con thì là Group
+                        if (parent.Id == "ROOT_DASHBOARD") parent.IsExpanded = true; // Mở sẵn mục Dashboards
                     }
                 }
             }
@@ -84,6 +96,8 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
             if (parent != null)
             {
                 parent.Children.Add(item);
+                parent.IsGroup = true;
+                if (parent.Id == "ROOT_DASHBOARD") parent.IsExpanded = true;
             }
             else
             {
@@ -125,6 +139,24 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
             OnWorkspaceChanged?.Invoke();
         }
 
+        public List<WorkspaceModel> GetAllWorkspacesFlat() // phục vụ tính năng tìm kiếm dashboard nhanh bằng tên trong tương lai
+        {
+            var list = new List<WorkspaceModel>();
+            foreach (var root in Workspaces)
+            {
+                GetRecursive(root, list);
+            }
+            return list;
+        }
+
+        private void GetRecursive(WorkspaceModel node, List<WorkspaceModel> list)
+        {
+            list.Add(node);
+            foreach (var c in node.Children)
+            {
+                GetRecursive(c, list);
+            }
+        }
     }
 }
 
