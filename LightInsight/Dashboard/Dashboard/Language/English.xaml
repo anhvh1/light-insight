@@ -64,9 +64,9 @@
     <sys:String x:Key="Camera_Label_CamerasOnline">Cameras Online</sys:String>
     <sys:String x:Key="Camera_Label_CamerasOffline">Cameras Offline</sys:String>
     <sys:String x:Key="Camera_Label_OnlineOffline">Online / Offline</sys:String>
-    <sys:String x:Key="Camera_Filter_All8">All (8)</sys:String>
-    <sys:String x:Key="Camera_Filter_Online6">Online (6)</sys:String>
-    <sys:String x:Key="Camera_Filter_Offline2">Offline (2)</sys:String>
+    <sys:String x:Key="Camera_Filter_All8">All</sys:String>
+    <sys:String x:Key="Camera_Filter_Online6">Online</sys:String>
+    <sys:String x:Key="Camera_Filter_Offline2">Offline</sys:String>
     <sys:String x:Key="Camera_GridHeader_ID">ID</sys:String>
     <sys:String x:Key="Camera_GridHeader_NAME">NAME</sys:String>
     <sys:String x:Key="Camera_GridHeader_STATUS">STATUS</sys:String>

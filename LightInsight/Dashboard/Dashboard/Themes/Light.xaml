@@ -54,6 +54,12 @@
     <SolidColorBrush x:Key="BadgeErrorBg"       Color="#DC2626"/>
     <SolidColorBrush x:Key="BadgeErrorText"     Color="#FFFFFF"/>
 
+    <!-- Status Badges for Tables -->
+    <SolidColorBrush x:Key="StatusOnlineBg"     Color="#DCFCE7"/>
+    <SolidColorBrush x:Key="StatusOnlineText"   Color="#166534"/>
+    <SolidColorBrush x:Key="StatusOfflineBg"    Color="#FEE2E2"/>
+    <SolidColorBrush x:Key="StatusOfflineText"  Color="#991B1B"/>
+
     <!-- ===== Sub-stat cards (Đã đăng ký / Tổng số ...) ===== -->
     <SolidColorBrush x:Key="StatPanelBg"     Color="#FFF1E6"/>
     <SolidColorBrush x:Key="StatPanelBorder" Color="#E8751A"/>
