@@ -10,7 +10,7 @@ using VideoOS.Platform;
 using VideoOS.Platform.ConfigurationItems;
 using VideoOS.Platform.Data;
 using VideoOS.Platform.Messaging;
-using LightInsight.DAL;
+//using LightInsight.DAL;
 
 
 namespace LightInsight.Dashboard.Camera
@@ -35,8 +35,8 @@ namespace LightInsight.Dashboard.Camera
             if (EnvironmentManager.Instance.MasterSite == null) return;
 
             //0.LoadURICameraMap();
-            Database db = new Database();
-            _uris = db.LoadCameraUriMap();
+            //Database db = new Database();
+            _uris = LoadCameraUriMap();
 
             // 1. Load configuration (chỉ 1 lần)
             LoadCameraConfiguration();

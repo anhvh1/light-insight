@@ -339,12 +339,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\LightInsight.DAL\LightInsight.DAL.csproj">
-      <Project>{5c3ce8af-3eb9-4dc0-a3a0-c797e127d79b}</Project>
-      <Name>LightInsight.DAL</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
