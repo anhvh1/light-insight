@@ -38,6 +38,61 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <HierarchicalDataTemplate x:Key="SidebarItemTemplate" ItemsSource="{Binding Children}">
+            <StackPanel>
+                <Border x:Name="ItemBorder" Height="40" Cursor="Hand" Background="Transparent" MouseLeftButtonDown="Menu_Click">
+                    <Grid x:Name="ItemGrid">
+                        <Border x:Name="SelectedAccent" Width="3" HorizontalAlignment="Left" Background="{DynamicResource AccentColor}" Visibility="Collapsed"/>
+
+                        <Grid x:Name="ContentGrid" Margin="12,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <iconPacks:PackIconMaterial Kind="{Binding Icon}" Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource TextSecondary}"/>
+
+                            <TextBlock Grid.Column="1" x:Name="ItemText" Text="{Binding DisplayTitle}" VerticalAlignment="Center" Margin="12,0" Foreground="{DynamicResource TextPrimary}" FontSize="13" TextTrimming="CharacterEllipsis"/>
+
+                            <iconPacks:PackIconMaterial Grid.Column="2" x:Name="ArrowIcon" Kind="ChevronRight" Width="10" Height="10" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource TextMuted}" Visibility="Collapsed"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <ItemsControl x:Name="ChildrenPresenter" 
+                              ItemsSource="{Binding Children}" 
+                              Margin="25,0,0,0" 
+                              Visibility="Collapsed"
+                              ItemTemplate="{DynamicResource SidebarItemTemplate}">
+                </ItemsControl>
+            </StackPanel>
+
+            <HierarchicalDataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsGroup}" Value="True">
+                    <Setter TargetName="ArrowIcon" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsExpanded}" Value="True">
+                    <Setter TargetName="ArrowIcon" Property="Kind" Value="ChevronDown"/>
+                    <Setter TargetName="ChildrenPresenter" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                    <Setter TargetName="SelectedAccent" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource SidebarHeaderBackgroundBrush}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSidebarCollapsed, ElementName=RootControl}" Value="True">
+                    <Setter TargetName="ItemText" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ArrowIcon" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ChildrenPresenter" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ContentGrid" Property="Margin" Value="0"/>
+                    <Setter TargetName="ContentGrid" Property="HorizontalAlignment" Value="Center"/>
+                </DataTrigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource ItemHoverBg}"/>
+                </Trigger>
+            </HierarchicalDataTemplate.Triggers>
+        </HierarchicalDataTemplate>
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource BgMain}">
@@ -116,58 +171,9 @@
                 </Grid.RowDefinitions>
 
                 <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding NavigationItems}" Margin="0,5">
-                        <ItemsControl.ItemTemplate>
-                            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                <StackPanel>
-                                    <Border x:Name="ItemBorder" Height="40" Cursor="Hand" Background="Transparent" MouseLeftButtonDown="Menu_Click">
-                                        <Grid x:Name="ItemGrid">
-                                            <Border x:Name="SelectedAccent" Width="3" HorizontalAlignment="Left" Background="{DynamicResource AccentColor}" Visibility="Collapsed"/>
-                                            
-                                            <Grid x:Name="ContentGrid" Margin="12,0">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="20"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                
-                                                <iconPacks:PackIconMaterial Kind="{Binding Icon}" Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource TextSecondary}"/>
-                                                
-                                                <TextBlock Grid.Column="1" x:Name="ItemText" Text="{Binding DisplayTitle}" VerticalAlignment="Center" Margin="12,0" Foreground="{DynamicResource TextPrimary}" FontSize="13" TextTrimming="CharacterEllipsis"/>
-                                                
-                                                <iconPacks:PackIconMaterial Grid.Column="2" x:Name="ArrowIcon" Kind="ChevronRight" Width="10" Height="10" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource TextMuted}" Visibility="Collapsed"/>
-                                            </Grid>
-                                        </Grid>
-                                    </Border>
-                                    
-                                    <ItemsPresenter x:Name="ChildrenPresenter" Margin="25,0,0,0" Visibility="Collapsed"/>
-                                </StackPanel>
-
-                                <HierarchicalDataTemplate.Triggers>
-                                    <DataTrigger Binding="{Binding IsGroup}" Value="True">
-                                        <Setter TargetName="ArrowIcon" Property="Visibility" Value="Visible"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding IsExpanded}" Value="True">
-                                        <Setter TargetName="ArrowIcon" Property="Kind" Value="ChevronDown"/>
-                                        <Setter TargetName="ChildrenPresenter" Property="Visibility" Value="Visible"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                        <Setter TargetName="SelectedAccent" Property="Visibility" Value="Visible"/>
-                                        <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource SidebarHeaderBackgroundBrush}"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding IsSidebarCollapsed, ElementName=RootControl}" Value="True">
-                                        <Setter TargetName="ItemText" Property="Visibility" Value="Collapsed"/>
-                                        <Setter TargetName="ArrowIcon" Property="Visibility" Value="Collapsed"/>
-                                        <Setter TargetName="ChildrenPresenter" Property="Visibility" Value="Collapsed"/>
-                                        <Setter TargetName="ContentGrid" Property="Margin" Value="0"/>
-                                        <Setter TargetName="ContentGrid" Property="HorizontalAlignment" Value="Center"/>
-                                    </DataTrigger>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource ItemHoverBg}"/>
-                                    </Trigger>
-                                </HierarchicalDataTemplate.Triggers>
-                            </HierarchicalDataTemplate>
-                        </ItemsControl.ItemTemplate>
+                    <ItemsControl ItemsSource="{Binding NavigationItems}" 
+                                  ItemTemplate="{DynamicResource SidebarItemTemplate}"
+                                  Margin="0,5">
                     </ItemsControl>
                 </ScrollViewer>
 
