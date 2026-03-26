@@ -79,11 +79,6 @@
     <SolidColorBrush x:Key="StatusOfflineBg"    Color="#4D1F1F"/>
     <SolidColorBrush x:Key="StatusOfflineText"  Color="#F87171"/>
 
-    <!-- Table -->
-    <SolidColorBrush x:Key="TableHeaderBg"   Color="#1F2A3A"/>
-    <SolidColorBrush x:Key="TableHeaderText" Color="#94A3B8"/>
-    <SolidColorBrush x:Key="TableRowAltBg"   Color="#172131"/>
-
     <!-- ===== LIVECHARTS ===== -->
     <SolidColorBrush x:Key="ChartGuestStroke"   Color="#EF4444"/>
     <SolidColorBrush x:Key="ChartGuestFill"     Color="#00000000"/>
