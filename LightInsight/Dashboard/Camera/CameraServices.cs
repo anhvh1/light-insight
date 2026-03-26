@@ -10,297 +10,259 @@ using VideoOS.Platform.Messaging;
 
 namespace LightInsight.Dashboard.Camera
 {
-	internal class CameraServices : IDisposable
-	{
-		private MessageCommunication _messageCommunication;
+    internal class CameraServices : IDisposable
+    {
+        private MessageCommunication _messageCommunication;
 
-		// Cache trạng thái realtime
-		// Cache danh sách camera (CONFIG)
-		private readonly ConcurrentDictionary<Guid, string> _cameraStatusCache = new ConcurrentDictionary<Guid, string>();
-		private List<Item> _cameraItems = new List<Item>();
+        private readonly ConcurrentDictionary<Guid, string> _cameraStatusCache = new ConcurrentDictionary<Guid, string>();
+        private readonly ConcurrentDictionary<Guid, bool> _recordingCache = new ConcurrentDictionary<Guid, bool>();
+        private readonly ConcurrentDictionary<Guid, DateTime> _onlineSinceCache = new ConcurrentDictionary<Guid, DateTime>();
 
-		private object _registration1, _registration2;
-		private bool _disposed = false;
+        private List<Item> _cameraItems = new List<Item>();
+        private object _registration1, _registration2;
+        private bool _disposed = false;
 
-		public event Action<int, int, int> StatusUpdated;
+        public event Action<int, int, int> StatusUpdated;
 
-		#region START / INIT
+        #region START / INIT
 
-		public void Start()
-		{
-			if (EnvironmentManager.Instance.MasterSite == null) return;
+        public void Start()
+        {
+            if (EnvironmentManager.Instance.MasterSite == null) return;
 
-			// 1. Load configuration (chỉ 1 lần)
-			LoadCameraConfiguration();
+            LoadCameraConfiguration();
 
-			// 2. Start messaging
-			MessageCommunicationManager.Start(EnvironmentManager.Instance.MasterSite.ServerId);
-			_messageCommunication = MessageCommunicationManager.Get(EnvironmentManager.Instance.MasterSite.ServerId);
+            MessageCommunicationManager.Start(EnvironmentManager.Instance.MasterSite.ServerId);
+            _messageCommunication = MessageCommunicationManager.Get(EnvironmentManager.Instance.MasterSite.ServerId);
 
-			_registration1 = _messageCommunication.RegisterCommunicationFilter(
-				CurrentStateResponseHandler,
-				new CommunicationIdFilter(MessageCommunication.ProvideCurrentStateResponse));
+            _registration1 = _messageCommunication.RegisterCommunicationFilter(
+                CurrentStateResponseHandler,
+                new CommunicationIdFilter(MessageCommunication.ProvideCurrentStateResponse));
 
-			_registration2 = _messageCommunication.RegisterCommunicationFilter(
-				RealTimeEventHandler,
-				new CommunicationIdFilter(MessageId.Server.NewEventIndication));
+            _registration2 = _messageCommunication.RegisterCommunicationFilter(
+                RealTimeEventHandler,
+                new CommunicationIdFilter(MessageId.Server.NewEventIndication));
 
-			// Request initial state
-			_messageCommunication.TransmitMessage(
-				new Message(MessageCommunication.ProvideCurrentStateRequest),
-				null, null, null);
-		}
+            _messageCommunication.TransmitMessage(
+                new Message(MessageCommunication.ProvideCurrentStateRequest),
+                null, null, null);
+        }
 
-		#endregion
+        #endregion
 
-		#region CONFIGURATION
+        #region CONFIGURATION
 
-		private void LoadCameraConfiguration()
-		{
-			_cameraItems.Clear();
+        private void LoadCameraConfiguration()
+        {
+            _cameraItems.Clear();
+            if (Configuration.Instance == null) return;
 
-			if (Configuration.Instance == null) return;
+            try
+            {
+                var topItems = Configuration.Instance.GetItems(ItemHierarchy.Both);
+                foreach (var item in topItems)
+                {
+                    FindCamerasRecursive(item);
+                }
+                System.Diagnostics.Debug.WriteLine($"[CameraServices] Loaded {_cameraItems.Count} cameras");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[CameraServices] Load config error: {ex.Message}");
+            }
+        }
 
-			try
-			{
-				var topItems = Configuration.Instance.GetItems(ItemHierarchy.Both);
+        private void FindCamerasRecursive(Item parent)
+        {
+            if (parent.FQID.Kind == Kind.Camera)
+            {
+                _cameraItems.Add(parent);
+            }
 
-				foreach (var item in topItems)
-				{
-					FindCamerasRecursive(item);
-				}
+            var children = parent.GetChildren();
+            if (children == null) return;
 
-				System.Diagnostics.Debug.WriteLine($"[CameraServices] Loaded {_cameraItems.Count} cameras");
-			}
-			catch (Exception ex)
-			{
-				System.Diagnostics.Debug.WriteLine($"[CameraServices] Load config error: {ex.Message}");
-			}
-		}
+            foreach (var child in children)
+            {
+                FindCamerasRecursive(child);
+            }
+        }
 
-		private void FindCamerasRecursive(Item parent)
-		{
-			if (parent.FQID.Kind == Kind.Camera)
-			{
-				_cameraItems.Add(parent);
-			}
+        #endregion
 
-			var children = parent.GetChildren();
-			if (children == null) return;
+        #region BUILD VIEW
 
-			foreach (var child in children)
-			{
-				FindCamerasRecursive(child);
-			}
-		}
+        public List<CameraInfo> GetCameraList()
+        {
+            return _cameraItems.Select(item =>
+            {
+                _cameraStatusCache.TryGetValue(item.FQID.ObjectId, out string status);
 
-		#endregion
+                return new CameraInfo
+                {
+                    ID = item.FQID.ObjectId.ToString().Substring(0, 8).ToUpper(),
+                    Name = item.Name,
+                    Status = MapStatus(status),
+                    IP = GetCameraIp(item),
+                    Recording = GetRecordingStatus(item),
+                    Uptime = GetUptime(item)
+                };
+            }).ToList();
+        }
 
-		#region BUILD VIEW (IMPORTANT)
+        private string MapStatus(string status)
+        {
+            if (string.IsNullOrEmpty(status)) return "Unknown";
+            if (status.Equals("Responding", StringComparison.OrdinalIgnoreCase)) return "Online";
+            if (status.Equals("Not Responding", StringComparison.OrdinalIgnoreCase)) return "Offline";
+            return "Unknown";
+        }
 
-		public List<CameraInfo> GetCameraList()
-		{
-			return _cameraItems.Select(item =>
-			{
-				_cameraStatusCache.TryGetValue(item.FQID.ObjectId, out string status);
+        #endregion
 
-				return new CameraInfo
-				{
-					ID = item.FQID.ObjectId.ToString().Substring(0, 8).ToUpper(),
-					Name = item.Name,
-					Status = MapStatus(status),
-					IP = GetCameraIp(item),
-					Recording = "Yes",
-					Uptime = "N/A"
-				};
-			}).ToList();
-		}
+        #region FEATURES: IP, RECORDING, UPTIME (FIXED VERSION)
 
-		private string MapStatus(string status)
-		{
-			if (string.IsNullOrEmpty(status))
-				return "Unknown";
+        private string GetCameraIp(Item cameraItem)
+        {
+            try
+            {
+                // Cách lấy IP an toàn nhất qua Hardware Property
+                var hardware = Configuration.Instance.GetItem(cameraItem.FQID.ParentId, Kind.Hardware);
+                if (hardware != null && hardware.Properties != null)
+                {
+                    if (hardware.Properties.ContainsKey("Address")) return hardware.Properties["Address"];
+                    if (hardware.Properties.ContainsKey("IpAddress")) return hardware.Properties["IpAddress"];
+                }
+            }
+            catch { }
+            return "N/A";
+        }
 
-			if (status.Equals("Responding", StringComparison.OrdinalIgnoreCase))
-				return "Online";
+        private string GetRecordingStatus(Item cameraItem)
+        {
+            if (_recordingCache.TryGetValue(cameraItem.FQID.ObjectId, out bool isRecording))
+            {
+                return isRecording ? "Recording" : "Stopped";
+            }
+            return "Unknown";
+        }
 
-			if (status.Equals("Not Responding", StringComparison.OrdinalIgnoreCase))
-				return "Offline";
+        private string GetUptime(Item cameraItem)
+        {
+            if (_onlineSinceCache.TryGetValue(cameraItem.FQID.ObjectId, out DateTime onlineTime))
+            {
+                TimeSpan uptime = DateTime.Now - onlineTime;
+                if (uptime.TotalDays >= 1)
+                    return $"{(int)uptime.TotalDays}d {uptime.Hours}h {uptime.Minutes}m";
+                return $"{uptime.Hours}h {uptime.Minutes}m {uptime.Seconds}s";
+            }
+            return "N/A";
+        }
 
-			return "Unknown";
-		}
+        public void TestLogAllCameraDetails()
+        {
+            System.Diagnostics.Debug.WriteLine("\n--- [CameraServices TEST] ---");
+            foreach (var item in _cameraItems)
+            {
+                string ip = GetCameraIp(item);
+                string rec = GetRecordingStatus(item);
+                string uptime = GetUptime(item);
+                _cameraStatusCache.TryGetValue(item.FQID.ObjectId, out string status);
 
-		#endregion
+                System.Diagnostics.Debug.WriteLine($"CAM: {item.Name} | IP: {ip} | Status: {status} | Rec: {rec} | Uptime: {uptime}");
+            }
+        }
 
-		#region IP
+        #endregion
 
-		private string GetCameraIp(Item cameraItem)
-		{
-			try
-			{
-				var hardware = Configuration.Instance.GetItem(cameraItem.FQID.ParentId, Kind.Hardware);
-                //foreach (var kv in hardware.Properties)
-                //{
-                //    System.Diagnostics.Debug.WriteLine($"{kv.Key} = {kv.Value}");
-                //}
-                if (hardware == null) return "N/A";
+        #region MESSAGING (STATE)
 
-				if (hardware.Properties != null)
-				{
-					string[] keys = { "Address", "IpAddress", "Host", "DeviceAddress" };
+        private object CurrentStateResponseHandler(Message message, FQID dest, FQID source)
+        {
+            if (message.Data is IEnumerable<ItemState> result)
+            {
+                foreach (var itemState in result.Where(i => i.FQID.Kind == Kind.Camera))
+                {
+                    _cameraStatusCache[itemState.FQID.ObjectId] = itemState.State;
 
-					foreach (var key in keys)
-					{
-						if (hardware.Properties.ContainsKey(key))
-						{
-							var value = hardware.Properties[key];
-							if (!string.IsNullOrEmpty(value))
-								return value;
-						}
-					}
+                    if (itemState.State == "Responding" && !_onlineSinceCache.ContainsKey(itemState.FQID.ObjectId))
+                    {
+                        _onlineSinceCache[itemState.FQID.ObjectId] = DateTime.Now;
+                    }
 
-					// fallback scan
-					foreach (var kv in hardware.Properties)
-					{
-						var k = kv.Key.ToLower();
-						if (k.Contains("ip") || k.Contains("address"))
-							return kv.Value;
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				System.Diagnostics.Debug.WriteLine("GetCameraIp error: " + ex.Message);
-			}
+                    // Một số hệ thống state có thể chứa chữ Recording
+                    if (itemState.State.Contains("Recording"))
+                    {
+                        _recordingCache[itemState.FQID.ObjectId] = true;
+                    }
+                }
+                NotifyStatus();
+            }
+            return null;
+        }
 
-			return "N/A";
-		}
+        private object RealTimeEventHandler(Message message, FQID dest, FQID source)
+        {
+            var eventData = message.Data as EventData;
+            if (eventData?.EventHeader.Source.FQID.Kind == Kind.Camera)
+            {
+                Guid camId = eventData.EventHeader.Source.FQID.ObjectId;
+                string msg = eventData.EventHeader.Message;
 
-		public void CheckRecordingStatus(Guid cameraId)
-		{
-		    // Tạo 1 FQID cho Camera
-		    FQID cameraFqid = new FQID(EnvironmentManager.Instance.MasterSite.ServerId, Guid.Empty, cameraId, FolderType.No, Kind.Camera);
-		    // Gửi yêu cầu lấy trạng thái CHI TIẾT
-		    // Server sẽ trả về một tin nhắn có tên là MessageId.Server.GetItemStatusResponse
-		    var msg = new VideoOS.Platform.Messaging.Message(MessageId.Server.GetIPAddressResponse);
-		    _messageCommunication.TransmitMessage(msg, cameraFqid, null, null);
-		}
-		// Trong Handler nhận tin nhắn:
-		private object StatusResponseHandler(Message message, FQID dest, FQID source)
-		{
-		    if (message.MessageId == MessageId.Server.GetIPAddressResponse)
-		    {
-		        // Data trả về là một đối tượng ItemStatus
-		        var status = message.Data;
-		        if (status != null)
-		        {
-					// Kiểm tra xem trong danh sách status có chữ "Recording" không
-					string statusString = status.ToString();
-		            System.Diagnostics.Debug.WriteLine($"Camera {source.ObjectId} ip {statusString}");
-		        }
-		    }
-		    return null;
-		}
+                if (msg.Equals("Responding", StringComparison.OrdinalIgnoreCase))
+                {
+                    _cameraStatusCache[camId] = msg;
+                    if (!_onlineSinceCache.ContainsKey(camId)) _onlineSinceCache[camId] = DateTime.Now;
+                    NotifyStatus();
+                }
+                else if (msg.Equals("Not Responding", StringComparison.OrdinalIgnoreCase))
+                {
+                    _cameraStatusCache[camId] = msg;
+                    _onlineSinceCache.TryRemove(camId, out _);
+                    NotifyStatus();
+                }
 
-		#endregion
+                // Bắt sự kiện Recording bằng Message String trực tiếp
+                if (msg.IndexOf("recording started", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    _recordingCache[camId] = true;
+                }
+                else if (msg.IndexOf("recording stopped", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    _recordingCache[camId] = false;
+                }
+            }
+            return null;
+        }
 
-		#region MESSAGING (STATE)
+        #endregion
 
-		private object CurrentStateResponseHandler(Message message, FQID dest, FQID source)
-		{
-			if (message.Data is IEnumerable<ItemState> result)
-			{
-				foreach (var itemState in result.Where(i => i.FQID.Kind == Kind.Camera))
-				{
-					_cameraStatusCache[itemState.FQID.ObjectId] = itemState.State;
-				}
+        #region HELPERS
+        private void NotifyStatus()
+        {
+            int online = _cameraItems.Count(i => _cameraStatusCache.TryGetValue(i.FQID.ObjectId, out var s) && s == "Responding");
+            int total = _cameraItems.Count;
+            int offline = total - online;
 
-				NotifyStatus();
-			}
-			return null;
-		}
+            Application.Current.Dispatcher.BeginInvoke(new Action(() => {
+                StatusUpdated?.Invoke(online, offline, total);
+            }));
+        }
 
-		private object RealTimeEventHandler(Message message, FQID dest, FQID source)
-		{
-			var eventData = message.Data as EventData;
-
-			if (eventData?.EventHeader.Source.FQID.Kind == Kind.Camera)
-			{
-				string msg = eventData.EventHeader.Message;
-
-				string[] validStates =
-				{
-					"Responding",
-					"Not Responding",
-					"Disabled",
-					"Enabled",
-					"Communication error"
-				};
-
-				if (validStates.Any(s => s.Equals(msg, StringComparison.OrdinalIgnoreCase)))
-				{
-					_cameraStatusCache[eventData.EventHeader.Source.FQID.ObjectId] = msg;
-					NotifyStatus();
-				}
-			}
-
-			return null;
-		}
-
-		#endregion
-
-		#region COUNT (FIXED)
-
-		private void NotifyStatus()
-		{
-			int online = 0;
-			int offline = 0;
-			int unknown = 0;
-
-			foreach (var item in _cameraItems)
-			{
-				_cameraStatusCache.TryGetValue(item.FQID.ObjectId, out string status);
-
-				if (status == "Responding")
-					online++;
-				else if (status == "Not Responding")
-					offline++;
-				else
-					unknown++;
-			}
-
-			int total = _cameraItems.Count;
-
-			Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-			{
-				StatusUpdated?.Invoke(online, offline, total);
-			}));
-		}
-
-		#endregion
-
-		#region DISPOSE
-
-		public void Dispose()
-		{
-			if (_disposed) return;
-
-			if (_messageCommunication != null)
-			{
-				if (_registration1 != null)
-					_messageCommunication.UnRegisterCommunicationFilter(_registration1);
-
-				if (_registration2 != null)
-					_messageCommunication.UnRegisterCommunicationFilter(_registration2);
-			}
-
-			_cameraStatusCache.Clear();
-			_cameraItems.Clear();
-
-			_disposed = true;
-			GC.SuppressFinalize(this);
-		}
-
-		#endregion
-	}
+        public void Dispose()
+        {
+            if (_disposed) return;
+            if (_messageCommunication != null)
+            {
+                if (_registration1 != null) _messageCommunication.UnRegisterCommunicationFilter(_registration1);
+                if (_registration2 != null) _messageCommunication.UnRegisterCommunicationFilter(_registration2);
+            }
+            _cameraStatusCache.Clear();
+            _recordingCache.Clear();
+            _onlineSinceCache.Clear();
+            _cameraItems.Clear();
+            _disposed = true;
+        }
+        #endregion
+    }
 }
