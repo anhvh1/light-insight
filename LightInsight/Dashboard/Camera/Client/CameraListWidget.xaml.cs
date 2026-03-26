@@ -145,35 +145,70 @@ namespace LightInsight.Dashboard.Camera.Client
 
         private int _totalPages = 1; // Thay cho MaxPages
 
+        private string _currentStatusFilter = "All";
+
+        private void Filter_Checked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is RadioButton rb && rb.Tag != null)
+                {
+                    _currentStatusFilter = rb.Tag.ToString();
+                    _currentPage = 1;
+                    UpdateTable(_currentPage.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[Filter_Checked Error]: {ex.Message} {ex.StackTrace}");
+            }
+        }
+
         public void UpdateTable(string page)
         {
-            if (_allCameras == null) return;
+            try
+            {
+                if (_allCameras == null) return;
 
-            // 1. Tính toán PageSize dựa trên chiều cao hiện tại
-            int pageSize = (int)Math.Max(1, Math.Floor((this.ActualHeight - 60) / 30));
+                // 1. Lọc theo trạng thái
+                var filteredData = _allCameras.AsEnumerable();
+                if (_currentStatusFilter != "All")
+                {
+                    filteredData = filteredData.Where(c => c.Status == _currentStatusFilter);
+                }
 
-            // 2. Tính toán lại tổng số trang dựa trên PageSize mới
-            _totalPages = (int)Math.Ceiling((double)_allCameras.Count / pageSize);
+                // 2. Phân trang
+                var list = filteredData.ToList();
+                double usableHeight = this.ActualHeight > 0 ? this.ActualHeight : 300;
+                int pageSize = (int)Math.Max(1, Math.Floor((usableHeight - 60) / 30));
+                
+                _totalPages = (int)Math.Ceiling((double)list.Count / pageSize);
+                if (_totalPages < 1) _totalPages = 1;
+                if (_currentPage > _totalPages) _currentPage = _totalPages;
+                if (_currentPage < 1) _currentPage = 1;
 
-            // 3. Đảm bảo trang hiện tại không vượt quá tổng số trang mới
-            if (_currentPage > _totalPages) _currentPage = _totalPages;
-            if (_currentPage < 1) _currentPage = 1;
+                int pageNum = (page == ">") ? Math.Min(_currentPage + 1, _totalPages) :
+                              (page == "<") ? Math.Max(_currentPage - 1, 1) :
+                              int.TryParse(page, out int p) ? p : _currentPage;
 
-            int pageNum = (page == ">") ? _currentPage : int.Parse(page);
+                _currentPage = pageNum;
 
-            // 4. Lấy dữ liệu
-            var pagedData = _allCameras.Skip((pageNum - 1) * pageSize).Take(pageSize).ToList();
-            CameraDataGrid.ItemsSource = pagedData;
+                var pagedData = list.Skip((_currentPage - 1) * pageSize).Take(pageSize).ToList();
+                if (CameraDataGrid != null)
+                    CameraDataGrid.ItemsSource = pagedData;
 
-            // 5. Cập nhật lại thanh điều hướng (Ẩn/hiện nút số tùy theo _totalPages)
-            UpdatePaginationUI();
+                UpdatePaginationUI(list.Count);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[UpdateTable Error]: {ex.Message} {ex.StackTrace}");
+            }
         }
         private void PageButton_Click(object sender, RoutedEventArgs e)
         {
             Button clickedButton = sender as Button;
             if (clickedButton == null) return;
 
-            // Lấy nội dung (có thể là chuỗi "<", ">" hoặc đối tượng PageItem)
             string content = clickedButton.Content.ToString();
 
             if (content == "<")
@@ -186,7 +221,6 @@ namespace LightInsight.Dashboard.Camera.Client
             }
             else
             {
-                // Nếu nhấn vào số trang
                 if (int.TryParse(content, out int targetPage))
                 {
                     _currentPage = targetPage;
@@ -194,10 +228,9 @@ namespace LightInsight.Dashboard.Camera.Client
             }
 
             UpdateTable(_currentPage.ToString());
-            UpdatePaginationUI();
         }
 
-        private void UpdatePaginationUI()
+        private void UpdatePaginationUI(int filteredCount)
         {
             if (PaginationItemsControl == null) return;
 
@@ -218,7 +251,7 @@ namespace LightInsight.Dashboard.Camera.Client
             // Cập nhật text Footer
             if (FooterText != null)
             {
-                FooterText.Text = $"Showing {CameraDataGrid.Items.Count} of {_allCameras.Count} (Page {_currentPage}/{_totalPages})";
+                FooterText.Text = $"Showing {CameraDataGrid.Items.Count} of {filteredCount} (Page {_currentPage}/{_totalPages})";
             }
         }
 
