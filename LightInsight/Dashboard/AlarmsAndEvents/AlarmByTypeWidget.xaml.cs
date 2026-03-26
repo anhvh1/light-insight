@@ -31,7 +31,7 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         private object _themeChangedRegistration;
         private bool _widgetEditMode;
         public event EventHandler DeleteRequested;
-        public int MinCol => 3;
+        public int MinCol => 5;
         public int MinRow => 3;
 
         public Thumb ResizeThumb => this.InternalResizeThumb;
