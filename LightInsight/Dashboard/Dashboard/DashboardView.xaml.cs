@@ -83,11 +83,12 @@ namespace LightInsight.Dashboard.Dashboard
         #region MENU LOGIC
         private void LoadUnifiedMenu()
         {
-            var allWorkspaces = WorkspaceService.Instance.Workspaces.ToList();
+            var allWorkspaces = WorkspaceService.Instance.Workspaces;
             var systemMenus = GetStaticSystemMenus();
-            var flatList = allWorkspaces.Concat(systemMenus).ToList();
-            var tree = BuildTree(flatList);
-            NavigationItems = new ObservableCollection<WorkspaceModel>(tree);
+            var systemTree = BuildTree(systemMenus); // Build tree ONLY for system menus
+            
+            var combined = allWorkspaces.Concat(systemTree).ToList();
+            NavigationItems = new ObservableCollection<WorkspaceModel>(combined);
         }
 
         private List<WorkspaceModel> BuildTree(List<WorkspaceModel> flatList)

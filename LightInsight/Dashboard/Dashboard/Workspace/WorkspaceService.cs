@@ -53,7 +53,10 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
             // 🔥 Clear children trước để tránh bị duplicate khi load lại
             foreach (var item in list)
             {
-                item.Children = new ObservableCollection<WorkspaceModel>();
+                if (item.Children == null)
+                    item.Children = new ObservableCollection<WorkspaceModel>();
+                else
+                    item.Children.Clear();
             }
 
             // 🔥 Tạo lookup để tìm nhanh
@@ -130,6 +133,24 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
             OnWorkspaceChanged?.Invoke();
         }
 
+        public List<WorkspaceModel> GetAllWorkspacesFlat()
+        {
+            var list = new List<WorkspaceModel>();
+            foreach (var root in Workspaces)
+            {
+                GetRecursive(root, list);
+            }
+            return list;
+        }
+
+        private void GetRecursive(WorkspaceModel node, List<WorkspaceModel> list)
+        {
+            list.Add(node);
+            foreach (var c in node.Children)
+            {
+                GetRecursive(c, list);
+            }
+        }
     }
 }
 
