@@ -139,7 +139,7 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
             OnWorkspaceChanged?.Invoke();
         }
 
-        public List<WorkspaceModel> GetAllWorkspacesFlat()
+        public List<WorkspaceModel> GetAllWorkspacesFlat() // phục vụ tính năng tìm kiếm dashboard nhanh bằng tên trong tương lai
         {
             var list = new List<WorkspaceModel>();
             foreach (var root in Workspaces)

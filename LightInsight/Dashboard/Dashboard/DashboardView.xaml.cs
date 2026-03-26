@@ -123,13 +123,72 @@ namespace LightInsight.Dashboard.Dashboard
         private List<WorkspaceModel> GetStaticSystemMenus()
         {
             var list = new List<WorkspaceModel>();
-            list.Add(new WorkspaceModel { Id = "sys-cam", Name = "Menu_Camera", Icon = PackIconMaterialKind.Camera, IsGroup = true, Type = null });
-            list.Add(new WorkspaceModel { Id = "sys-inv", Name = "Menu_Inventory", Icon = PackIconMaterialKind.FormatListBulleted, ParentId = "sys-cam", Path = "/camera/inventory", Type = null });
-            list.Add(new WorkspaceModel { Id = "sys-health", Name = "Menu_Health", Icon = PackIconMaterialKind.HeartPulse, ParentId = "sys-cam", Path = "/camera/health", Type = null });
-            list.Add(new WorkspaceModel { Id = "sys-srv", Name = "Menu_RecordingServer", Icon = PackIconMaterialKind.Server, IsGroup = true, Type = null });
-            list.Add(new WorkspaceModel { Id = "srv-det", Name = "Menu_Details", Icon = PackIconMaterialKind.Information, ParentId = "sys-srv", Path = "/recording-server/details", Type = null });
-            list.Add(new WorkspaceModel { Id = "sys-set", Name = "Menu_Settings", Icon = PackIconMaterialKind.Cog, IsGroup = true, Type = null });
-            list.Add(new WorkspaceModel { Id = "set-br", Name = "Menu_Branding", Icon = PackIconMaterialKind.Palette, ParentId = "sys-set", Path = "/settings/branding", Type = null });
+
+            // 1. Camera
+            list.Add(new WorkspaceModel { Id = "sys-cam", Name = "Camera", Icon = PackIconMaterialKind.Camera, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "cam-inv", Name = "Inventory", Icon = PackIconMaterialKind.FormatListBulleted, ParentId = "sys-cam", Path = "/camera/inventory", Type = null });
+            list.Add(new WorkspaceModel { Id = "cam-store", Name = "Storage", Icon = PackIconMaterialKind.Database, ParentId = "sys-cam", Path = "/camera/storage", Type = null });
+            list.Add(new WorkspaceModel { Id = "cam-health", Name = "Health", Icon = PackIconMaterialKind.HeartPulse, ParentId = "sys-cam", Path = "/camera/health", Type = null });
+
+            // 2. Recording Server
+            list.Add(new WorkspaceModel { Id = "sys-srv", Name = "Recording Server", Icon = PackIconMaterialKind.Server, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "srv-det", Name = "Details", Icon = PackIconMaterialKind.Information, ParentId = "sys-srv", Path = "/recording-server/details", Type = null });
+            list.Add(new WorkspaceModel { Id = "srv-store", Name = "Storage", Icon = PackIconMaterialKind.DatabaseOutline, ParentId = "sys-srv", Path = "/recording-server/storage", Type = null });
+            list.Add(new WorkspaceModel { Id = "srv-health", Name = "Health", Icon = PackIconMaterialKind.HeartPulseOutline, ParentId = "sys-srv", Path = "/recording-server/health", Type = null });
+
+            // 3. Monitoring
+            list.Add(new WorkspaceModel { Id = "sys-mon", Name = "Monitoring", Icon = PackIconMaterialKind.Monitor, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "mon-live", Name = "Live View", Icon = PackIconMaterialKind.PlayCircle, ParentId = "sys-mon", Path = "/monitoring/live", Type = null });
+            list.Add(new WorkspaceModel { Id = "mon-play", Name = "Playback", Icon = PackIconMaterialKind.History, ParentId = "sys-mon", Path = "/monitoring/playback", Type = null });
+
+            // 4. Alarm Details
+            list.Add(new WorkspaceModel { Id = "sys-alm", Name = "Alarm Details", Icon = PackIconMaterialKind.Bell, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "alm-det", Name = "Details", Icon = PackIconMaterialKind.InformationOutline, ParentId = "sys-alm", Path = "/alarms/details", Type = null });
+            list.Add(new WorkspaceModel { Id = "alm-day", Name = "Daily Count", Icon = PackIconMaterialKind.ChartBar, ParentId = "sys-alm", Path = "/alarms/daily-count", Type = null });
+            list.Add(new WorkspaceModel { Id = "alm-src", Name = "Daily Count by Source", Icon = PackIconMaterialKind.SourceBranch, ParentId = "sys-alm", Path = "/alarms/source-count", Type = null });
+
+            // 5. Trends
+            list.Add(new WorkspaceModel { Id = "sys-trd", Name = "Trends", Icon = PackIconMaterialKind.TrendingUp, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "trd-alm", Name = "Alarms", Icon = PackIconMaterialKind.BellAlert, ParentId = "sys-trd", Path = "/trends/alarms", Type = null });
+            list.Add(new WorkspaceModel { Id = "trd-cam", Name = "Cameras", Icon = PackIconMaterialKind.CameraSettings, ParentId = "sys-trd", Path = "/trends/cameras", Type = null });
+
+            // 6. Access Control
+            list.Add(new WorkspaceModel { Id = "sys-acs", Name = "Access Control", Icon = PackIconMaterialKind.Lock, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "acs-stat", Name = "Item Status", Icon = PackIconMaterialKind.ListStatus, ParentId = "sys-acs", Path = "/acs/status", Type = null });
+            list.Add(new WorkspaceModel { Id = "acs-alm", Name = "ACS Alarms", Icon = PackIconMaterialKind.ShieldAlert, ParentId = "sys-acs", Path = "/acs/alarms", Type = null });
+            list.Add(new WorkspaceModel { Id = "acs-evt", Name = "ACS Events", Icon = PackIconMaterialKind.CalendarText, ParentId = "sys-acs", Path = "/acs/events", Type = null });
+            list.Add(new WorkspaceModel { Id = "acs-card", Name = "Cardholders", Icon = PackIconMaterialKind.AccountGroup, ParentId = "sys-acs", Path = "/acs/cardholders", Type = null });
+
+            // 7. IoT
+            list.Add(new WorkspaceModel { Id = "sys-iot", Name = "IoT", Icon = PackIconMaterialKind.AccessPoint, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "iot-sen", Name = "Sensors", Icon = PackIconMaterialKind.Sensor, ParentId = "sys-iot", Path = "/iot/sensors", Type = null });
+            list.Add(new WorkspaceModel { Id = "iot-dash", Name = "IoT Dashboard", Icon = PackIconMaterialKind.ViewDashboard, ParentId = "sys-iot", Path = "/iot/dashboard", Type = null });
+            list.Add(new WorkspaceModel { Id = "iot-alt", Name = "Alerts", Icon = PackIconMaterialKind.AlertDecagram, ParentId = "sys-iot", Path = "/iot/alerts", Type = null });
+
+            // 8. Reporting
+            list.Add(new WorkspaceModel { Id = "sys-rep", Name = "Reporting", Icon = PackIconMaterialKind.FileDocument, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "rep-list", Name = "Reports", Icon = PackIconMaterialKind.FileChart, ParentId = "sys-rep", Path = "/reporting/reports", Type = null });
+            list.Add(new WorkspaceModel { Id = "rep-sch", Name = "Scheduled", Icon = PackIconMaterialKind.Clock, ParentId = "sys-rep", Path = "/reporting/scheduled", Type = null });
+
+            // 9. Notifications
+            list.Add(new WorkspaceModel { Id = "sys-not", Name = "Notifications", Icon = PackIconMaterialKind.BellRing, Path = "/notifications", Type = null });
+
+            // 10. Settings
+            list.Add(new WorkspaceModel { Id = "sys-set", Name = "Settings", Icon = PackIconMaterialKind.Cog, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "set-br", Name = "Branding", Icon = PackIconMaterialKind.Palette, ParentId = "sys-set", Path = "/settings/branding", Type = null });
+            list.Add(new WorkspaceModel { Id = "set-not", Name = "Notification", Icon = PackIconMaterialKind.EmailOutline, ParentId = "sys-set", Path = "/settings/notification", Type = null });
+            list.Add(new WorkspaceModel { Id = "set-wea", Name = "Weather", Icon = PackIconMaterialKind.WeatherPartlyCloudy, ParentId = "sys-set", Path = "/settings/weather", Type = null });
+            list.Add(new WorkspaceModel { Id = "set-iot", Name = "IoT", Icon = PackIconMaterialKind.AccessPointNetwork, ParentId = "sys-set", Path = "/settings/iot", Type = null });
+            list.Add(new WorkspaceModel { Id = "set-rep", Name = "Reporting", Icon = PackIconMaterialKind.FileTable, ParentId = "sys-set", Path = "/settings/reporting", Type = null });
+            list.Add(new WorkspaceModel { Id = "set-rol", Name = "Roles", Icon = PackIconMaterialKind.AccountKey, ParentId = "sys-set", Path = "/settings/roles", Type = null });
+            list.Add(new WorkspaceModel { Id = "set-lic", Name = "License Info", Icon = PackIconMaterialKind.Key, ParentId = "sys-set", Path = "/settings/license", Type = null });
+            list.Add(new WorkspaceModel { Id = "set-db", Name = "Database Statistics", Icon = PackIconMaterialKind.DatabaseSettings, ParentId = "sys-set", Path = "/settings/database", Type = null });
+
+            // 11. Help
+            list.Add(new WorkspaceModel { Id = "sys-hlp", Name = "Help", Icon = PackIconMaterialKind.HelpCircle, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "hlp-ws", Name = "Workspace", Icon = PackIconMaterialKind.Briefcase, ParentId = "sys-hlp", Path = "/help/workspace", Type = null });
+            list.Add(new WorkspaceModel { Id = "hlp-rep", Name = "Reporting", Icon = PackIconMaterialKind.Information, ParentId = "sys-hlp", Path = "/help/reporting", Type = null });
+
             return list;
         }
 
