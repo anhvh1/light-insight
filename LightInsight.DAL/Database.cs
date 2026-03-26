@@ -9,7 +9,7 @@ namespace LightInsight.DAL
 {
     public class Database
     {
-        public  Dictionary<string, string> LoadCameraUriMap()
+        public Dictionary<string, string> LoadCameraUriMap()
         {
             var dict = new Dictionary<string, string>();
 

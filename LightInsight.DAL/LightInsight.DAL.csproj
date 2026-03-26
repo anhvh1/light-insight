@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5CA5EA76-CFCB-4077-ADFF-A0FE3D460DD7}</ProjectGuid>
+    <ProjectGuid>{5C3CE8AF-3EB9-4DC0-A3A0-C797E127D79B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LightInsight.DAL</RootNamespace>

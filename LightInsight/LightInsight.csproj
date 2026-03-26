@@ -341,7 +341,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LightInsight.DAL\LightInsight.DAL.csproj">
-      <Project>{5ca5ea76-cfcb-4077-adff-a0fe3d460dd7}</Project>
+      <Project>{5c3ce8af-3eb9-4dc0-a3a0-c797e127d79b}</Project>
       <Name>LightInsight.DAL</Name>
     </ProjectReference>
   </ItemGroup>
