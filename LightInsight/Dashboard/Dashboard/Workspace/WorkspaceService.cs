@@ -57,6 +57,8 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
                     item.Children = new ObservableCollection<WorkspaceModel>();
                 else
                     item.Children.Clear();
+                
+                item.IsGroup = false; // Reset trước khi dựng lại
             }
 
             // 🔥 Tạo lookup để tìm nhanh
@@ -73,6 +75,8 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
                     if (parent != item)
                     {
                         parent.Children.Add(item);
+                        parent.IsGroup = true; // Có con thì là Group
+                        if (parent.Id == "ROOT_DASHBOARD") parent.IsExpanded = true; // Mở sẵn mục Dashboards
                     }
                 }
             }
@@ -92,6 +96,8 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
             if (parent != null)
             {
                 parent.Children.Add(item);
+                parent.IsGroup = true;
+                if (parent.Id == "ROOT_DASHBOARD") parent.IsExpanded = true;
             }
             else
             {

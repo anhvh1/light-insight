@@ -36,8 +36,13 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
             set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); }
         }
 
+        private bool _isGroup;
         [JsonIgnore]
-        public bool IsGroup { get; set; }
+        public bool IsGroup
+        {
+            get => _isGroup;
+            set { _isGroup = value; OnPropertyChanged(nameof(IsGroup)); }
+        }
 
         private bool _isExpanded;
         [JsonIgnore]
