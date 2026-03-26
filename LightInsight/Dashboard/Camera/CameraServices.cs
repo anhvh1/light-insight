@@ -262,7 +262,7 @@ namespace LightInsight.Dashboard.Camera
                     unknown++;
             }
 
-            int total = uniqueCameras.Count;
+            int total = online +offline;
 
             Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
