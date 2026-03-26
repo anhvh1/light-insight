@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LightInsight.BUS", "LightIn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LightInsight.DAL", "LightInsight.DAL\LightInsight.DAL.csproj", "{5CA5EA76-CFCB-4077-ADFF-A0FE3D460DD7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LightInsightService", "LightInsightService\LightInsightService.csproj", "{2EEC4D8D-D20A-4B09-AD37-3E9F83BA3403}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,14 @@ Global
 		{5CA5EA76-CFCB-4077-ADFF-A0FE3D460DD7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5CA5EA76-CFCB-4077-ADFF-A0FE3D460DD7}.Release|x64.ActiveCfg = Release|Any CPU
 		{5CA5EA76-CFCB-4077-ADFF-A0FE3D460DD7}.Release|x64.Build.0 = Release|Any CPU
+		{2EEC4D8D-D20A-4B09-AD37-3E9F83BA3403}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EEC4D8D-D20A-4B09-AD37-3E9F83BA3403}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EEC4D8D-D20A-4B09-AD37-3E9F83BA3403}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2EEC4D8D-D20A-4B09-AD37-3E9F83BA3403}.Debug|x64.Build.0 = Debug|Any CPU
+		{2EEC4D8D-D20A-4B09-AD37-3E9F83BA3403}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EEC4D8D-D20A-4B09-AD37-3E9F83BA3403}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EEC4D8D-D20A-4B09-AD37-3E9F83BA3403}.Release|x64.ActiveCfg = Release|Any CPU
+		{2EEC4D8D-D20A-4B09-AD37-3E9F83BA3403}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

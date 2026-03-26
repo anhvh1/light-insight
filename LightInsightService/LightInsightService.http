@@ -1,0 +1,6 @@
+@LightInsightService_HostAddress = http://localhost:5209
+
+GET {{LightInsightService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
