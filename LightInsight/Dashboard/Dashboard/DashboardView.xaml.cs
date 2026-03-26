@@ -134,7 +134,7 @@ namespace LightInsight.Dashboard.Dashboard
             list.Add(new WorkspaceModel { Id = "sys-srv", Name = "Recording Server", Icon = PackIconMaterialKind.Server, IsGroup = true, Type = null });
             list.Add(new WorkspaceModel { Id = "srv-det", Name = "Details", Icon = PackIconMaterialKind.Information, ParentId = "sys-srv", Path = "/recording-server/details", Type = null });
             list.Add(new WorkspaceModel { Id = "srv-store", Name = "Storage", Icon = PackIconMaterialKind.DatabaseOutline, ParentId = "sys-srv", Path = "/recording-server/storage", Type = null });
-            list.Add(new WorkspaceModel { Id = "srv-health", Name = "Health", Icon = PackIconMaterialKind.HeartPulseOutline, ParentId = "sys-srv", Path = "/recording-server/health", Type = null });
+            list.Add(new WorkspaceModel { Id = "srv-health", Name = "Health", Icon = PackIconMaterialKind.HeartPulse, ParentId = "sys-srv", Path = "/recording-server/health", Type = null });
 
             // 3. Monitoring
             list.Add(new WorkspaceModel { Id = "sys-mon", Name = "Monitoring", Icon = PackIconMaterialKind.Monitor, IsGroup = true, Type = null });
@@ -150,7 +150,7 @@ namespace LightInsight.Dashboard.Dashboard
             // 5. Trends
             list.Add(new WorkspaceModel { Id = "sys-trd", Name = "Trends", Icon = PackIconMaterialKind.TrendingUp, IsGroup = true, Type = null });
             list.Add(new WorkspaceModel { Id = "trd-alm", Name = "Alarms", Icon = PackIconMaterialKind.BellAlert, ParentId = "sys-trd", Path = "/trends/alarms", Type = null });
-            list.Add(new WorkspaceModel { Id = "trd-cam", Name = "Cameras", Icon = PackIconMaterialKind.CameraSettings, ParentId = "sys-trd", Path = "/trends/cameras", Type = null });
+            list.Add(new WorkspaceModel { Id = "trd-cam", Name = "Cameras", Icon = PackIconMaterialKind.Camera, ParentId = "sys-trd", Path = "/trends/cameras", Type = null });
 
             // 6. Access Control
             list.Add(new WorkspaceModel { Id = "sys-acs", Name = "Access Control", Icon = PackIconMaterialKind.Lock, IsGroup = true, Type = null });
@@ -161,7 +161,7 @@ namespace LightInsight.Dashboard.Dashboard
 
             // 7. IoT
             list.Add(new WorkspaceModel { Id = "sys-iot", Name = "IoT", Icon = PackIconMaterialKind.AccessPoint, IsGroup = true, Type = null });
-            list.Add(new WorkspaceModel { Id = "iot-sen", Name = "Sensors", Icon = PackIconMaterialKind.Sensor, ParentId = "sys-iot", Path = "/iot/sensors", Type = null });
+            list.Add(new WorkspaceModel { Id = "iot-sen", Name = "Sensors", Icon = PackIconMaterialKind.Leak, ParentId = "sys-iot", Path = "/iot/sensors", Type = null });
             list.Add(new WorkspaceModel { Id = "iot-dash", Name = "IoT Dashboard", Icon = PackIconMaterialKind.ViewDashboard, ParentId = "sys-iot", Path = "/iot/dashboard", Type = null });
             list.Add(new WorkspaceModel { Id = "iot-alt", Name = "Alerts", Icon = PackIconMaterialKind.AlertDecagram, ParentId = "sys-iot", Path = "/iot/alerts", Type = null });
 
