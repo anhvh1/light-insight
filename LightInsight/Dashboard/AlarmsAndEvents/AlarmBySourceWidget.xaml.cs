@@ -15,13 +15,6 @@ using System.Threading;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {
-    // 1. NHÚNG MODEL
-    public class SourceCountData
-    {
-        public string Source { get; set; }
-        public int Count { get; set; }
-    }
-
     public partial class AlarmBySourceWidget : UserControl, IResizableWidget
     {
         private ResourceDictionary _currentThemeDictionary;
@@ -38,7 +31,7 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
 
         public int MinCol => 4;
 
-        public int MinRow => 4;
+        public int MinRow => 3;
 
         public Thumb ResizeThumb => this.InternalResizeThumb;
 
@@ -74,36 +67,72 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
 
         private void LoadChartData()
         {
-            // Mẹo: LiveCharts vẽ từ dưới lên trên, nên mình đưa Warehouse vào trước để nó chìm xuống đáy
-            var rawData = new List<SourceCountData>
+            try
             {
-                new SourceCountData { Source = "Warehouse", Count = 13 },
-                new SourceCountData { Source = "Lobby", Count = 17 },
-                new SourceCountData { Source = "Server Room", Count = 28 },
-                new SourceCountData { Source = "Parking Lot", Count = 32 },
-                new SourceCountData { Source = "Entrance Gate", Count = 45 }
-            };
+                // 1. Gọi Service lấy TẤT CẢ danh sách Source
+                List<SourceCountData> rawData = AlarmServices.GetAlarmCountsBySource();
 
-            var values = new ChartValues<int>();
+                // Fallback nếu không có data
+                if (rawData == null || rawData.Count == 0)
+                {
+                    rawData = new List<SourceCountData> { new SourceCountData { Source = "No Data", Count = 0 } };
+                }
 
-            foreach (var item in rawData)
-            {
-                values.Add(item.Count);
-                _yAxisLabels.Add(item.Source);
+                // 2. Vẫn giữ nguyên lệnh đảo ngược để thanh dài nhất (Top 1) được đẩy lên trên cùng
+                rawData.Reverse();
+
+                var values = new ChartValues<int>();
+
+                // 3. Đổ dữ liệu vào Chart và ngắt dòng thông minh theo chuẩn i-PRO
+                foreach (var item in rawData)
+                {
+                    values.Add(item.Count);
+
+                    string labelName = item.Source;
+
+                    // Tìm vị trí của cụm " (" (Khoảng trắng + dấu ngoặc mở)
+                    int bracketIndex = labelName.IndexOf(" (");
+
+                    if (bracketIndex > 0)
+                    {
+                        // Cắt làm đôi, thay thế khoảng trắng đó bằng dấu xuống dòng \n
+                        // Nửa đầu: lấy từ đầu đến trước khoảng trắng
+                        // Nửa sau: lấy từ dấu ( trở đi
+                        labelName = labelName.Substring(0, bracketIndex) + "\n" + labelName.Substring(bracketIndex + 1);
+                    }
+                    else if (labelName.Length > 30)
+                    {
+                        // DỰ PHÒNG: Lỡ có cái camera nào tên dài mà không có dấu (
+                        // Thì tự động tìm khoảng trắng ở giữa để ngắt
+                        int spaceIndex = labelName.IndexOf(' ', labelName.Length / 2);
+                        if (spaceIndex < 0) spaceIndex = labelName.LastIndexOf(' ', labelName.Length / 2);
+
+                        if (spaceIndex > 0)
+                        {
+                            labelName = labelName.Substring(0, spaceIndex) + "\n" + labelName.Substring(spaceIndex + 1);
+                        }
+                    }
+
+                    _yAxisLabels.Add(labelName);
+                }
+
+                // VẼ THANH NGANG
+                _chartSeries.Add(new RowSeries
+                {
+                    Values = values,
+                    Fill = _defaultColor,
+
+                    // Tác giả LiveCharts gõ sai chính tả: MaxRowHeigth
+                    MaxRowHeigth = 40,
+
+                    RowPadding = 4,
+                    StrokeThickness = 0
+                });
             }
-
-            // ĐỔI THÀNH ROWSERIES ĐỂ VẼ THANH NGANG
-            _chartSeries.Add(new RowSeries
+            catch (Exception ex)
             {
-                Values = values,
-                Fill = _defaultColor,
-
-                // ÔNG TÁC GIẢ GÕ SAI CHÍNH TẢ, BÁC PHẢI GÕ THEO ỔNG:
-                MaxRowHeigth = 40,
-
-                RowPadding = 4,
-                StrokeThickness = 0
-            });
+                EnvironmentManager.Instance.Log(false, "LightInsight Widget", "LoadChart Source Error: " + ex.Message);
+            }
         }
 
         private void Chart_DataHover(object sender, ChartPoint chartPoint)

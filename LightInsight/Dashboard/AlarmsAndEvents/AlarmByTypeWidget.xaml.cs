@@ -23,11 +23,7 @@ using System.Threading;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {
-    public class TypeData
-    {
-        public string Day { get; set; }
-        public int Count { get; set; }
-    }
+    // Đã xóa class TypeData dư thừa vì ta đã khai báo TypeCountData ở AlarmServices
 
     public partial class AlarmByTypeWidget : UserControl, IResizableWidget
     {
@@ -35,11 +31,11 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         private object _themeChangedRegistration;
         private bool _widgetEditMode;
         public event EventHandler DeleteRequested;
-        public int MinCol => 3;
-        public int MinRow => 2;
+        public int MinCol => 5;
+        public int MinRow => 3;
 
         public Thumb ResizeThumb => this.InternalResizeThumb;
-        // Chuyển sang biến nội bộ cho gọn, không cần Public nữa
+
         private SeriesCollection _chartSeries = new SeriesCollection();
         private List<string> _xAxisLabels = new List<string>();
 
@@ -59,7 +55,6 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
 
             LoadChartData();
 
-            // THẦN CHÚ LÀ ĐÂY: Gán thẳng tay data vào biểu đồ, không trượt đi đâu được!
             DailyChart.Series = _chartSeries;
             DailyAxisX.Labels = _xAxisLabels;
         }
@@ -80,26 +75,41 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
 
         private void LoadChartData()
         {
-            var rawData = new List<TypeData>
+            try
             {
-                new TypeData { Day = "Mon", Count = 34 },
-                new TypeData { Day = "Tue", Count = 28 },
-                new TypeData { Day = "Wed", Count = 45 },
-                new TypeData { Day = "Thu", Count = 53 },
-                new TypeData { Day = "Fri", Count = 38 },
-                new TypeData { Day = "Sat", Count = 15 },
-                new TypeData { Day = "Sun", Count = 12 }
-            };
+                // 1. Kéo data thật từ hệ thống
+                List<TypeCountData> rawData = AlarmServices.GetAlarmCountsByType();
 
-            // Kiểm tra xem DataProvider có thực sự trả về data không
-            if (rawData != null && rawData.Count > 0)
-            {
                 var values = new ChartValues<int>();
 
-                foreach (var item in rawData)
+                if (rawData != null && rawData.Count > 0)
                 {
-                    values.Add(item.Count);
-                    _xAxisLabels.Add(item.Day);
+                    foreach (var item in rawData)
+                    {
+                        values.Add(item.Count);
+
+                        string typeName = item.TypeName;
+
+                        // Logic xuống dòng nếu tên Type quá dài (Ví dụ: "Motion Detection Alarm" -> Xuống dòng ở chữ Detection)
+                        if (typeName.Length > 15)
+                        {
+                            int spaceIndex = typeName.IndexOf(' ', typeName.Length / 2);
+                            if (spaceIndex < 0) spaceIndex = typeName.LastIndexOf(' ', typeName.Length / 2);
+
+                            if (spaceIndex > 0)
+                            {
+                                typeName = typeName.Substring(0, spaceIndex) + "\n" + typeName.Substring(spaceIndex + 1);
+                            }
+                        }
+
+                        _xAxisLabels.Add(typeName);
+                    }
+                }
+                else
+                {
+                    // Fallback an toàn
+                    values.Add(0);
+                    _xAxisLabels.Add("No Data");
                 }
 
                 _chartSeries.Add(new ColumnSeries
@@ -111,11 +121,9 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
                     StrokeThickness = 0
                 });
             }
-            else
+            catch (Exception ex)
             {
-                // Dòng này để phòng hờ bác truyền lộn Enum, nó sẽ tạo Data giả để hiện cột luôn
-                _chartSeries.Add(new ColumnSeries { Values = new ChartValues<int> { 10, 20, 30 }, Fill = _defaultColor });
-                _xAxisLabels.AddRange(new[] { "Lỗi Data", "Không có", "Dữ liệu" });
+                EnvironmentManager.Instance.Log(false, "LightInsight Widget", "LoadChart Type Error: " + ex.Message);
             }
         }
 
@@ -142,7 +150,8 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
             int index = (int)chartPoint.X;
             if (index >= 0 && index < _xAxisLabels.Count)
             {
-                TooltipDay.Text = _xAxisLabels[index];
+                // Bỏ đi ký tự xuống dòng (\n) trong XLabel để lúc hiển thị trên Tooltip được dính liền 1 dòng cho đẹp
+                TooltipDay.Text = _xAxisLabels[index].Replace("\n", " ");
                 TooltipCount.Text = $"count : {chartPoint.Y}";
                 HoverPopup.IsOpen = true;
             }

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -8,11 +10,12 @@ using LightInsight.Dashboard.Dashboard;
 using VideoOS.Platform;
 using VideoOS.Platform.Client;
 using VideoOS.Platform.Messaging;
+using VideoOS.Platform.Data;
 using System.Threading;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {
-    // 1. NHÚNG MODEL VÀO ĐÂY
+    // 1. MODEL CẬP NHẬT ĐỦ 4 TRẠNG THÁI
     public class AlarmItem
     {
         public string Location { get; set; }
@@ -22,15 +25,20 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         public bool IsHighPriority { get; set; }
         public bool IsLastItem { get; set; }
 
-        public string PriorityColor => IsHighPriority ? "#FF4B4B" : "Transparent";
+        public string PriorityColor => IsHighPriority && Status == "New" ? "#FF4B4B" : "Transparent";
 
         public string IndicatorColor
         {
             get
             {
-                if (Status == "Active") return IsHighPriority ? "#FF4B4B" : "#FFC107";
-                if (Status == "Ack") return "#FFC107";
-                return "#FF9800";
+                switch (Status)
+                {
+                    case "New": return IsHighPriority ? "#FF4B4B" : "#FFC107";
+                    case "In Progress": return "#FFC107"; // Vàng
+                    case "On Hold": return "#2196F3";     // Xanh dương
+                    case "Closed": return "#666666";      // Xám
+                    default: return "#666666";
+                }
             }
         }
 
@@ -38,9 +46,14 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         {
             get
             {
-                if (Status == "Active") return "#331515";
-                if (Status == "Ack") return "#151A28";
-                return "#222222";
+                switch (Status)
+                {
+                    case "New": return "#331515";
+                    case "In Progress": return "#332A15";
+                    case "On Hold": return "#152433";
+                    case "Closed": return "#222222";
+                    default: return "#222222";
+                }
             }
         }
 
@@ -48,26 +61,34 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
         {
             get
             {
-                if (Status == "Active") return "#FF4B4B";
-                if (Status == "Ack") return "#FFA500";
-                return "#AAAAAA";
+                switch (Status)
+                {
+                    case "New": return "#FF4B4B";
+                    case "In Progress": return "#FFC107";
+                    case "On Hold": return "#2196F3";
+                    case "Closed": return "#AAAAAA";
+                    default: return "#AAAAAA";
+                }
             }
         }
 
         public string BottomLineColor => IsLastItem ? "Transparent" : "#2A2B31";
     }
 
+    // 2. WIDGET CLASS
     public partial class LiveAlarmsFeedWidget : UserControl, IResizableWidget
     {
         private ResourceDictionary _currentThemeDictionary;
         private object _themeChangedRegistration;
         private bool _widgetEditMode;
-        public int MinCol => 3;
 
+        private ObservableCollection<AlarmItem> _alarmsList;
+        private object _newAlarmReceiver;
+
+        public int MinCol => 3;
         public int MinRow => 4;
 
         public Thumb ResizeThumb => this.InternalResizeThumb;
-
         public event EventHandler DeleteRequested;
 
         public LiveAlarmsFeedWidget()
@@ -75,39 +96,142 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
             ApplySmartClientLanguage(Thread.CurrentThread.CurrentUICulture.Name);
             InitializeComponent();
             ApplySmartClientTheme(ClientControl.Instance?.Theme);
+
             _themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
                 new MessageReceiver(OnThemeChanged),
                 new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
             DeleteButton.Visibility = Visibility.Collapsed;
 
-            // 2. NHÚNG TRỰC TIẾP FAKE DATA VÀO DATACONTEXT
-            this.DataContext = new List<AlarmItem>
+            // Dùng ObservableCollection để giao diện tự cập nhật khi có alarm mới
+            _alarmsList = new ObservableCollection<AlarmItem>();
+            this.DataContext = _alarmsList;
+
+            // Đăng ký sự kiện nạp/hủy dữ liệu
+            this.Loaded += LiveAlarmsFeedWidget_Loaded;
+            this.Unloaded += LiveAlarmsFeedWidget_Unloaded;
+        }
+
+        private void LiveAlarmsFeedWidget_Loaded(object sender, RoutedEventArgs e)
+        {
+            _alarmsList.Clear();
+            LoadHistoricalAlarms();
+
+            // Đăng ký nhận Alarm Live
+            if (_newAlarmReceiver == null)
             {
-                new AlarmItem { Location = "Entrance Gate", EventType = "Face Recognized", IdAndTime = "ALM-001 • 10:23:15", Status = "Active", IsHighPriority = true },
-                new AlarmItem { Location = "Parking Lot A", EventType = "Loitering Detected", IdAndTime = "ALM-002 • 10:18:42", Status = "Active", IsHighPriority = false },
-                new AlarmItem { Location = "Server Room", EventType = "Temperature Alert", IdAndTime = "ALM-003 • 10:12:08", Status = "Ack", IsHighPriority = false },
-                new AlarmItem { Location = "Warehouse Cam 02", EventType = "Connection Lost", IdAndTime = "ALM-004 • 10:05:33", Status = "Active", IsHighPriority = true },
-                new AlarmItem { Location = "Lobby", EventType = "Motion", IdAndTime = "ALM-005 • 09:58:17", Status = "Closed", IsHighPriority = false },
-                new AlarmItem { Location = "Loading Dock", EventType = "Object Left Behind", IdAndTime = "ALM-006 • 09:45:00", Status = "Active", IsHighPriority = false },
-                new AlarmItem { Location = "Perimeter Fence", EventType = "Line Crossing", IdAndTime = "ALM-007 • 09:30:22", Status = "Active", IsHighPriority = true },
-                new AlarmItem { Location = "Corridor B", EventType = "Behavior Alert", IdAndTime = "ALM-008 • 09:15:10", Status = "Ack", IsHighPriority = false, IsLastItem = false },
-                new AlarmItem { Location = "Main Entrance", EventType = "Unauthorized Person", IdAndTime = "ALM-009 • 09:10:05", Status = "Active", IsHighPriority = true },
-                new AlarmItem { Location = "IT Room Door", EventType = "Tailgating Detected", IdAndTime = "ALM-010 • 08:55:12", Status = "Active", IsHighPriority = true },
-                new AlarmItem { Location = "Backdoor Alley", EventType = "Intrusion", IdAndTime = "ALM-011 • 08:30:00", Status = "Closed", IsHighPriority = false },
-                new AlarmItem { Location = "Parking B", EventType = "Vehicle Wrong Way", IdAndTime = "ALM-012 • 08:15:22", Status = "Ack", IsHighPriority = false, IsLastItem = true }
+                _newAlarmReceiver = AlarmServices.RegisterForLiveAlarms(OnNewAlarmReceived);
+            }
+        }
+
+        private void LiveAlarmsFeedWidget_Unloaded(object sender, RoutedEventArgs e)
+        {
+            // Hủy đăng ký khi đóng Widget tránh rò rỉ bộ nhớ
+            if (_newAlarmReceiver != null)
+            {
+                AlarmServices.UnregisterLiveAlarms(_newAlarmReceiver);
+                _newAlarmReceiver = null;
+            }
+        }
+
+        private void LoadHistoricalAlarms()
+        {
+            List<Alarm> alarmList = AlarmServices.GetHistoricalAlarms(50); // Lấy 50 báo động gần nhất
+            if (alarmList == null || alarmList.Count == 0) return;
+
+            for (int i = 0; i < alarmList.Count; i++)
+            {
+                AlarmItem item = MapMilestoneAlarmToAlarmItem(alarmList[i]);
+                if (i == alarmList.Count - 1) item.IsLastItem = true;
+                _alarmsList.Add(item);
+            }
+        }
+
+        private void OnNewAlarmReceived(Alarm newAlarm)
+        {
+            if (newAlarm == null) return;
+
+            // Phải đẩy lên luồng UI
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                try
+                {
+                    AlarmItem item = MapMilestoneAlarmToAlarmItem(newAlarm);
+
+                    // Xử lý ẩn hiện dòng kẻ gạch dưới
+                    if (_alarmsList.Count == 0) item.IsLastItem = true;
+                    if (_alarmsList.Count > 0) _alarmsList.Last().IsLastItem = true;
+
+                    // Chèn báo động mới lên đầu danh sách
+                    _alarmsList.Insert(0, item);
+
+                    // Giữ lại tối đa 100 báo động trên UI để không bị nặng máy
+                    if (_alarmsList.Count > 100)
+                    {
+                        _alarmsList.RemoveAt(_alarmsList.Count - 1);
+                        if (_alarmsList.Count > 0) _alarmsList.Last().IsLastItem = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    EnvironmentManager.Instance.Log(false, "LightInsight Widget", "Update Live Alarm Error: " + ex.Message);
+                }
+            }));
+        }
+
+        private AlarmItem MapMilestoneAlarmToAlarmItem(Alarm alarm)
+        {
+            // Map State chuẩn
+            string statusText = "New";
+            switch (alarm.State)
+            {
+                case 1: statusText = "New"; break;
+                case 4: statusText = "In Progress"; break;
+                case 9: statusText = "On Hold"; break;
+                case 11: statusText = "Closed"; break;
+                default: statusText = alarm.StateName ?? "Unknown"; break;
+            }
+
+            // KHỞI TẠO CÁC BIẾN MẶC ĐỊNH
+            bool isHigh = false;
+            string camName = "Unknown Camera";
+            string eventMsg = "Unknown Event";
+            string alarmName = "Unknown Alarm";
+            DateTime time = DateTime.Now;
+
+            // BẮT BUỘC TRUY CẬP QUA EventHeader ĐỂ TRÁNH LỖI CS1061
+            if (alarm.EventHeader != null)
+            {
+                isHigh = alarm.EventHeader.Priority == 1;
+                camName = alarm.EventHeader.Source?.Name ?? "Unknown Camera";
+
+                // Thuộc tính Message thường chứa tên hiển thị của Báo động
+                eventMsg = alarm.EventHeader.Message ?? "Unknown Alarm";
+
+                alarmName = alarm.EventHeader.Name.ToString();
+                time = alarm.EventHeader.Timestamp.ToLocalTime();
+            }
+
+            return new AlarmItem
+            {
+                Location = camName,
+                EventType = eventMsg,
+                IdAndTime = $"{alarmName} • {time:dd/MM/yyyy HH:mm:ss}",
+                Status = statusText,
+                IsHighPriority = isHigh,
+                IsLastItem = false
             };
         }
+
+        // ========================================================
+        // CÁC HÀM CŨ XỬ LÝ THEME, NGÔN NGỮ, KÉO THẢ (KHÔNG THAY ĐỔI)
+        // ========================================================
         private void ApplySmartClientLanguage(string name)
         {
             var uri = name == "vi-VN"
                        ? "/LightInsight;component/Dashboard/Dashboard/Language/Vi.xaml"
                        : "/LightInsight;component/Dashboard/Dashboard/Language/English.xaml";
 
-            var dict = new ResourceDictionary
-            {
-                Source = new Uri(uri, UriKind.Relative)
-            };
-
+            var dict = new ResourceDictionary { Source = new Uri(uri, UriKind.Relative) };
             Resources.MergedDictionaries.Clear();
             Resources.MergedDictionaries.Add(dict);
         }

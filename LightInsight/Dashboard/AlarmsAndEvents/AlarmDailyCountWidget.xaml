@@ -108,7 +108,7 @@
                         </lvc:CartesianChart.AxisX>
 
                         <lvc:CartesianChart.AxisY>
-                            <lvc:Axis MinValue="0" MaxValue="60" Foreground="{DynamicResource TextPrimary}" FontSize="12">
+                            <lvc:Axis MinValue="0" Foreground="{DynamicResource TextPrimary}" FontSize="12">
                                 <lvc:Axis.Separator>
                                     <lvc:Separator Stroke="#333333" StrokeThickness="1" StrokeDashArray="4" />
                                 </lvc:Axis.Separator>
