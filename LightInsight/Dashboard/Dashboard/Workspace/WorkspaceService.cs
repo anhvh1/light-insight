@@ -30,18 +30,23 @@ namespace LightInsight.Dashboard.Dashboard.Workspace
         private bool _isLoaded = false;
         public void Load()
         {
-            if (_isLoaded && Workspaces != null)
-                return;
-
             var list = WorkspaceStorage.LoadWorkspaces();
-
             BuildTree(list);
-
             var roots = list.Where(x => string.IsNullOrEmpty(x.ParentId)).ToList();
 
-            Workspaces = new ObservableCollection<WorkspaceModel>(roots);
+            Workspaces.Clear();
+            foreach (var root in roots)
+            {
+                Workspaces.Add(root);
+            }
 
             _isLoaded = true;
+        }
+
+        public void Refresh()
+        {
+            _isLoaded = false;
+            Load();
         }
         private void BuildTree(List<WorkspaceModel> list)
         {
