@@ -7,7 +7,7 @@
              VerticalAlignment="Stretch"
              UseLayoutRounding="True"
              SnapsToDevicePixels="True">
-
+              
 	<UserControl.Resources>
 		<Style x:Key="TabButtonStyle" TargetType="RadioButton">
 			<Setter Property="Template">
