@@ -366,12 +366,15 @@ namespace LightInsight.Dashboard.Dashboard
 
 		private void Menu_Click(object sender, RoutedEventArgs e)
 		{
+			System.Diagnostics.Debug.WriteLine("Menu clicked");
 			var item = (sender as FrameworkElement)?.DataContext as WorkspaceModel;
 			if (item == null) return;
             if (item.IsGroup) { item.IsExpanded = !item.IsExpanded; return; }
-            DeselectAll(NavigationItems); item.IsSelected = true;
+			if (!ConfirmBeforeLeave()) return;
+			DeselectAll(NavigationItems); item.IsSelected = true;
             if (item.Type != null) { OpenDashboardByName(item.Name); }
             else { BreadcrumbText.Text = $"System > {item.DisplayTitle}"; }
+			ExitEditMode();
         }
 
         private void DeselectAll(IEnumerable<WorkspaceModel> items)
@@ -653,7 +656,30 @@ namespace LightInsight.Dashboard.Dashboard
 
 		private void ApplySmartClientLanguage(string name) { var uri = name == "vi-VN" ? "/LightInsight;component/Dashboard/Dashboard/Language/Vi.xaml" : "/LightInsight;component/Dashboard/Dashboard/Language/English.xaml"; var newDict = new ResourceDictionary { Source = new Uri(uri, UriKind.Relative) }; if (_currentLanguageDictionary != null) Resources.MergedDictionaries.Remove(_currentLanguageDictionary); Resources.MergedDictionaries.Add(newDict); _currentLanguageDictionary = newDict; RefreshMenuLocalization(); }
 
-        private bool ConfirmBeforeLeave() { return true; }
+		private bool ConfirmBeforeLeave()
+		{
+			if (!editMode || !_isDirty)
+				return true;
+
+			var result = MessageBox.Show(
+				"Bạn có muốn lưu chỉnh sửa không?",
+				"Xác nhận",
+				MessageBoxButton.YesNoCancel,
+				MessageBoxImage.Warning);
+
+			if (result == MessageBoxResult.Yes)
+			{
+				SaveBtn_Click(null, null);
+				return true;
+			}
+
+			if (result == MessageBoxResult.No)
+			{
+				return true;
+			}
+
+			return false; // Cancel
+		}
 
 		void SetFilePermissionForAllUsers(string filePath)
 		{
