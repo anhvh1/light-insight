@@ -83,5 +83,9 @@
     <!-- ===== Logo - chỉ dùng nền đỡ cho logo trắng ===== -->
     <SolidColorBrush x:Key="LogoPlateBg" Color="#FFFFFF"/>
     <ImageSource x:Key="CompanyLogo">/LightInsight;component/Dashboard/Asset/logo.png"</ImageSource>
+    
+    <!-- ===== ACCENT ===== -->
+    <SolidColorBrush x:Key="AccentColor" Color="#E8751A"/>
+    <SolidColorBrush x:Key="AccentHover" Color="#F2943B"/>
 
 </ResourceDictionary>

@@ -31,1503 +31,611 @@ using Microsoft.Identity.Client;
 using System.Configuration;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using MahApps.Metro.IconPacks;
 
 
 namespace LightInsight.Dashboard.Dashboard
 {
-    /// <summary>
-    /// Interaction logic for DashboardView.xaml
-    /// </summary>
     public partial class DashboardView : UserControl, INotifyPropertyChanged
     {
-        private object _languageChangedRegistration;
         private ResourceDictionary _currentThemeDictionary;
+        private ResourceDictionary _currentLanguageDictionary;
         private object _themeChangedRegistration;
         bool editMode = false;
         private bool _isDirty = false;
         private Point startPoint;
-        Button currentMenu = null;
-        string currentDashboard = "Default Workspace";
-        private bool _isSidebarCollapsed = false;
+
+        public static readonly DependencyProperty CurrentDashboardProperty =
+            DependencyProperty.Register("CurrentDashboard", typeof(string), typeof(DashboardView), new PropertyMetadata("Default Workspace"));
+
+        public string CurrentDashboard
+        {
+            get { return (string)GetValue(CurrentDashboardProperty); }
+            set { SetValue(CurrentDashboardProperty, value); }
+        }
+
+        public static readonly DependencyProperty IsSidebarCollapsedProperty =
+            DependencyProperty.Register("IsSidebarCollapsed", typeof(bool), typeof(DashboardView), new PropertyMetadata(false));
+
         public bool IsSidebarCollapsed
         {
-            get => _isSidebarCollapsed;
-            set
-            {
-                _isSidebarCollapsed = value;
-                OnPropertyChanged(nameof(IsSidebarCollapsed));
-            }
-        }
-
-        private CancellationTokenSource _popupCloseCancellation;
-
-        private async void Expander_MouseEnter(object sender, MouseEventArgs e)
-        {
-            if (!IsSidebarCollapsed) return;
-
-            // Hủy lệnh đóng đang chờ (nếu có)
-            _popupCloseCancellation?.Cancel();
-            SubMenuPopup.IsOpen = true;
-        }
-
-        private async void Expander_MouseLeave(object sender, MouseEventArgs e)
-        {
-            if (!IsSidebarCollapsed) return;
-
-            // Bắt đầu đếm ngược 300ms trước khi đóng
-            _popupCloseCancellation?.Cancel();
-            _popupCloseCancellation = new CancellationTokenSource();
-            var token = _popupCloseCancellation.Token;
-
-            try
-            {
-                await Task.Delay(300, token);
-                if (!token.IsCancellationRequested)
-                {
-                    // Kiểm tra lại lần cuối xem chuột có đang nằm trên Popup không
-                    if (!SubMenuPopup.IsMouseOver && !DashboardExpander.IsMouseOver)
-                    {
-                        SubMenuPopup.IsOpen = false;
-                    }
-                }
-            }
-            catch (TaskCanceledException) { }
-        }
-
-        private void Popup_MouseEnter(object sender, MouseEventArgs e)
-        {
-            _popupCloseCancellation?.Cancel();
-        }
-
-        private void Popup_MouseLeave(object sender, MouseEventArgs e)
-        {
-            Expander_MouseLeave(sender, e);
+            get { return (bool)GetValue(IsSidebarCollapsedProperty); }
+            set { SetValue(IsSidebarCollapsedProperty, value); }
         }
 
         FrameworkElement selectedWidget = null;
         bool isDraggingWidget = false;
-        bool isDark = true;
-        string currentFilter = null;
-        //public ObservableCollection<WorkspaceModel> DashboardMenus { get; set; }
+        private Point _clickOffset;
         public event PropertyChangedEventHandler PropertyChanged;
 
 		void OnPropertyChanged(string name)
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 		}
-		private ObservableCollection<WorkspaceModel> _dashboardMenus;
-		public ObservableCollection<WorkspaceModel> DashboardMenus
+
+        private ObservableCollection<WorkspaceModel> _navigationItems = new ObservableCollection<WorkspaceModel>();
+        public ObservableCollection<WorkspaceModel> NavigationItems
+        {
+            get => _navigationItems;
+            set { _navigationItems = value; OnPropertyChanged(nameof(NavigationItems)); }
+        }
+
+        #region MENU LOGIC
+        private void LoadUnifiedMenu()
+        {
+            var allWorkspaces = WorkspaceService.Instance.Workspaces;
+            var systemMenus = GetStaticSystemMenus();
+            var systemTree = BuildTree(systemMenus); // Build tree ONLY for system menus
+            
+            var combined = allWorkspaces.Concat(systemTree).ToList();
+            NavigationItems = new ObservableCollection<WorkspaceModel>(combined);
+        }
+
+        private List<WorkspaceModel> BuildTree(List<WorkspaceModel> flatList)
+        {
+            foreach (var item in flatList) item.Children.Clear();
+            var itemMap = flatList.ToDictionary(x => x.Id);
+            var rootNodes = new List<WorkspaceModel>();
+
+            foreach (var item in flatList)
+            {
+                if (string.IsNullOrEmpty(item.ParentId) || !itemMap.ContainsKey(item.ParentId))
+                {
+                    rootNodes.Add(item);
+                }
+                else
+                {
+                    if (itemMap.ContainsKey(item.ParentId))
+                    {
+                        var parent = itemMap[item.ParentId];
+                        parent.Children.Add(item);
+                        parent.IsGroup = true;
+                    }
+                    else
+                    {
+                        rootNodes.Add(item);
+                    }
+                }
+            }
+            return rootNodes;
+        }
+
+        private List<WorkspaceModel> GetStaticSystemMenus()
+        {
+            var list = new List<WorkspaceModel>();
+
+            // 1. Camera
+            list.Add(new WorkspaceModel { Id = "sys-cam", Name = "Camera", Icon = PackIconMaterialKind.Camera, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "cam-inv", Name = "Inventory", Icon = PackIconMaterialKind.FormatListBulleted, ParentId = "sys-cam", Path = "/camera/inventory", Type = null });
+            list.Add(new WorkspaceModel { Id = "cam-store", Name = "Storage", Icon = PackIconMaterialKind.Database, ParentId = "sys-cam", Path = "/camera/storage", Type = null });
+            list.Add(new WorkspaceModel { Id = "cam-health", Name = "Health", Icon = PackIconMaterialKind.HeartPulse, ParentId = "sys-cam", Path = "/camera/health", Type = null });
+
+            // 2. Recording Server
+            list.Add(new WorkspaceModel { Id = "sys-srv", Name = "Recording Server", Icon = PackIconMaterialKind.Server, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "srv-det", Name = "Details", Icon = PackIconMaterialKind.Information, ParentId = "sys-srv", Path = "/recording-server/details", Type = null });
+            list.Add(new WorkspaceModel { Id = "srv-store", Name = "Storage", Icon = PackIconMaterialKind.DatabaseOutline, ParentId = "sys-srv", Path = "/recording-server/storage", Type = null });
+            list.Add(new WorkspaceModel { Id = "srv-health", Name = "Health", Icon = PackIconMaterialKind.HeartPulse, ParentId = "sys-srv", Path = "/recording-server/health", Type = null });
+
+            // 3. Monitoring
+            list.Add(new WorkspaceModel { Id = "sys-mon", Name = "Monitoring", Icon = PackIconMaterialKind.Monitor, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "mon-live", Name = "Live View", Icon = PackIconMaterialKind.PlayCircle, ParentId = "sys-mon", Path = "/monitoring/live", Type = null });
+            list.Add(new WorkspaceModel { Id = "mon-play", Name = "Playback", Icon = PackIconMaterialKind.History, ParentId = "sys-mon", Path = "/monitoring/playback", Type = null });
+
+            // 4. Alarm Details
+            list.Add(new WorkspaceModel { Id = "sys-alm", Name = "Alarm Details", Icon = PackIconMaterialKind.Bell, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "alm-det", Name = "Details", Icon = PackIconMaterialKind.InformationOutline, ParentId = "sys-alm", Path = "/alarms/details", Type = null });
+            list.Add(new WorkspaceModel { Id = "alm-day", Name = "Daily Count", Icon = PackIconMaterialKind.ChartBar, ParentId = "sys-alm", Path = "/alarms/daily-count", Type = null });
+            list.Add(new WorkspaceModel { Id = "alm-src", Name = "Daily Count by Source", Icon = PackIconMaterialKind.SourceBranch, ParentId = "sys-alm", Path = "/alarms/source-count", Type = null });
+
+            // 5. Trends
+            list.Add(new WorkspaceModel { Id = "sys-trd", Name = "Trends", Icon = PackIconMaterialKind.TrendingUp, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "trd-alm", Name = "Alarms", Icon = PackIconMaterialKind.BellAlert, ParentId = "sys-trd", Path = "/trends/alarms", Type = null });
+            list.Add(new WorkspaceModel { Id = "trd-cam", Name = "Cameras", Icon = PackIconMaterialKind.Camera, ParentId = "sys-trd", Path = "/trends/cameras", Type = null });
+
+            // 6. Access Control
+            list.Add(new WorkspaceModel { Id = "sys-acs", Name = "Access Control", Icon = PackIconMaterialKind.Lock, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "acs-stat", Name = "Item Status", Icon = PackIconMaterialKind.ListStatus, ParentId = "sys-acs", Path = "/acs/status", Type = null });
+            list.Add(new WorkspaceModel { Id = "acs-alm", Name = "ACS Alarms", Icon = PackIconMaterialKind.ShieldAlert, ParentId = "sys-acs", Path = "/acs/alarms", Type = null });
+            list.Add(new WorkspaceModel { Id = "acs-evt", Name = "ACS Events", Icon = PackIconMaterialKind.CalendarText, ParentId = "sys-acs", Path = "/acs/events", Type = null });
+            list.Add(new WorkspaceModel { Id = "acs-card", Name = "Cardholders", Icon = PackIconMaterialKind.AccountGroup, ParentId = "sys-acs", Path = "/acs/cardholders", Type = null });
+
+            // 7. IoT
+            list.Add(new WorkspaceModel { Id = "sys-iot", Name = "IoT", Icon = PackIconMaterialKind.AccessPoint, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "iot-sen", Name = "Sensors", Icon = PackIconMaterialKind.Leak, ParentId = "sys-iot", Path = "/iot/sensors", Type = null });
+            list.Add(new WorkspaceModel { Id = "iot-dash", Name = "IoT Dashboard", Icon = PackIconMaterialKind.ViewDashboard, ParentId = "sys-iot", Path = "/iot/dashboard", Type = null });
+            list.Add(new WorkspaceModel { Id = "iot-alt", Name = "Alerts", Icon = PackIconMaterialKind.AlertDecagram, ParentId = "sys-iot", Path = "/iot/alerts", Type = null });
+
+            // 8. Reporting
+            list.Add(new WorkspaceModel { Id = "sys-rep", Name = "Reporting", Icon = PackIconMaterialKind.FileDocument, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "rep-list", Name = "Reports", Icon = PackIconMaterialKind.FileChart, ParentId = "sys-rep", Path = "/reporting/reports", Type = null });
+            list.Add(new WorkspaceModel { Id = "rep-sch", Name = "Scheduled", Icon = PackIconMaterialKind.Clock, ParentId = "sys-rep", Path = "/reporting/scheduled", Type = null });
+
+            // 9. Notifications
+            list.Add(new WorkspaceModel { Id = "sys-not", Name = "Notifications", Icon = PackIconMaterialKind.BellRing, Path = "/notifications", Type = null });
+
+            // 10. Settings
+            list.Add(new WorkspaceModel { Id = "sys-set", Name = "Settings", Icon = PackIconMaterialKind.Cog, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "set-br", Name = "Branding", Icon = PackIconMaterialKind.Palette, ParentId = "sys-set", Path = "/settings/branding", Type = null });
+            list.Add(new WorkspaceModel { Id = "set-not", Name = "Notification", Icon = PackIconMaterialKind.EmailOutline, ParentId = "sys-set", Path = "/settings/notification", Type = null });
+            list.Add(new WorkspaceModel { Id = "set-wea", Name = "Weather", Icon = PackIconMaterialKind.WeatherPartlyCloudy, ParentId = "sys-set", Path = "/settings/weather", Type = null });
+            list.Add(new WorkspaceModel { Id = "set-iot", Name = "IoT", Icon = PackIconMaterialKind.AccessPointNetwork, ParentId = "sys-set", Path = "/settings/iot", Type = null });
+            list.Add(new WorkspaceModel { Id = "set-rep", Name = "Reporting", Icon = PackIconMaterialKind.FileTable, ParentId = "sys-set", Path = "/settings/reporting", Type = null });
+            list.Add(new WorkspaceModel { Id = "set-rol", Name = "Roles", Icon = PackIconMaterialKind.AccountKey, ParentId = "sys-set", Path = "/settings/roles", Type = null });
+            list.Add(new WorkspaceModel { Id = "set-lic", Name = "License Info", Icon = PackIconMaterialKind.Key, ParentId = "sys-set", Path = "/settings/license", Type = null });
+            list.Add(new WorkspaceModel { Id = "set-db", Name = "Database Statistics", Icon = PackIconMaterialKind.DatabaseSettings, ParentId = "sys-set", Path = "/settings/database", Type = null });
+
+            // 11. Help
+            list.Add(new WorkspaceModel { Id = "sys-hlp", Name = "Help", Icon = PackIconMaterialKind.HelpCircle, IsGroup = true, Type = null });
+            list.Add(new WorkspaceModel { Id = "hlp-ws", Name = "Workspace", Icon = PackIconMaterialKind.Briefcase, ParentId = "sys-hlp", Path = "/help/workspace", Type = null });
+            list.Add(new WorkspaceModel { Id = "hlp-rep", Name = "Reporting", Icon = PackIconMaterialKind.Information, ParentId = "sys-hlp", Path = "/help/reporting", Type = null });
+
+            return list;
+        }
+
+        private void RefreshMenuLocalization()
+        {
+            if (NavigationItems != null) foreach (var item in NavigationItems) item.RefreshLocalization();
+        }
+        #endregion
+
+        #region DASHBOARD ENGINE
+		private ObservableCollection<WidgetGroup> _widgetGroups = new ObservableCollection<WidgetGroup>();
+		public ObservableCollection<WidgetGroup> WidgetGroups
 		{
-			get => _dashboardMenus;
-			set
-			{
-				_dashboardMenus = value;
-				OnPropertyChanged(nameof(DashboardMenus));
-			}
+			get => _widgetGroups;
+			set { _widgetGroups = value; OnPropertyChanged(nameof(WidgetGroups)); }
 		}
-		// khai báo widget mẫu để hiển thị trong thư viện widget library
+
 		List<WidgetItem> allWidgets = new List<WidgetItem>()
 		{
-			new WidgetItem{ Name="Camera Online Count", Category="KPI", WidgetType = typeof(CameraOnlineWidget)},
-			new WidgetItem{ Name="Camera Offline Count", Category="KPI",WidgetType = typeof(CameraOfflineWidget)},
-			new WidgetItem{ Name="Camera Total Count", Category="KPI",WidgetType = typeof(TotalCameraCount)},
-			new WidgetItem{ Name="Camera Online + Offline", Category="KPI",WidgetType = typeof(CameraOnlineNOffline)},
-			new WidgetItem{ Name="Camera Status Donut", Category="Charts",WidgetType = typeof(CameraStatusDonut)},
-			new WidgetItem{ Name="Camera Offline Duration top 10", Category="Tables",WidgetType = typeof(CameraOfflineDurationTop10)},
-			new WidgetItem{ Name="Camera Disconnection Trend", Category="Tables",WidgetType = typeof(CameraDisconnectionTrend)},
-			new WidgetItem{ Name="Camera Analytics Summary",WidgetType = typeof(CameraAnalyticsSummaryWidget)},
-			new WidgetItem{ Name="Camera List",WidgetType = typeof(CameraListWidget)},
-			new WidgetItem{ Name="Camera Health Score",WidgetType = typeof(CameraHealthScoreWidget)},
+			new WidgetItem{ Name="Camera Online Count", Category="Camera", Description="Cameras online", WidgetType = typeof(CameraOnlineWidget), Icon = PackIconMaterialKind.Camera},
+			new WidgetItem{ Name="Camera Offline Count", Category="Camera", Description="Cameras offline", WidgetType = typeof(CameraOfflineWidget), Icon = PackIconMaterialKind.CameraOff},
+			new WidgetItem{ Name="Camera Total Count", Category="Camera", Description="Total cameras", WidgetType = typeof(TotalCameraCount), Icon = PackIconMaterialKind.Video},
+			new WidgetItem{ Name="Camera Online + Offline", Category="Camera", Description="Online and offline summary", WidgetType = typeof(CameraOnlineNOffline), Icon = PackIconMaterialKind.VideoOutline},
+			new WidgetItem{ Name="Camera Status Donut", Category="Camera", Description="Camera status distribution", WidgetType = typeof(CameraStatusDonut), Icon = PackIconMaterialKind.ChartDonut},
+			new WidgetItem{ Name="Camera Offline Duration top 10", Category="Camera", Description="Top 10 longest disconnections", WidgetType = typeof(CameraOfflineDurationTop10), Icon = PackIconMaterialKind.Table},
+			new WidgetItem{ Name="Camera Disconnection Trend", Category="Camera", Description="Trend of disconnected cameras", WidgetType = typeof(CameraDisconnectionTrend), Icon = PackIconMaterialKind.ChartLine},
+			new WidgetItem{ Name="Camera Analytics Summary", Category="Camera", Description="Analytics events summary", WidgetType = typeof(CameraAnalyticsSummaryWidget), Icon = PackIconMaterialKind.GoogleAnalytics},
+			new WidgetItem{ Name="Camera List", Category="Camera", Description="Detailed camera inventory", WidgetType = typeof(CameraListWidget), Icon = PackIconMaterialKind.FormatListBulleted},
+			new WidgetItem{ Name="Camera Health Score", Category="Camera", Description="Health metrics overview", WidgetType = typeof(CameraHealthScoreWidget), Icon = PackIconMaterialKind.HeartPulse},
+			new WidgetItem{ Name="Live Alarm Feed", Category="Alarms & Events", Description="Recent alarm activity", WidgetType = typeof(LiveAlarmsFeedWidget), Icon = PackIconMaterialKind.BellRing},
+			new WidgetItem{ Name="Alarm by Severity", Category="Alarms & Events", Description="Alarms grouped by severity", WidgetType = typeof(AlarmBySeverityWidget), Icon = PackIconMaterialKind.ChartPie},
+			new WidgetItem{ Name="Alarm Daily Count", Category="Alarms & Events", Description="Alarm trend by day", WidgetType = typeof(AlarmDailyCountWidget), Icon = PackIconMaterialKind.ChartBar},
+			new WidgetItem{ Name="Alarm by Source", Category="Alarms & Events", Description="Alarms by source device", WidgetType = typeof(AlarmBySourceWidget), Icon = PackIconMaterialKind.SourceBranch},
+			new WidgetItem{ Name="Alarm by Type", Category="Alarms & Events", Description="Alarms by category", WidgetType = typeof(AlarmByTypeWidget), Icon = PackIconMaterialKind.Shape},
+			new WidgetItem{ Name="Alarm SLA Breach", Category="Alarms & Events", Description="SLA compliance status", WidgetType = typeof(AlarmSLABreachWidget), Icon = PackIconMaterialKind.ClockAlert},
+			new WidgetItem{ Name="Event Trend Chart", Category="Alarms & Events", Description="Events frequency trend", WidgetType = typeof(EventTrendChartWidget), Icon = PackIconMaterialKind.ChartTimelineVariant},
+            new WidgetItem{ Name="Servers Online Count", Category="Recording Server", Description="Servers online", WidgetType = typeof(ServersOnlineCountWidget), Icon = PackIconMaterialKind.Server},
+            new WidgetItem{ Name="Servers Offline Count", Category="Recording Server", Description="Servers offline", WidgetType = typeof(ServersOfflineCountWidget), Icon = PackIconMaterialKind.ServerOff},
+            new WidgetItem{ Name="Servers Total", Category="Recording Server", Description="Total recording servers", WidgetType = typeof(TotalServersWidget), Icon = PackIconMaterialKind.ServerNetwork},
+            new WidgetItem{ Name="Storage Usage by Server", Category="Recording Server", Description="Storage utilization", WidgetType = typeof(StorageUsageWidget), Icon = PackIconMaterialKind.Database},
+		};
 
-			new WidgetItem{ Name="Live Alarm Feed", Category="Lists", WidgetType = typeof(LiveAlarmsFeedWidget)},
-			new WidgetItem{ Name="Alarm by Severity", Category="Charts", WidgetType = typeof(AlarmBySeverityWidget)},
-			new WidgetItem{ Name="Alarm Daily Count", Category="Charts", WidgetType = typeof(AlarmDailyCountWidget)},
-			new WidgetItem{ Name="Alarm by Source", Category="Charts", WidgetType = typeof(AlarmBySourceWidget)},
-			new WidgetItem{ Name="Alarm by Type", Category="Charts", WidgetType = typeof(AlarmByTypeWidget)},
-			new WidgetItem{ Name="Alarm SLA Breach", Category="KPI", WidgetType = typeof(AlarmSLABreachWidget)},
-			new WidgetItem{ Name="Event Trend Chart", Category="Charts", WidgetType = typeof(EventTrendChartWidget)},
-
-
-            new WidgetItem{ Name="Servers Online Count", Category="KPI", WidgetType = typeof(ServersOnlineCountWidget)},
-            new WidgetItem{ Name="Servers Offline Count", Category="KPI",WidgetType = typeof(ServersOfflineCountWidget)},
-            new WidgetItem{ Name="Servers Total", Category="KPI",WidgetType = typeof(TotalServersWidget)},
-            new WidgetItem{ Name="Storage Usage by Server", Category="KPI",WidgetType = typeof(StorageUsageWidget)},
-            new WidgetItem{ Name="Template", Category="Tables",WidgetType = typeof(Temp)},
-        };
         public DashboardView()
         {
             InitializeComponent();
+            this.DataContext = this;
             TimeRangeCombo.SelectedIndex = 0;
-            LocalizeWidgetNames();
-            LoadSidebar();
-            // nạp dữ liệu ngôn ngữ
             ApplySmartClientLanguage(Thread.CurrentThread.CurrentUICulture.Name);
-
+            LocalizeWidgetNames();
+            
             WorkspaceService.Instance.OnWorkspaceChanged += () =>
             {
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    LoadSidebar();
-                });
+                Application.Current.Dispatcher.Invoke(() => { LoadUnifiedMenu(); });
             };
-            // nạp theme hiện tại ngay lúc mở
+            
             ApplySmartClientTheme(ClientControl.Instance?.Theme);
-            // đăng ký nghe sự kiện đổi theme
             _themeChangedRegistration = EnvironmentManager.Instance.RegisterReceiver(
                 new MessageReceiver(OnThemeChanged),
                 new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
-            WidgetList.ItemsSource = allWidgets;
+            
+            UpdateWidgetGroups();
             EnsureDashboardFile();
+            LoadUnifiedMenu();
 
-            // Thiết lập Dashboard mặc định ban đầu nếu có danh sách menu
-            if (DashboardMenus != null && DashboardMenus.Any())
-            {
-                currentDashboard = DashboardMenus[0].Name;
-                BreadcrumbText.Text = $"Dashboard > {currentDashboard}";
-            }
-
-            // đọc lại dữ liệu widget đang có
+            var firstDb = NavigationItems.FirstOrDefault(x => x.Id == "ROOT_DASHBOARD")?.Children.FirstOrDefault();
+            if (firstDb != null) { firstDb.IsSelected = true; CurrentDashboard = firstDb.Name; BreadcrumbText.Text = $"Dashboard > {firstDb.DisplayTitle}"; }
+            
             LoadLayout();
-
         }
+
         private void LocalizeWidgetNames()
         {
-            string GetText(string key, string fallback)
-            {
-                return TryFindResource(key) as string ?? fallback;
-            }
-
+            string GetText(string key, string fallback) { return TryFindResource(key) as string ?? fallback; }
 			foreach (var w in allWidgets)
 			{
-				if (w.WidgetType == typeof(CameraOnlineWidget))
-					w.Name = GetText("WidgetName_CameraOnlineCount", w.Name);
-				else if (w.WidgetType == typeof(CameraOfflineWidget))
-					w.Name = GetText("WidgetName_CameraOfflineCount", w.Name);
-				else if (w.WidgetType == typeof(TotalCameraCount))
-					w.Name = GetText("WidgetName_CameraTotalCount", w.Name);
-				else if (w.WidgetType == typeof(CameraOnlineNOffline))
-					w.Name = GetText("WidgetName_CameraOnlinePlusOffline", w.Name);
-				else if (w.WidgetType == typeof(CameraStatusDonut))
-					w.Name = GetText("WidgetName_CameraStatusDonut", w.Name);
-				else if (w.WidgetType == typeof(CameraOfflineDurationTop10))
-					w.Name = GetText("WidgetName_CameraOfflineDurationTop10", w.Name);
-				else if (w.WidgetType == typeof(CameraDisconnectionTrend))
-					w.Name = GetText("WidgetName_CameraDisconnectionTrend", w.Name);
-				else if (w.WidgetType == typeof(CameraAnalyticsSummaryWidget))
-					w.Name = GetText("WidgetName_CameraAnalyticsSummary", w.Name);
-				else if (w.WidgetType == typeof(CameraListWidget))
-					w.Name = GetText("WidgetName_CameraList", w.Name);
-				else if (w.WidgetType == typeof(CameraHealthScoreWidget))
-					w.Name = GetText("WidgetName_CameraHealthScore", w.Name);
-				else if (w.WidgetType == typeof(LiveAlarmsFeedWidget))
-					w.Name = GetText("WidgetName_LiveAlarmFeed", w.Name);
-				else if (w.WidgetType == typeof(AlarmBySeverityWidget))
-					w.Name = GetText("WidgetName_AlarmBySeverity", w.Name);
-				else if (w.WidgetType == typeof(AlarmDailyCountWidget))
-					w.Name = GetText("WidgetName_AlarmDailyCount", w.Name);
-				else if (w.WidgetType == typeof(AlarmBySourceWidget))
-					w.Name = GetText("WidgetName_AlarmBySource", w.Name);
-				else if (w.WidgetType == typeof(AlarmByTypeWidget))
-					w.Name = GetText("WidgetName_AlarmByType", w.Name);
-				else if (w.WidgetType == typeof(AlarmSLABreachWidget))
-					w.Name = GetText("WidgetName_AlarmSLABreach", w.Name);
-				else if (w.WidgetType == typeof(EventTrendChartWidget))
-					w.Name = GetText("WidgetName_EventTrendChart", w.Name);
-				else if (w.WidgetType == typeof(ServersOnlineCountWidget))
-					w.Name = GetText("WidgetName_ServersOnlineCount", w.Name);
-				else if (w.WidgetType == typeof(ServersOfflineCountWidget))
-					w.Name = GetText("WidgetName_ServersOfflineCount", w.Name);
-				else if (w.WidgetType == typeof(TotalServersWidget))
-					w.Name = GetText("WidgetName_ServersTotal", w.Name);
-				else if (w.WidgetType == typeof(StorageUsageWidget))
-					w.Name = GetText("WidgetName_StorageUsageByServer", w.Name);
-				else if (w.WidgetType == typeof(Temp))
-					w.Name = GetText("WidgetName_Template", w.Name);
+				if (w.WidgetType == typeof(CameraOnlineWidget)) w.Name = GetText("WidgetName_CameraOnlineCount", w.Name);
+				else if (w.WidgetType == typeof(CameraOfflineWidget)) w.Name = GetText("WidgetName_CameraOfflineCount", w.Name);
+				else if (w.WidgetType == typeof(TotalCameraCount)) w.Name = GetText("WidgetName_CameraTotalCount", w.Name);
+				else if (w.WidgetType == typeof(CameraOnlineNOffline)) w.Name = GetText("WidgetName_CameraOnlinePlusOffline", w.Name);
+				else if (w.WidgetType == typeof(CameraStatusDonut)) w.Name = GetText("WidgetName_CameraStatusDonut", w.Name);
+				else if (w.WidgetType == typeof(CameraOfflineDurationTop10)) w.Name = GetText("WidgetName_CameraOfflineDurationTop10", w.Name);
+				else if (w.WidgetType == typeof(CameraDisconnectionTrend)) w.Name = GetText("WidgetName_CameraDisconnectionTrend", w.Name);
+				else if (w.WidgetType == typeof(CameraAnalyticsSummaryWidget)) w.Name = GetText("WidgetName_CameraAnalyticsSummary", w.Name);
+				else if (w.WidgetType == typeof(CameraListWidget)) w.Name = GetText("WidgetName_CameraList", w.Name);
+				else if (w.WidgetType == typeof(CameraHealthScoreWidget)) w.Name = GetText("WidgetName_CameraHealthScore", w.Name);
+				else if (w.WidgetType == typeof(LiveAlarmsFeedWidget)) w.Name = GetText("WidgetName_LiveAlarmFeed", w.Name);
+				else if (w.WidgetType == typeof(AlarmBySeverityWidget)) w.Name = GetText("WidgetName_AlarmBySeverity", w.Name);
+				else if (w.WidgetType == typeof(AlarmDailyCountWidget)) w.Name = GetText("WidgetName_AlarmDailyCount", w.Name);
+				else if (w.WidgetType == typeof(AlarmBySourceWidget)) w.Name = GetText("WidgetName_AlarmBySource", w.Name);
+				else if (w.WidgetType == typeof(AlarmByTypeWidget)) w.Name = GetText("WidgetName_AlarmByType", w.Name);
+				else if (w.WidgetType == typeof(AlarmSLABreachWidget)) w.Name = GetText("WidgetName_AlarmSLABreach", w.Name);
+				else if (w.WidgetType == typeof(EventTrendChartWidget)) w.Name = GetText("WidgetName_EventTrendChart", w.Name);
+				else if (w.WidgetType == typeof(ServersOnlineCountWidget)) w.Name = GetText("WidgetName_ServersOnlineCount", w.Name);
+				else if (w.WidgetType == typeof(ServersOfflineCountWidget)) w.Name = GetText("WidgetName_ServersOfflineCount", w.Name);
+				else if (w.WidgetType == typeof(TotalServersWidget)) w.Name = GetText("WidgetName_ServersTotal", w.Name);
+				else if (w.WidgetType == typeof(StorageUsageWidget)) w.Name = GetText("WidgetName_StorageUsageByServer", w.Name);
 			}
 		}
-		//private (int colSpan, int rowSpan) CalculateWidgetSpan(FrameworkElement widget)
-		//{
-		//    double cellWidth = DashboardGrid.ActualWidth / 12;
-		//    double cellHeight = 80;
-
-		//    double widgetWidth = widget.Width;
-		//    double widgetHeight = widget.Height;
-
-		//    int colSpan = (int)Math.Round(widgetWidth / cellWidth);
-		//    int rowSpan = (int)Math.Ceiling(widgetHeight / cellHeight);
-
-		//    if (colSpan < 1) colSpan = 1;
-		//    if (rowSpan < 1) rowSpan = 1;
-
-		//    return (colSpan, rowSpan);
-		//}
 
 		private (int colSpan, int rowSpan) CalculateWidgetSpan(FrameworkElement widget)
 		{
-			// Đọc cấu hình từ Tag (ví dụ "2x2", "4x3")
 			string config = widget.Tag as string;
-
 			if (!string.IsNullOrEmpty(config) && config.Contains("x"))
 			{
 				var parts = config.Split('x');
 				if (parts.Length == 2)
 				{
-					int cols = int.Parse(parts[0]);
-					int rows = int.Parse(parts[1]);
-					return (cols, rows);
+					if (int.TryParse(parts[0], out int cols) && int.TryParse(parts[1], out int rows))
+						return (cols, rows);
 				}
 			}
-
-			return (2, 2); // Mặc định nếu không có cấu hình
+			return (2, 2);
 		}
-		private void Filter_Click(object sender, RoutedEventArgs e)
-		{
-			ToggleButton clickedBtn = sender as ToggleButton;
 
-			// lấy tất cả ToggleButton trong container (StackPanel chứa filter)
-			var buttons = FilterPanel.Children.OfType<ToggleButton>();
-
-			// nếu button vừa click đang bật -> tắt các button khác
-			if (clickedBtn.IsChecked == true)
-			{
-				foreach (var btn in buttons)
-				{
-					if (btn != clickedBtn)
-						btn.IsChecked = false;
-				}
-			}
-
-			// tìm button đang được chọn
-			var activeBtn = buttons.FirstOrDefault(b => b.IsChecked == true);
-
-			if (activeBtn == null)
-			{
-				// không có filter nào -> show tất cả
-				WidgetList.ItemsSource = allWidgets;
-			}
-			else
-			{
-				string filter = activeBtn.Tag.ToString();
-
-				var result = allWidgets
-					.Where(x => x.Category == filter)
-					.ToList();
-
-				WidgetList.ItemsSource = result;
-			}
-		}
 		private void AddWidget_Click(object sender, RoutedEventArgs e)
 		{
-			Button btn = sender as Button;
-			WidgetItem widget = btn.Tag as WidgetItem;
-
-			if (widget == null)
-				return;
-
-			FrameworkElement newWidget =
-				Activator.CreateInstance(widget.WidgetType) as FrameworkElement;
-
-			if (newWidget == null)
-				return;
-			bool exists = DashboardGrid.Children
-				.OfType<FrameworkElement>()
-				.Any(x => x.GetType() == widget.WidgetType);
-
-			if (exists)
-			{
-				MessageBox.Show("Widget này đã tồn tại trên dashboard!");
-				return;
-			}
-
+			Button btn = sender as Button; WidgetItem widget = btn.Tag as WidgetItem;
+			if (widget == null) return;
+			FrameworkElement newWidget = Activator.CreateInstance(widget.WidgetType) as FrameworkElement;
+			if (newWidget == null) return;
+			if (IsWidgetAdded(widget.WidgetType)) { MessageBox.Show("Widget này đã tồn tại!"); return; }
 			SetupWidget(newWidget);
-
-
 			var span = CalculateWidgetSpan(newWidget);
 			var pos = FindFreePosition(span.rowSpan, span.colSpan);
-
 			EnsureRow(pos.Row + span.rowSpan);
-
-			Grid.SetRow(newWidget, pos.Row);
-			Grid.SetColumn(newWidget, pos.Column);
-
-			Grid.SetColumnSpan(newWidget, span.colSpan);
-			Grid.SetRowSpan(newWidget, span.rowSpan);
-
-			DashboardGrid.Children.Add(newWidget);
+			Grid.SetRow(newWidget, pos.Row); Grid.SetColumn(newWidget, pos.Column);
+			Grid.SetColumnSpan(newWidget, span.colSpan); Grid.SetRowSpan(newWidget, span.rowSpan);
+			DashboardGrid.Children.Add(newWidget); _isDirty = true;
 		}
+
+		private void ExitEditModeBtn_Click(object sender, RoutedEventArgs e) { ExitEditMode(); }
+
+		private void ExitEditMode()
+		{
+			WidgetLibraryColumn.Width = new GridLength(0); GridOverlay.Visibility = Visibility.Collapsed; WidgetLibrary.Visibility = Visibility.Collapsed;
+			EditLayoutBtn.Visibility = Visibility.Visible; SaveBtn.Visibility = Visibility.Collapsed; CancelBtn.Visibility = Visibility.Collapsed;
+			foreach (var widget in DashboardGrid.Children.OfType<IDashboardWidget>()) { widget.SetEditMode(false); }
+			TrimEmptyRows(); editMode = false; GridOverlay.Children.Clear();
+		}
+
 		private (int Row, int Column) FindFreePosition(int rowSpan, int colSpan)
 		{
-			int maxCols = 12;
-
-			HashSet<string> used = new HashSet<string>();
-
+			int maxCols = 12; HashSet<string> used = new HashSet<string>();
 			foreach (UIElement child in DashboardGrid.Children)
 			{
-				int r = Grid.GetRow(child);
-				int c = Grid.GetColumn(child);
-				int rs = Grid.GetRowSpan(child);
-				int cs = Grid.GetColumnSpan(child);
-
-				for (int i = r; i < r + rs; i++)
-				{
-					for (int j = c; j < c + cs; j++)
-					{
-						used.Add($"{i}-{j}");
-					}
-				}
+				int r = Grid.GetRow(child); int c = Grid.GetColumn(child);
+				int rs = Grid.GetRowSpan(child); int cs = Grid.GetColumnSpan(child);
+				for (int i = r; i < r + rs; i++) for (int j = c; j < c + cs; j++) used.Add($"{i}-{j}");
 			}
-
 			for (int row = 0; row < 100; row++)
 			{
 				for (int col = 0; col <= maxCols - colSpan; col++)
 				{
 					bool free = true;
-
-					for (int r = row; r < row + rowSpan; r++)
-					{
-						for (int c = col; c < col + colSpan; c++)
-						{
-							if (used.Contains($"{r}-{c}"))
-							{
-								free = false;
-								break;
-							}
-						}
-
-						if (!free) break;
-					}
-
-					if (free)
-						return (row, col);
+					for (int r = row; r < row + rowSpan; r++) for (int c = col; c < col + colSpan; c++) if (used.Contains($"{r}-{c}")) { free = false; break; }
+					if (free) return (row, col);
 				}
 			}
-
 			return (0, 0);
 		}
-		private (int Row, int Column) GetGridPosition()
-		{
-			int count = DashboardGrid.Children.Count;
 
-			int columns = DashboardGrid.ColumnDefinitions.Count;
+        private void UpdateWidgetGroups(string filter = "")
+        {
+            var query = allWidgets.AsEnumerable();
+            if (!string.IsNullOrWhiteSpace(filter)) query = query.Where(x => x.Name.ToLower().Contains(filter.ToLower()));
+            var grouped = query.GroupBy(x => x.Category).Select(g => new WidgetGroup { Title = g.Key, Items = new ObservableCollection<WidgetItem>(g.ToList()) }).OrderBy(x => x.Title).ToList();
+            WidgetGroups = new ObservableCollection<WidgetGroup>(grouped);
+        }
 
-			int row = count / columns;
-			int column = count % columns;
+		private void SearchBox_TextChanged(object sender, TextChangedEventArgs e) { UpdateWidgetGroups(SearchBox.Text); }
 
-			return (row, column);
-		}
-		private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
-		{
-			string keyword = SearchBox.Text.ToLower();
+		private void RefreshBtn_Click(object sender, RoutedEventArgs e) { MessageBox.Show("Refreshing..."); }
 
-			var result = allWidgets
-				.Where(x => x.Name.ToLower().Contains(keyword))
-				.ToList();
+		private void WorkspaceBtn_Click(object sender, RoutedEventArgs e) { var win = new LightInsight.Dashboard.Dashboard.Workspace.WorkspaceWindow(); win.ShowDialog(); }
 
-			WidgetList.ItemsSource = result;
-		}
-		//void ThemeBtn_Click(object sender, RoutedEventArgs e)
-		//{
-		//    isDark = !isDark;
-
-		//    if (!isDark)
-		//    {
-		//        ThemeBtn.Content = "🌙";
-		//        //this.Background = new SolidColorBrush(Color.FromRgb(30, 30, 30));
-		//    }
-		//    else
-		//    {
-		//        ThemeBtn.Content = "☀";
-		//        //this.Background = Brushes.White;
-		//    }
-		//}
-		void RefreshBtn_Click(object sender, RoutedEventArgs e)
-		{
-			MessageBox.Show("Refreshing dashboard...");
-		}
-		//void LanguageCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		//{
-		//    ComboBoxItem item = (ComboBoxItem)LanguageCombo.SelectedItem;
-
-		//    if (item.Content.ToString() == "VI")
-		//    {
-		//        //OperationsText.Text = " Vận hành";
-		//        //AlarmMonitorText.Text = " Giám sát cảnh báo";
-		//    }
-		//    else
-		//    {
-		//        //OperationsText.Text = " Operations";
-		//        //AlarmMonitorText.Text = " Alarm Monitor";
-		//    }
-		//}
-		//private void Menu_Click(object sender, RoutedEventArgs e)
-		//{
-		//    OpenDashboard(sender as Button);
-		//}
 		private void Menu_Click(object sender, RoutedEventArgs e)
 		{
 			var item = (sender as FrameworkElement)?.DataContext as WorkspaceModel;
-
-			if (item == null)
-				return;
-
-            OpenDashboard(item);
-            ExitEditMode();
-
-            // Đóng popup nếu đang ở chế độ thu gọn
-            if (IsSidebarCollapsed)
-            {
-                SubMenuPopup.IsOpen = false;
-            }
+			if (item == null) return;
+            if (item.IsGroup) { item.IsExpanded = !item.IsExpanded; return; }
+            DeselectAll(NavigationItems); item.IsSelected = true;
+            if (item.Type != null) { OpenDashboardByName(item.Name); }
+            else { BreadcrumbText.Text = $"System > {item.DisplayTitle}"; }
         }
-        //void OpenDashboard(Button btn)
-        //{
-        //    SelectMenu(btn);
 
-		//    currentDashboard = btn.Tag.ToString();
+        private void DeselectAll(IEnumerable<WorkspaceModel> items)
+        {
+            foreach (var i in items) { i.IsSelected = false; if (i.Children != null) DeselectAll(i.Children); }
+        }
 
-		//    string parent = DashboardExpander.Header.ToString();
-		//    string child = btn.Tag.ToString().Trim();
-		//    BreadcrumbText.Text = $"{parent} > {child}";
-
-		//    LoadLayout();
-		//}
-		//void SelectMenu(Button btn)
-		//{
-		//    if (currentMenu != null)
-		//        currentMenu.Background = Brushes.Transparent;
-
-		//    btn.Background = Brushes.DodgerBlue;
-
-		//    currentMenu = btn;
-		//}
-		private void OpenDashboard(WorkspaceModel item)
+		private void OpenDashboardByName(string name)
 		{
-			if (!ConfirmBeforeLeave())
-				return;
-			currentDashboard = item.Name;
-
-			BreadcrumbText.Text = $"Dashboard > {item.Name}";
-
-			LoadLayout();
+			if (!ConfirmBeforeLeave()) return;
+			CurrentDashboard = name; var localized = Application.Current.TryFindResource(name) as string;
+			BreadcrumbText.Text = $"Dashboard > {localized ?? name}"; LoadLayout();
 		}
-		private void Widget_MouseDown(object sender, MouseButtonEventArgs e)
-		{
-			startPoint = e.GetPosition(null);
-		}
-
 
 		private void EditLayoutBtn_Click(object sender, RoutedEventArgs e)
 		{
-			editMode = true;
-			_isDirty = false;
-			InitGrid();
-			CreateGrid();
-			GridOverlay.Visibility = Visibility.Visible;
-			// mở widget library
-			WidgetLibraryColumn.Width = new GridLength(280);
-			WidgetLibrary.Visibility = Visibility.Visible;
-
-			EditLayoutBtn.Visibility = Visibility.Collapsed;
-			SaveBtn.Visibility = Visibility.Visible;
-			CancelBtn.Visibility = Visibility.Visible;
-
-			foreach (var widget in DashboardGrid.Children.OfType<IDashboardWidget>())
-			{
-				widget.SetEditMode(true);
-			}
+			editMode = true; _isDirty = false; InitGrid(); CreateGrid();
+			GridOverlay.Visibility = Visibility.Visible; WidgetLibraryColumn.Width = new GridLength(320); WidgetLibrary.Visibility = Visibility.Visible;
+			EditLayoutBtn.Visibility = Visibility.Collapsed; SaveBtn.Visibility = Visibility.Visible; CancelBtn.Visibility = Visibility.Visible;
+			foreach (var widget in DashboardGrid.Children.OfType<FrameworkElement>()) { SetupWidget(widget); if (widget is IDashboardWidget dw) dw.SetEditMode(true); }
 		}
 
 		private void SaveBtn_Click(object sender, RoutedEventArgs e)
 		{
 			List<WidgetLayout> layouts = new List<WidgetLayout>();
-
 			foreach (UIElement child in DashboardGrid.Children)
 			{
-				if (child is FrameworkElement widget)
-				{
-					WidgetLayout layout = new WidgetLayout
-					{
-						Dashboard = currentDashboard,
-						Type = widget.GetType().Name,
-						Row = Grid.GetRow(widget),
-						Column = Grid.GetColumn(widget),
-						RowSpan = Grid.GetRowSpan(widget),
-						ColumnSpan = Grid.GetColumnSpan(widget)
-					};
-
-					layouts.Add(layout);
-				}
+				if (child is FrameworkElement widget) layouts.Add(new WidgetLayout { Dashboard = CurrentDashboard, Type = widget.GetType().Name, Row = Grid.GetRow(widget), Column = Grid.GetColumn(widget), RowSpan = Grid.GetRowSpan(widget), ColumnSpan = Grid.GetColumnSpan(widget) });
 			}
-
-			SaveLayout(layouts);
-			ExitEditMode();
+			SaveLayout(layouts); ExitEditMode();
 		}
 
-		private void CancelBtn_Click(object sender, RoutedEventArgs e)
-		{
-			LoadLayout();
-			// đóng widget library
-			ExitEditMode();
-		}
-		private void EnsureRow(int rowIndex)
-		{
-			while (DashboardGrid.RowDefinitions.Count <= rowIndex)
-			{
-				DashboardGrid.RowDefinitions.Add(
-					new RowDefinition
-					{
-						Height = new GridLength(80)   // chiều cao 1 ô
-					});
-			}
-		}
-		private void ExitEditMode()
-		{
-			WidgetLibraryColumn.Width = new GridLength(0);
+		private void CancelBtn_Click(object sender, RoutedEventArgs e) { LoadLayout(); ExitEditMode(); }
 
-			editMode = false;
-			GridOverlay.Visibility = Visibility.Collapsed;
-			WidgetLibrary.Visibility = Visibility.Collapsed;
-			EditLayoutBtn.Visibility = Visibility.Visible;
-			SaveBtn.Visibility = Visibility.Collapsed;
-			CancelBtn.Visibility = Visibility.Collapsed;
+		private void EnsureRow(int rowIndex) { while (DashboardGrid.RowDefinitions.Count <= rowIndex) { DashboardGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(80) }); GridOverlay.RowDefinitions.Add(new RowDefinition { Height = new GridLength(80) }); } }
 
-            foreach (var widget in DashboardGrid.Children.OfType<IDashboardWidget>())
-            {
-                widget.SetEditMode(false);
-            }
-        }
-        private void DashboardGrid_DragOver(object sender, DragEventArgs e)
+		private void TrimEmptyRows()
+		{
+		    int maxRowUsed = 0;
+		    foreach (FrameworkElement child in DashboardGrid.Children) { int row = Grid.GetRow(child); int rowSpan = Grid.GetRowSpan(child); if (row + rowSpan > maxRowUsed) maxRowUsed = row + rowSpan; }
+		    int targetRows = Math.Max(maxRowUsed, 10);
+		    while (DashboardGrid.RowDefinitions.Count > targetRows) DashboardGrid.RowDefinitions.RemoveAt(DashboardGrid.RowDefinitions.Count - 1);
+		    while (GridOverlay.RowDefinitions.Count > targetRows) GridOverlay.RowDefinitions.RemoveAt(GridOverlay.RowDefinitions.Count - 1);
+		}
+
+        private void DashboardGrid_DragOver(object sender, DragEventArgs e) { if (!editMode || !e.Data.GetDataPresent(typeof(WidgetItem))) { e.Effects = DragDropEffects.None; return; } e.Effects = DragDropEffects.Copy; }
+
+        private void Widget_MouseMove(object sender, MouseEventArgs e)
         {
-            e.Effects = DragDropEffects.Copy;
-            e.Handled = false;
+            if (!editMode || !isDraggingWidget || selectedWidget == null) return;
+            Point currentPoint = e.GetPosition(DashboardGrid);
+            if (Math.Abs(startPoint.X - currentPoint.X) < SystemParameters.MinimumHorizontalDragDistance && Math.Abs(startPoint.Y - currentPoint.Y) < SystemParameters.MinimumVerticalDragDistance) return;
+            double cellWidth = DashboardGrid.ActualWidth / 12; double cellHeight = 80;
+            int column = (int)Math.Round((currentPoint.X - _clickOffset.X) / cellWidth);
+            int row = (int)Math.Round((currentPoint.Y - _clickOffset.Y) / cellHeight);
+            int colSpan = Grid.GetColumnSpan(selectedWidget);
+            column = Math.Max(0, Math.Min(column, 12 - colSpan)); row = Math.Max(0, row);
+            if (Grid.GetColumn(selectedWidget) != column || Grid.GetRow(selectedWidget) != row) { Grid.SetColumn(selectedWidget, column); Grid.SetRow(selectedWidget, row); _isDirty = true; }
         }
-
-		private void Widget_MouseMove(object sender, MouseEventArgs e)
-		{
-			if (!editMode) return;
-
-			if (!isDraggingWidget || selectedWidget == null)
-				return;
-
-			FrameworkElement widget = sender as FrameworkElement;
-
-
-			Point pos = e.GetPosition(DashboardGrid);
-
-			int columnCount = 12;
-
-			double cellWidth = DashboardGrid.ActualWidth / columnCount;
-			double cellHeight = 80;
-
-			int column = (int)(pos.X / cellWidth);
-			int row = (int)(pos.Y / cellHeight);
-
-			int colSpan = Grid.GetColumnSpan(widget);
-			int rowSpan = Grid.GetRowSpan(widget);
-
-			column = Math.Max(0, Math.Min(column, columnCount - colSpan));
-			row = Math.Max(0, row);
-
-			Grid.SetColumn(widget, column);
-			Grid.SetRow(widget, row);
-		}
 
 		private void DashboardGrid_Drop(object sender, DragEventArgs e)
 		{
-			_isDirty = true;
-			if (!editMode)
-				return;
-
-			if (!e.Data.GetDataPresent(typeof(WidgetItem)))
-				return;
-
+			if (!editMode || !e.Data.GetDataPresent(typeof(WidgetItem))) return;
 			WidgetItem widgetItem = e.Data.GetData(typeof(WidgetItem)) as WidgetItem;
-
-			if (widgetItem == null)
-				return;
-
-			bool exists = DashboardGrid.Children
-				.OfType<FrameworkElement>()
-				.Any(x => x.GetType() == widgetItem.WidgetType);
-
-			if (exists)
-			{
-				MessageBox.Show("Widget này đã tồn tại trên dashboard!");
-				return;
-			}
-
-			FrameworkElement newWidget =
-				Activator.CreateInstance(widgetItem.WidgetType) as FrameworkElement;
-
-			if (newWidget == null)
-				return;
-
-			SetupWidget(newWidget);
-
-			// vị trí drop
-			Point position = e.GetPosition(DashboardGrid);
-
-			double cellWidth = DashboardGrid.ActualWidth / 12;
-			double cellHeight = 80;
-
-			int column = (int)(position.X / cellWidth);
-			int row = (int)(position.Y / cellHeight);
-
-			// gọi hàm tính span
+			FrameworkElement newWidget = Activator.CreateInstance(widgetItem.WidgetType) as FrameworkElement;
+			SetupWidget(newWidget); Point pos = e.GetPosition(DashboardGrid);
+			int column = (int)(pos.X / (DashboardGrid.ActualWidth / 12)); int row = (int)(pos.Y / 80);
 			var span = CalculateWidgetSpan(newWidget);
-
-			int colSpan = span.colSpan;
-			int rowSpan = span.rowSpan;
-
-			// tránh vượt quá 12 column
-			if (column + colSpan > 12)
-				column = 12 - colSpan;
-
-			// đảm bảo đủ row
-			EnsureRow(row + rowSpan);
-
-			Grid.SetColumn(newWidget, column);
-			Grid.SetRow(newWidget, row);
-
-			Grid.SetColumnSpan(newWidget, colSpan);
-			Grid.SetRowSpan(newWidget, rowSpan);
-
-			DashboardGrid.Children.Add(newWidget);
+			Grid.SetColumn(newWidget, Math.Max(0, Math.Min(column, 12 - span.colSpan))); 
+            Grid.SetRow(newWidget, row); 
+            Grid.SetColumnSpan(newWidget, span.colSpan); 
+            Grid.SetRowSpan(newWidget, span.rowSpan);
+			DashboardGrid.Children.Add(newWidget); SmartCascadePush(newWidget); _isDirty = true;
 		}
 
-		private void WidgetLibrary_MouseMove(object sender, MouseEventArgs e)
-		{
-			if (e.LeftButton != MouseButtonState.Pressed)
-				return;
-
-			Border border = sender as Border;
-
-			if (border == null)
-				return;
-
-			WidgetItem widget = border.DataContext as WidgetItem;
-
-			if (widget == null)
-				return;
-
-			DragDrop.DoDragDrop(border, widget, DragDropEffects.Copy);
-		}
 		void Widget_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (!editMode) return;
-
-			selectedWidget = sender as FrameworkElement;
-
-			startPoint = e.GetPosition(DashboardGrid);
-
-			isDraggingWidget = true;
-
-			selectedWidget.CaptureMouse();
+			if (!editMode) return; selectedWidget = sender as FrameworkElement;
+			startPoint = e.GetPosition(DashboardGrid); _clickOffset = e.GetPosition(selectedWidget);
+			isDraggingWidget = true; selectedWidget.CaptureMouse(); Panel.SetZIndex(selectedWidget, 999);
 		}
 
-		void Widget_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-		{
-			if (selectedWidget != null)
-			{
-				SmartCascadePush(selectedWidget);
-				selectedWidget.ReleaseMouseCapture();
-			}
+		void Widget_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) { if (selectedWidget != null) { SmartCascadePush(selectedWidget); selectedWidget.ReleaseMouseCapture(); } isDraggingWidget = false; selectedWidget = null; }
 
-			isDraggingWidget = false;
-			selectedWidget = null;
-		}
-		void Widget_DeleteRequested(object sender, EventArgs e)
-		{
-			if (sender is FrameworkElement widget)
-			{
-				DashboardGrid.Children.Remove(widget);
-			}
-		}
-		/// <summary>
-		/// Lưu layout của dashboard vào file JSON để có thể load lại sau này
-		/// </summary>
-		/// <param name="newLayouts"></param>
-		void SaveLayout(List<WidgetLayout> newLayouts)
-		{
-			_isDirty = false;
-			string folder = Path.Combine(
-				Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-				"LightInsight");
-
-			if (!Directory.Exists(folder))
-				Directory.CreateDirectory(folder);
-
-			string filePath = Path.Combine(folder, "dashboard_layout.json");
-
-			List<WidgetLayout> allLayouts = new List<WidgetLayout>();
-
-			if (File.Exists(filePath))
-			{
-				string oldJson = File.ReadAllText(filePath);
-
-				if (!string.IsNullOrWhiteSpace(oldJson))
-				{
-					try
-					{
-						allLayouts = JsonSerializer.Deserialize<List<WidgetLayout>>(oldJson);
-					}
-					catch
-					{
-						allLayouts = new List<WidgetLayout>();
-					}
-				}
-			}
-
-			allLayouts.RemoveAll(x => x.Dashboard == currentDashboard);
-
-			allLayouts.AddRange(newLayouts);
-
-            string json = JsonSerializer.Serialize(allLayouts, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
-            File.WriteAllText(filePath, json);
-            SetFilePermissionForAllUsers(filePath);
-        }
-        /// <summary>
-        /// Load layout từ file JSON và hiển thị trên dashboard
-        /// </summary>
-        void LoadLayout()
-        {
-            if (DashboardGrid.Children.Count > 0)
-            {
-                DashboardGrid.Children.Clear();
-            }
-
-			string folder = Path.Combine(
-				Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-				"LightInsight");
-
-			string filePath = Path.Combine(folder, "dashboard_layout.json");
-
-			if (!File.Exists(filePath))
-				return;
-
-			string json = File.ReadAllText(filePath);
-
-			if (string.IsNullOrWhiteSpace(json))
-				return;
-
-			List<WidgetLayout> layouts;
-
-			try
-			{
-				layouts = JsonSerializer.Deserialize<List<WidgetLayout>>(json);
-			}
-			catch
-			{
-				return;
-			}
-
-			if (layouts == null)
-				return;
-
-			// lưu tất cả cell đã dùng
-			HashSet<string> usedCells = new HashSet<string>();
-
-
-			foreach (var layout in layouts)
-			{
-				if (layout.Dashboard != currentDashboard)
-					continue;
-
-				FrameworkElement widget = CreateWidget(layout.Type);
-
-				if (widget == null)
-					continue;
-
-				int row = layout.Row;
-				int col = layout.Column;
-
-				int rowSpan = layout.RowSpan <= 0 ? 1 : layout.RowSpan;
-				int colSpan = layout.ColumnSpan <= 0 ? 1 : layout.ColumnSpan;
-
-				// đảm bảo grid đủ hàng
-				EnsureRow(row + rowSpan);
-
-				// kiểm tra toàn bộ vùng widget chiếm
-				bool isOverlap = false;
-
-				for (int r = row; r < row + rowSpan; r++)
-				{
-					for (int c = col; c < col + colSpan; c++)
-					{
-						string key = $"{r}-{c}";
-						if (usedCells.Contains(key))
-						{
-							isOverlap = true;
-							break;
-						}
-					}
-					if (isOverlap)
-						break;
-				}
-
-				if (isOverlap)
-					continue;
-
-				SetupWidget(widget);
-				Grid.SetRow(widget, row);
-				Grid.SetColumn(widget, col);
-				Grid.SetRowSpan(widget, rowSpan);
-				Grid.SetColumnSpan(widget, colSpan);
-
-				Panel.SetZIndex(widget, DashboardGrid.Children.Count);
-
-				DashboardGrid.Children.Add(widget);
-
-				// đánh dấu tất cả cell đã dùng
-				for (int r = row; r < row + rowSpan; r++)
-				{
-					for (int c = col; c < col + colSpan; c++)
-					{
-						usedCells.Add($"{r}-{c}");
-					}
-				}
-			}
-		}
-		void InitGrid()
-		{
-			GridOverlay.RowDefinitions.Clear();
-			GridOverlay.ColumnDefinitions.Clear();
-
-			DashboardGrid.RowDefinitions.Clear();
-			DashboardGrid.ColumnDefinitions.Clear();
-
-			// 12 column
-			for (int i = 0; i < 12; i++)
-			{
-				GridOverlay.ColumnDefinitions.Add(
-					new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-
-				DashboardGrid.ColumnDefinitions.Add(
-					new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-			}
-
-			// 10 row
-			for (int i = 0; i < 10; i++)
-			{
-				GridOverlay.RowDefinitions.Add(
-					new RowDefinition { Height = new GridLength(80) });
-
-				DashboardGrid.RowDefinitions.Add(
-					new RowDefinition { Height = new GridLength(80) });
-			}
-
-			CreateGrid();
-		}
-		void CreateGrid()
-		{
-			GridOverlay.Children.Clear();
-
-			int rowCount = GridOverlay.RowDefinitions.Count;
-			int colCount = GridOverlay.ColumnDefinitions.Count;
-
-			for (int r = 0; r < rowCount; r++)
-			{
-				for (int c = 0; c < colCount; c++)
-				{
-					Border cell = new Border
-					{
-						BorderBrush = new SolidColorBrush(Color.FromRgb(60, 60, 60)),
-						BorderThickness = new Thickness(0.5),
-						Background = Brushes.Transparent
-					};
-
-					Grid.SetRow(cell, r);
-					Grid.SetColumn(cell, c);
-
-					GridOverlay.Children.Add(cell);
-				}
-			}
-		}
-
-		FrameworkElement CreateWidget(string typeName)
-		{
-			var widgetType = AppDomain.CurrentDomain
-				.GetAssemblies()
-				.SelectMany(a => a.GetTypes())
-				.FirstOrDefault(t => t.Name == typeName);
-
-			if (widgetType == null)
-				return null;
-
-			return Activator.CreateInstance(widgetType) as FrameworkElement;
-		}
-		//void SetupWidget(FrameworkElement widget)  // old
-		//{
-		//    widget.Margin = new Thickness(1, 1, 5, 5);
-
-		//    widget.HorizontalAlignment = HorizontalAlignment.Stretch;
-		//    widget.VerticalAlignment = VerticalAlignment.Stretch;
-		//    widget.Loaded += (s, e) => 
-		//    {
-		//        var thumb = FindVisualChild<Thumb>(widget, "ResizeThumb");
-		//        if (thumb != null)
-		//        {
-		//            System.Diagnostics.Debug.WriteLine($"SUCCESS: Found ResizeThumb on {widget.GetType().Name}");
-		//            thumb.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
-
-		//            // Xóa sự kiện cũ (nếu có) để tránh lặp và đăng ký mới
-		//            thumb.DragDelta -= Thumb_DragDelta; 
-		//            thumb.DragDelta += Thumb_DragDelta;
-		//        }
-		//        else
-		//        {
-		//            System.Diagnostics.Debug.WriteLine($"ERROR: Still cannot find ResizeThumb on {widget.GetType().Name}");
-		//        }
-		//    };
-		//    widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
-		//    widget.MouseMove += Widget_MouseMove;
-		//    widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
-
-		//    if (widget is IDashboardWidget dashboardWidget)
-		//    {
-		//        dashboardWidget.DeleteRequested += Widget_DeleteRequested;
-		//        dashboardWidget.SetEditMode(editMode);
-		//    }
-		//}
-
-		void SetupWidget(FrameworkElement widget) // new
-		{
-			widget.Margin = new Thickness(1, 1, 5, 5);
-			widget.HorizontalAlignment = HorizontalAlignment.Stretch;
-			widget.VerticalAlignment = VerticalAlignment.Stretch;
-
-			widget.Loaded += (s, e) =>
-			{
-				Thumb thumb = null;
-
-				if (widget is IResizableWidget resizable)
-				{
-					thumb = resizable.ResizeThumb;
-				}
-
-				if (thumb != null)
-				{
-					System.Diagnostics.Debug.WriteLine($"SUCCESS: Found ResizeThumb on {widget.GetType().Name}");
-					//thumb.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
-					if (widget is IDashboardWidget dw)
-					{
-						dw.SetEditMode(editMode);
-					}
-
-					thumb.DragDelta -= Thumb_DragDelta;
-					thumb.DragDelta += Thumb_DragDelta;
-				}
-				else
-				{
-					System.Diagnostics.Debug.WriteLine($"ERROR: Still cannot find ResizeThumb on {widget.GetType().Name}");
-				}
-			};
-
-			widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown;
-			widget.MouseMove += Widget_MouseMove;
-			widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
-
-            if (widget is IDashboardWidget dashboardWidget)
-            {
-                dashboardWidget.DeleteRequested += Widget_DeleteRequested;
-                dashboardWidget.SetEditMode(editMode);
-            }
-        }
-        private void ToggleSidebar_Click(object sender, RoutedEventArgs e)
-        {
-            if (IsSidebarCollapsed)
-            {
-                SidebarColumn.Width = new GridLength(220);
-            }
-            else
-            {
-                SidebarColumn.Width = new GridLength(40);
-            }
-
-            IsSidebarCollapsed = !IsSidebarCollapsed;
-        }
         private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
             if (!editMode) return;
-
-			// 'sender' ở đây chính là cái Thumb
-			Thumb thumb = sender as Thumb;
-			FrameworkElement widget = FindParentWidget(thumb);
-
-			if (widget != null)
-			{
-				double cellWidth = DashboardGrid.ActualWidth / 12;
-				double cellHeight = 80;
-
-				// 1. Tính toán Span mong muốn dựa trên vị trí chuột
-				int targetColSpan = (int)Math.Max(1, Math.Round((widget.ActualWidth + e.HorizontalChange) / cellWidth));
-				int targetRowSpan = (int)Math.Max(1, Math.Round((widget.ActualHeight + e.VerticalChange) / cellHeight));
-
-				// 2. Lấy giới hạn tối thiểu từ chính Widget đó
-				int finalColSpan = targetColSpan;
-				int finalRowSpan = targetRowSpan;
-
-				// Mặc định là 1 cho các Widget cũ chỉ dùng IDashboardWidget
-				int minCol = 1;
-				int minRow = 1;
-
-				// Kiểm tra xem Widget này có "đăng ký" tính năng giới hạn kích thước không
-				if (widget is IResizableWidget resizable)
-				{
-					minCol = resizable.MinCol;
-					minRow = resizable.MinRow;
-					finalColSpan = Math.Max(minCol, targetColSpan);
-					finalRowSpan = Math.Max(minRow, targetRowSpan);
-				}
-				// 3. Cập nhật Layout
-				Grid.SetColumnSpan(widget, finalColSpan);
-				Grid.SetRowSpan(widget, finalRowSpan);
-
-				// Cập nhật Tag để lưu trữ
-				widget.Tag = $"{finalColSpan}x{finalRowSpan}";
-				if (widget is CameraListWidget listWidget)
-				{
-					listWidget.UpdateTable(listWidget._currentPage.ToString());
-				}
-			}
-		}
-
-		// Hàm bổ trợ để tìm ngược từ Thumb lên Widget cha
-		private FrameworkElement FindParentWidget(DependencyObject child)
-		{
-			DependencyObject parentObject = VisualTreeHelper.GetParent(child);
-			if (parentObject == null) return null;
-
-			if (parentObject is UserControl || (parentObject is FrameworkElement fe && DashboardGrid.Children.Contains(fe)))
-				return parentObject as FrameworkElement;
-
-			return FindParentWidget(parentObject);
-		}
-		// old
-		//private T FindVisualChild<T>(DependencyObject obj, string name) where T : DependencyObject 
-		//      {
-		//          for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-		//          {
-		//              DependencyObject child = VisualTreeHelper.GetChild(obj, i);
-		//              if (child != null && child is T t && (child as FrameworkElement).Name == name)
-		//                  return t;
-
-		//              T childOfChild = FindVisualChild<T>(child, name);
-		//              if (childOfChild != null)
-		//                  return childOfChild;
-		//          }
-		//          return null;
-		//      }
-
-
-		bool IsOverlap(FrameworkElement a, FrameworkElement b)
-		{
-			int r1 = Grid.GetRow(a);
-			int c1 = Grid.GetColumn(a);
-			int rs1 = Grid.GetRowSpan(a);
-			int cs1 = Grid.GetColumnSpan(a);
-
-			int r2 = Grid.GetRow(b);
-			int c2 = Grid.GetColumn(b);
-			int rs2 = Grid.GetRowSpan(b);
-			int cs2 = Grid.GetColumnSpan(b);
-
-			return r1 < r2 + rs2 &&
-				   r1 + rs1 > r2 &&
-				   c1 < c2 + cs2 &&
-				   c1 + cs1 > c2;
-		}
-		// hàm xử lý việc đè widget khi kéo thả, sẽ tự động tìm vị trí mới cho widget bị đè
-		(bool found, int row, int col) FindNearestPosition(int startRow, int startCol, int rowSpan, int colSpan)
-		{
-			int maxCols = 12;
-
-			// 1. thử sang phải
-			for (int col = startCol + 1; col <= maxCols - colSpan; col++)
-			{
-				if (IsAreaFree(startRow, col, rowSpan, colSpan))
-					return (true, startRow, col);
-			}
-
-			// 2. thử sang trái
-			for (int col = startCol - 1; col >= 0; col--)
-			{
-				if (IsAreaFree(startRow, col, rowSpan, colSpan))
-					return (true, startRow, col);
-			}
-
-			// 3. tìm xuống dưới nhiều row
-			for (int row = startRow + 1; row < 200; row++)
-			{
-				for (int col = 0; col <= maxCols - colSpan; col++)
-				{
-					if (IsAreaFree(row, col, rowSpan, colSpan))
-						return (true, row, col);
-				}
-			}
-
-			return (false, startRow, startCol);
-		}
-		bool IsAreaFree(int row, int col, int rowSpan, int colSpan)
-		{
-			foreach (FrameworkElement widget in DashboardGrid.Children.OfType<FrameworkElement>())
-			{
-				int r = Grid.GetRow(widget);
-				int c = Grid.GetColumn(widget);
-				int rs = Grid.GetRowSpan(widget);
-				int cs = Grid.GetColumnSpan(widget);
-
-				bool overlap =
-					r < row + rowSpan &&
-					r + rs > row &&
-					c < col + colSpan &&
-					c + cs > col;
-
-				if (overlap)
-					return false;
-			}
-
-			return true;
-		}
-		void SmartCascadePush(FrameworkElement movedWidget)
-		{
-			Queue<FrameworkElement> queue = new Queue<FrameworkElement>();
-			queue.Enqueue(movedWidget);
-
-			while (queue.Count > 0)
-			{
-				var current = queue.Dequeue();
-
-				foreach (FrameworkElement widget in DashboardGrid.Children.OfType<FrameworkElement>().OrderBy(x => Grid.GetRow(x)))
-				{
-					if (widget == current)
-						continue;
-
-					if (IsOverlap(current, widget))
-					{
-						int r = Grid.GetRow(widget);
-						int c = Grid.GetColumn(widget);
-						int rs = Grid.GetRowSpan(widget);
-						int cs = Grid.GetColumnSpan(widget);
-
-						var pos = FindNearestPosition(r, c, rs, cs);
-
-						if (pos.found)
-						{
-							EnsureRow(pos.row + rs);
-
-							Grid.SetRow(widget, pos.row);
-							Grid.SetColumn(widget, pos.col);
-
-							queue.Enqueue(widget);
-						}
-					}
-				}
-			}
-		}
-		void AddMoreRows(int count)
-		{
-			for (int i = 0; i < count; i++)
-			{
-				DashboardGrid.RowDefinitions.Add(
-					new RowDefinition
-					{
-						Height = new GridLength(80)
-					});
-
-				GridOverlay.RowDefinitions.Add(
-					new RowDefinition
-					{
-						Height = new GridLength(80)
-					});
-			}
-
-            CreateGrid();
-        }
-        private void DashboardScroll_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            ScrollViewer scrollViewer = sender as ScrollViewer;
-
-            if (scrollViewer != null)
+            Thumb thumb = sender as Thumb;
+            FrameworkElement widget = FindParentWidget(thumb);
+            if (widget != null)
             {
-                scrollViewer.ScrollToVerticalOffset(
-                    scrollViewer.VerticalOffset - e.Delta);
-
-                e.Handled = true; // 🔥 QUAN TRỌNG
+                double cellWidth = DashboardGrid.ActualWidth / 12; double cellHeight = 80;
+                int targetColSpan = (int)Math.Max(1, Math.Round((widget.ActualWidth + e.HorizontalChange) / cellWidth));
+                int targetRowSpan = (int)Math.Max(1, Math.Round((widget.ActualHeight + e.VerticalChange) / cellHeight));
+                Grid.SetColumnSpan(widget, targetColSpan); Grid.SetRowSpan(widget, targetRowSpan);
+                SmartCascadePush(widget); _isDirty = true;
             }
         }
-        private void DashboardScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
+
+        private FrameworkElement FindParentWidget(DependencyObject child)
         {
-            // 🔥 CHẶN nếu không phải edit mode
-            if (!editMode)
-                return;
-            ScrollViewer sv = sender as ScrollViewer;
+            DependencyObject parent = VisualTreeHelper.GetParent(child);
+            if (parent == null) return null;
+            if (parent is UserControl || (parent is FrameworkElement fe && DashboardGrid.Children.Contains(fe))) return parent as FrameworkElement;
+            return FindParentWidget(parent);
+        }
 
-			if (sv.VerticalOffset + sv.ViewportHeight >= sv.ExtentHeight - 5)
-			{
-				AddMoreRows(10);
-			}
-		}
-		private void WorkspaceBtn_Click(object sender, RoutedEventArgs e)
-		{
-			var win = new LightInsight.Dashboard.Dashboard.Workspace.WorkspaceWindow();
-			win.ShowDialog();
-		}
-		private void LoadSidebar()
-		{
-			var root = FindById(WorkspaceService.Instance.Workspaces, "ROOT_DASHBOARD");
-
-			if (root != null)
-			{
-				DashboardMenus = root.Children; // 🔥 dùng trực tiếp reference
-				DataContext = this;
-			}
-		}
-		private WorkspaceModel FindById(IEnumerable<WorkspaceModel> list, string id)
-		{
-			foreach (var item in list)
-			{
-				if (item.Id == id)
-					return item;
-
-				var found = FindById(item.Children, id);
-				if (found != null)
-					return found;
-			}
-
-			return null;
-		}
-		private object OnThemeChanged(Message message, FQID dest, FQID sender)
-		{
-			var theme = message?.Data as Theme;
-			ApplySmartClientTheme(theme);
-			return null;
-		}
-
-		private void ApplySmartClientTheme(Theme scTheme)
-		{
-			Dispatcher.Invoke(() =>
-			{
-				var themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Dark.xaml";
-				var crTheme = ClientControl.Instance.Theme.ThemeType;
-				//if (scTheme != null && scTheme.ThemeType == ThemeType.Light)
-				if (crTheme == ThemeType.Light)
-					themeUri = "/LightInsight;component/Dashboard/Dashboard/Themes/Light.xaml";
-
-				var newDict = new ResourceDictionary { Source = new Uri(themeUri, UriKind.RelativeOrAbsolute) };
-
-				if (_currentThemeDictionary != null)
-					Resources.MergedDictionaries.Remove(_currentThemeDictionary);
-
-				Resources.MergedDictionaries.Insert(0, newDict);
-				_currentThemeDictionary = newDict;
-
-				//_vm?.SetThemeResources(Resources);
-				//_vm?.RefreshChartTheme();
-			});
-		}
-		private void ApplySmartClientLanguage(string name)
-		{
-			var uri = name == "vi-VN"
-					   ? "/LightInsight;component/Dashboard/Dashboard/Language/Vi.xaml"
-					   : "/LightInsight;component/Dashboard/Dashboard/Language/English.xaml";
-
-            var dict = new ResourceDictionary
+		void SaveLayout(List<WidgetLayout> newLayouts) 
+        { 
+            _isDirty = false;
+            string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "LightInsight");
+            if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+            string filePath = Path.Combine(folder, "dashboard_layout.json");
+            List<WidgetLayout> allLayouts = new List<WidgetLayout>();
+            if (File.Exists(filePath))
             {
-                Source = new Uri(uri, UriKind.Relative)
+                try { allLayouts = JsonSerializer.Deserialize<List<WidgetLayout>>(File.ReadAllText(filePath)) ?? new List<WidgetLayout>(); } catch { }
+            }
+            allLayouts.RemoveAll(x => x.Dashboard == CurrentDashboard);
+            if (newLayouts != null) allLayouts.AddRange(newLayouts);
+            File.WriteAllText(filePath, JsonSerializer.Serialize(allLayouts, new JsonSerializerOptions { WriteIndented = true }));
+            SetFilePermissionForAllUsers(filePath);
+        }
+
+        void LoadLayout() 
+        { 
+            DashboardGrid.Children.Clear();
+            string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "LightInsight");
+            string filePath = Path.Combine(folder, "dashboard_layout.json");
+            if (!File.Exists(filePath)) return;
+            try
+            {
+                var layouts = JsonSerializer.Deserialize<List<WidgetLayout>>(File.ReadAllText(filePath));
+                if (layouts == null) return;
+                foreach (var layout in layouts.Where(x => x.Dashboard == CurrentDashboard))
+                {
+                    var widgetType = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.Name == layout.Type);
+                    if (widgetType == null) continue;
+                    FrameworkElement widget = Activator.CreateInstance(widgetType) as FrameworkElement;
+                    SetupWidget(widget);
+                    Grid.SetRow(widget, layout.Row); Grid.SetColumn(widget, layout.Column);
+                    Grid.SetRowSpan(widget, layout.RowSpan); Grid.SetColumnSpan(widget, layout.ColumnSpan);
+                    DashboardGrid.Children.Add(widget);
+                    EnsureRow(layout.Row + layout.RowSpan);
+                }
+            } catch { }
+            _isDirty = false;
+        }
+
+		void InitGrid() { DashboardGrid.RowDefinitions.Clear(); GridOverlay.RowDefinitions.Clear(); for (int i = 0; i < 10; i++) EnsureRow(i); }
+
+		void CreateGrid() { GridOverlay.Children.Clear(); for (int r = 0; r < GridOverlay.RowDefinitions.Count; r++) for (int c = 0; c < 12; c++) { Border b = new Border { BorderBrush = new SolidColorBrush(Color.FromRgb(60, 60, 60)), BorderThickness = new Thickness(0.5) }; Grid.SetRow(b, r); Grid.SetColumn(b, c); GridOverlay.Children.Add(b); } }
+
+		void SetupWidget(FrameworkElement widget)
+		{
+            if (widget is Control ctrl && ctrl.Background == null) ctrl.Background = Brushes.Transparent;
+            else if (widget is Panel panel && panel.Background == null) panel.Background = Brushes.Transparent;
+
+			widget.MouseLeftButtonDown += Widget_MouseLeftButtonDown; widget.MouseMove += Widget_MouseMove; widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
+            
+            widget.Loaded += (s, e) => {
+                if (widget is IResizableWidget resizable && resizable.ResizeThumb != null)
+                {
+                    resizable.ResizeThumb.DragDelta -= Thumb_DragDelta;
+                    resizable.ResizeThumb.DragDelta += Thumb_DragDelta;
+                }
             };
 
-            Resources.MergedDictionaries.Clear();
-            Resources.MergedDictionaries.Add(dict);
+            if (widget is IDashboardWidget dw)
+            {
+                dw.DeleteRequested += (s, e) => { DashboardGrid.Children.Remove(widget); _isDirty = true; };
+                dw.SetEditMode(editMode);
+            }
         }
-        //public void SetThemeResources(ResourceDictionary resources)
-        //{
-        //    _currentThemeDictionary = resources;
-        //}
-        private bool ConfirmBeforeLeave()
+
+        private void ToggleSidebar_Click(object sender, RoutedEventArgs e)
         {
-            if (!editMode || !_isDirty)
-                return true;
+            if (IsSidebarCollapsed) { SidebarColumn.Width = new GridLength(220); CollapseIcon.Kind = PackIconMaterialKind.ChevronLeft; }
+            else { SidebarColumn.Width = new GridLength(40); CollapseIcon.Kind = PackIconMaterialKind.ChevronRight; }
+            IsSidebarCollapsed = !IsSidebarCollapsed;
+        }
 
-			var result = MessageBox.Show(
-				"Bạn có thay đổi chưa lưu. Bạn muốn lưu không?",
-				"Cảnh báo",
-				MessageBoxButton.YesNoCancel,
-				MessageBoxImage.Warning);
+        void SmartCascadePush(FrameworkElement movedWidget)
+        {
+            var widgets = DashboardGrid.Children.OfType<FrameworkElement>().ToList();
+            if (widgets.Count <= 1) return;
+            var anchor = movedWidget;
+            var placed = new List<FrameworkElement> { anchor };
+            var ordered = widgets.Where(w => w != anchor).OrderBy(w => Grid.GetRow(w)).ThenBy(w => Grid.GetColumn(w)).ToList();
+            foreach (var widget in ordered)
+            {
+                int rowSpan = Grid.GetRowSpan(widget); int col = Grid.GetColumn(widget); int colSpan = Grid.GetColumnSpan(widget);
+                int candidateRow = 0; bool collision;
+                do {
+                    collision = false;
+                    foreach (var other in placed) {
+                        if (IsRectOverlap(candidateRow, col, rowSpan, colSpan, Grid.GetRow(other), Grid.GetColumn(other), Grid.GetRowSpan(other), Grid.GetColumnSpan(other))) {
+                            candidateRow = Grid.GetRow(other) + Grid.GetRowSpan(other); collision = true; break;
+                        }
+                    }
+                } while (collision);
+                Grid.SetRow(widget, candidateRow); placed.Add(widget);
+            }
+            if (widgets.Any()) EnsureRow(widgets.Max(w => Grid.GetRow(w) + Grid.GetRowSpan(w)));
+        }
 
-			if (result == MessageBoxResult.Yes)
-			{
-				List<WidgetLayout> layouts = new List<WidgetLayout>();
+        private bool IsRectOverlap(int r1, int c1, int rs1, int cs1, int r2, int c2, int rs2, int cs2)
+        { return r1 < r2 + rs2 && r1 + rs1 > r2 && c1 < c2 + cs2 && c1 + cs1 > c2; }
 
-				foreach (UIElement child in DashboardGrid.Children)
-				{
-					if (child is FrameworkElement widget)
-					{
-						WidgetLayout layout = new WidgetLayout
-						{
-							Dashboard = currentDashboard,
-							Type = widget.GetType().Name,
-							Row = Grid.GetRow(widget),
-							Column = Grid.GetColumn(widget),
-							RowSpan = Grid.GetRowSpan(widget),
-							ColumnSpan = Grid.GetColumnSpan(widget)
-						};
-
-						layouts.Add(layout);
-					}
-				}
-
-				SaveLayout(layouts);
-				ExitEditMode();
-				return true;
-			}
-			else if (result == MessageBoxResult.No)
-			{
-				// discard
-				return true;
-			}
-			else
-			{
-				return false; // cancel
-			}
-		}
-		private void Back_Click(object sender, RoutedEventArgs e)
+		private WorkspaceModel FindById(IEnumerable<WorkspaceModel> list, string id)
 		{
-			if (!ConfirmBeforeLeave())
-				return;
+			foreach (var item in list) { if (item.Id == id) return item; var found = FindById(item.Children, id); if (found != null) return found; }
+			return null;
+		}
 
-			// xử lý back
-		}
-		bool IsWidgetAdded(Type widgetType)
-		{
-			return DashboardGrid.Children
-				.OfType<FrameworkElement>()
-				.Any(x => x.GetType() == widgetType);
-		}
+		private object OnThemeChanged(Message message, FQID dest, FQID sender) { ApplySmartClientTheme(null); return null; }
+
+		private void ApplySmartClientTheme(Theme scTheme) { Dispatcher.Invoke(() => { var themeUri = ClientControl.Instance.Theme.ThemeType == ThemeType.Light ? "/LightInsight;component/Dashboard/Dashboard/Themes/Light.xaml" : "/LightInsight;component/Dashboard/Dashboard/Themes/Dark.xaml"; var newDict = new ResourceDictionary { Source = new Uri(themeUri, UriKind.RelativeOrAbsolute) }; if (_currentThemeDictionary != null) Resources.MergedDictionaries.Remove(_currentThemeDictionary); Resources.MergedDictionaries.Add(newDict); _currentThemeDictionary = newDict; }); }
+
+		private void ApplySmartClientLanguage(string name) { var uri = name == "vi-VN" ? "/LightInsight;component/Dashboard/Dashboard/Language/Vi.xaml" : "/LightInsight;component/Dashboard/Dashboard/Language/English.xaml"; var newDict = new ResourceDictionary { Source = new Uri(uri, UriKind.Relative) }; if (_currentLanguageDictionary != null) Resources.MergedDictionaries.Remove(_currentLanguageDictionary); Resources.MergedDictionaries.Add(newDict); _currentLanguageDictionary = newDict; RefreshMenuLocalization(); }
+
+        private bool ConfirmBeforeLeave() { return true; }
+
 		void SetFilePermissionForAllUsers(string filePath)
 		{
 			try
 			{
-				var fileInfo = new FileInfo(filePath);
-				var fileSecurity = fileInfo.GetAccessControl();
-
-				// Group "Users"
+				var fileInfo = new FileInfo(filePath); var fileSecurity = fileInfo.GetAccessControl();
 				var users = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
-
-				var rule = new FileSystemAccessRule(
-					users,
-					FileSystemRights.Read | FileSystemRights.Write | FileSystemRights.Modify,
-					InheritanceFlags.None,
-					PropagationFlags.NoPropagateInherit,
-					AccessControlType.Allow);
-
-				fileSecurity.AddAccessRule(rule);
-
-                fileInfo.SetAccessControl(fileSecurity);
+				var rule = new System.Security.AccessControl.FileSystemAccessRule(users, System.Security.AccessControl.FileSystemRights.Read | System.Security.AccessControl.FileSystemRights.Write | System.Security.AccessControl.FileSystemRights.Modify, System.Security.AccessControl.InheritanceFlags.None, System.Security.AccessControl.PropagationFlags.NoPropagateInherit, System.Security.AccessControl.AccessControlType.Allow);
+				fileSecurity.AddAccessRule(rule); fileInfo.SetAccessControl(fileSecurity);
             }
-            catch (Exception ex)
-            {
-                // log nếu cần
-                System.Diagnostics.Debug.WriteLine("Set permission failed: " + ex.Message);
-            }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine("Set permission failed: " + ex.Message); }
         }
+
         void EnsureDashboardFile()
         {
-            string folder = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-                "LightInsight");
-
-            if (!Directory.Exists(folder))
-                Directory.CreateDirectory(folder);
-
+            string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "LightInsight");
+            if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
             string filePath = Path.Combine(folder, "dashboard_layout.json");
-
-            // 🔥 CHỈ tạo khi chưa có file
             if (!File.Exists(filePath))
             {
-                string defaultJson = @"
-                                        [
-                                          {
-                                            ""Dashboard"": ""Default Workspace"",
-                                            ""Type"": ""CameraOnlineWidget"",
-                                            ""Row"": 0,
-                                            ""Column"": 0,
-                                            ""RowSpan"": 2,
-                                            ""ColumnSpan"": 2
-                                          },
-                                          {
-                                            ""Dashboard"": ""Default Workspace"",
-                                            ""Type"": ""CameraOfflineWidget"",
-                                            ""Row"": 0,
-                                            ""Column"": 2,
-                                            ""RowSpan"": 2,
-                                            ""ColumnSpan"": 2
-                                          },
-                                          {
-                                            ""Dashboard"": ""Default Workspace"",
-                                            ""Type"": ""TotalCameraCount"",
-                                            ""Row"": 0,
-                                            ""Column"": 4,
-                                            ""RowSpan"": 2,
-                                            ""ColumnSpan"": 2
-                                          },
-                                          {
-                                            ""Dashboard"": ""Default Workspace"",
-                                            ""Type"": ""CameraListWidget"",
-                                            ""Row"": 5,
-                                            ""Column"": 0,
-                                            ""RowSpan"": 4,
-                                            ""ColumnSpan"": 12
-                                          },
-                                          {
-                                            ""Dashboard"": ""Default Workspace"",
-                                            ""Type"": ""CameraHealthScoreWidget"",
-                                            ""Row"": 0,
-                                            ""Column"": 6,
-                                            ""RowSpan"": 2,
-                                            ""ColumnSpan"": 2
-                                          },
-                                          {
-                                            ""Dashboard"": ""Default Workspace"",
-                                            ""Type"": ""StorageUsageWidget"",
-                                            ""Row"": 0,
-                                            ""Column"": 8,
-                                            ""RowSpan"": 3,
-                                            ""ColumnSpan"": 4
-                                          },
-                                          {
-                                            ""Dashboard"": ""Default Workspace"",
-                                            ""Type"": ""TotalServersWidget"",
-                                            ""Row"": 2,
-                                            ""Column"": 0,
-                                            ""RowSpan"": 2,
-                                            ""ColumnSpan"": 2
-                                          },
-                                          {
-                                            ""Dashboard"": ""Default Workspace"",
-                                            ""Type"": ""AlarmSLABreachWidget"",
-                                            ""Row"": 2,
-                                            ""Column"": 2,
-                                            ""RowSpan"": 2,
-                                            ""ColumnSpan"": 2
-                                          },
-                                          {
-                                            ""Dashboard"": ""Default Workspace"",
-                                            ""Type"": ""AlarmBySeverityWidget"",
-                                            ""Row"": 2,
-                                            ""Column"": 4,
-                                            ""RowSpan"": 3,
-                                            ""ColumnSpan"": 3
-                                          }
+                string defaultJson = @"[
+                                          { ""Dashboard"": ""Default Workspace"", ""Type"": ""CameraOnlineWidget"", ""Row"": 0, ""Column"": 0, ""RowSpan"": 2, ""ColumnSpan"": 2 },
+                                          { ""Dashboard"": ""Default Workspace"", ""Type"": ""CameraOfflineWidget"", ""Row"": 0, ""Column"": 2, ""RowSpan"": 2, ""ColumnSpan"": 2 },
+                                          { ""Dashboard"": ""Default Workspace"", ""Type"": ""TotalCameraCount"", ""Row"": 0, ""Column"": 4, ""RowSpan"": 2, ""ColumnSpan"": 2 },
+                                          { ""Dashboard"": ""Default Workspace"", ""Type"": ""CameraListWidget"", ""Row"": 5, ""Column"": 0, ""RowSpan"": 4, ""ColumnSpan"": 12 },
+                                          { ""Dashboard"": ""Default Workspace"", ""Type"": ""CameraHealthScoreWidget"", ""Row"": 0, ""Column"": 6, ""RowSpan"": 2, ""ColumnSpan"": 2 },
+                                          { ""Dashboard"": ""Default Workspace"", ""Type"": ""StorageUsageWidget"", ""Row"": 0, ""Column"": 8, ""RowSpan"": 3, ""ColumnSpan"": 4 },
+                                          { ""Dashboard"": ""Default Workspace"", ""Type"": ""TotalServersWidget"", ""Row"": 2, ""Column"": 0, ""RowSpan"": 2, ""ColumnSpan"": 2 },
+                                          { ""Dashboard"": ""Default Workspace"", ""Type"": ""AlarmSLABreachWidget"", ""Row"": 2, ""Column"": 2, ""RowSpan"": 2, ""ColumnSpan"": 2 },
+                                          { ""Dashboard"": ""Default Workspace"", ""Type"": ""AlarmBySeverityWidget"", ""Row"": 2, ""Column"": 4, ""RowSpan"": 3, ""ColumnSpan"": 3 }
                                         ]";
-
-                File.WriteAllText(filePath, defaultJson);
-
-                SetFilePermissionForAllUsers(filePath);
+                File.WriteAllText(filePath, defaultJson); SetFilePermissionForAllUsers(filePath);
             }
         }
+
+		bool IsWidgetAdded(Type widgetType) { return DashboardGrid.Children.OfType<FrameworkElement>().Any(x => x.GetType() == widgetType); }
+
+        private void WidgetLibrary_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { startPoint = e.GetPosition(null); }
+        private void WidgetLibrary_MouseMove(object sender, MouseEventArgs e) { if (e.LeftButton != MouseButtonState.Pressed) return; Point mousePos = e.GetPosition(null); Vector diff = startPoint - mousePos; if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance) { FrameworkElement element = sender as FrameworkElement; WidgetItem widget = element?.DataContext as WidgetItem; if (widget != null) DragDrop.DoDragDrop(element, new DataObject(typeof(WidgetItem), widget), DragDropEffects.Copy); } }
+        private void WidgetLibrary_Item_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e) { Point mousePos = e.GetPosition(null); if (Math.Abs(startPoint.X - mousePos.X) <= 3 && Math.Abs(startPoint.Y - mousePos.Y) <= 3) { WidgetItem widget = (sender as FrameworkElement)?.DataContext as WidgetItem; if (widget != null) AddWidget_Click(new Button { Tag = widget }, null); } }
+        private void DashboardScroll_PreviewMouseWheel(object sender, MouseWheelEventArgs e) { DashboardScroll.ScrollToVerticalOffset(DashboardScroll.VerticalOffset - e.Delta); e.Handled = true; }
+        private void DashboardScroll_ScrollChanged(object sender, ScrollChangedEventArgs e) { if (editMode && DashboardScroll.VerticalOffset + DashboardScroll.ViewportHeight >= DashboardScroll.ExtentHeight - 20) EnsureRow(DashboardGrid.RowDefinitions.Count + 5); }
     }
 }
+#endregion
