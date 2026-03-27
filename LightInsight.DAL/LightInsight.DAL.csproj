@@ -33,6 +33,10 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.SqlClient, Version=4.6.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SqlClient.4.9.1\lib\net462\System.Data.SqlClient.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,6 +47,19 @@
   <ItemGroup>
     <Compile Include="Database.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ServiceBUS\ServiceBUS.csproj">
+      <Project>{a325071b-dc8c-45dd-b224-5957d7086d57}</Project>
+      <Name>ServiceBUS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ServiceUltilities\ServiceUltilities.csproj">
+      <Project>{4d0e6893-f8d1-43dc-9b22-29c18458e77a}</Project>
+      <Name>ServiceUltilities</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

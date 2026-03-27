@@ -202,6 +202,7 @@
     <Compile Include="Dashboard\Camera\Client\TotalCameraCount.xaml.cs">
       <DependentUpon>TotalCameraCount.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dashboard\Camera\LightInsightServiceClient.cs" />
     <Compile Include="Dashboard\Dashboard\DashboardView.xaml.cs">
       <DependentUpon>DashboardView.xaml</DependentUpon>
     </Compile>

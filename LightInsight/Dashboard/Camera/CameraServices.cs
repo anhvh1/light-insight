@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IdentityModel.Protocols.WSTrust;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using VideoOS.Platform;
 using VideoOS.Platform.ConfigurationItems;
@@ -29,12 +30,14 @@ namespace LightInsight.Dashboard.Camera
         public event Action<int, int, int> StatusUpdated;
         #region START / INIT
 
-        public void Start()
+        public async Task Start()
         {
             if (EnvironmentManager.Instance.MasterSite == null) return;
 
             //0.LoadURICameraMap();
-            _uris = LoadCameraUriMap();
+            //_uris = LoadCameraUriMap();
+            LightInsightServiceClient serviceClient = new LightInsightServiceClient();
+            _uris = await serviceClient.GetAsync<Dictionary<string, string>>("camera/uri");
 
             // 1. Load configuration (chỉ 1 lần)
             LoadCameraConfiguration();
