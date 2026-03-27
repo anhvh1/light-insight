@@ -18,7 +18,7 @@
 
     <!-- Sidebar -->
     <sys:String x:Key="Dashboard">Bảng điều khiển</sys:String>
-    <sys:String x:Key="Collapse">☰ Thu gọn</sys:String>
+    <sys:String x:Key="Collapse">Thu gọn</sys:String>
 
     <!-- Widget -->
     <sys:String x:Key="WidgetLibrary">Thư viện Widget</sys:String>

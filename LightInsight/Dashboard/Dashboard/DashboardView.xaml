@@ -151,6 +151,7 @@
 
                     </Border>
                 </Popup>
+
             </Grid>
 
             <!-- ===== TRIGGERS ===== -->
@@ -301,11 +302,12 @@
                             <ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/>
                         </Grid.ColumnDefinitions>
                     </Grid>
-                    <Grid x:Name="DashboardGrid" Background="Transparent" MinHeight="1000" AllowDrop="False" Drop="DashboardGrid_Drop" PreviewDragOver="DashboardGrid_DragOver">
+                    <Grid x:Name="DashboardGrid" Background="Transparent" MinHeight="1000" AllowDrop="True" Drop="DashboardGrid_Drop" DragOver="DashboardGrid_DragOver">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/>
                         </Grid.ColumnDefinitions>
                     </Grid>
+                    
                 </Grid>
             </ScrollViewer>
         </Border>
