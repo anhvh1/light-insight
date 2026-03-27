@@ -429,30 +429,14 @@ namespace LightInsight.Dashboard.Dashboard
 			e.Handled = true;
 		}
 
-		//private void Widget_MouseMove(object sender, MouseEventArgs e)
-		//      {
-		//          if (!editMode || !isDraggingWidget || selectedWidget == null) return;
-		//          Point currentPoint = e.GetPosition(DashboardGrid);
-		//          if (Math.Abs(startPoint.X - currentPoint.X) < SystemParameters.MinimumHorizontalDragDistance && Math.Abs(startPoint.Y - currentPoint.Y) < SystemParameters.MinimumVerticalDragDistance) return;
-		//          double cellWidth = DashboardGrid.ActualWidth / 12; double cellHeight = 80;
-		//          int column = (int)Math.Round((currentPoint.X - _clickOffset.X) / cellWidth);
-		//          int row = (int)Math.Round((currentPoint.Y - _clickOffset.Y) / cellHeight);
-		//          int colSpan = Grid.GetColumnSpan(selectedWidget);
-		//          column = Math.Max(0, Math.Min(column, 12 - colSpan)); row = Math.Max(0, row);
-		//          if (Grid.GetColumn(selectedWidget) != column || Grid.GetRow(selectedWidget) != row) { Grid.SetColumn(selectedWidget, column); Grid.SetRow(selectedWidget, row); _isDirty = true; }
-		//      }
-
 		private void Widget_MouseMove(object sender, MouseEventArgs e)
 		{
 			if (!editMode || !isDraggingWidget || selectedWidget == null) return;
-
-			// 🔥 LẤY POSITION THEO SCROLLVIEWER (FIX BUG NGƯỢC CHIỀU)
 			Point currentPoint = e.GetPosition(DashboardScroll);
 
 			double cellWidth = DashboardGrid.ActualWidth / 12;
 			double cellHeight = 80;
 
-			// position theo grid (để set row/column)
 			Point gridPoint = e.GetPosition(DashboardGrid);
 
 			int column = (int)Math.Round((gridPoint.X - _clickOffset.X) / cellWidth);
@@ -461,14 +445,8 @@ namespace LightInsight.Dashboard.Dashboard
 			int colSpan = Grid.GetColumnSpan(selectedWidget);
 			int rowSpan = Grid.GetRowSpan(selectedWidget);
 
-			// =============================
-			// 🔥 CLAMP COLUMN
-			// =============================
 			column = Math.Max(0, Math.Min(column, 12 - colSpan));
 
-			// =============================
-			// 🔥 AUTO SCROLL (MƯỢT)
-			// =============================
 			double threshold = 60;
 
 			// kéo xuống
@@ -484,25 +462,16 @@ namespace LightInsight.Dashboard.Dashboard
 				DashboardScroll.ScrollToVerticalOffset(DashboardScroll.VerticalOffset - speed);
 			}
 
-			// =============================
-			// 🔥 AUTO ADD ROW
-			// =============================
 			if (row + rowSpan >= DashboardGrid.RowDefinitions.Count - 2)
 			{
 				EnsureRow(DashboardGrid.RowDefinitions.Count + 5);
 			}
 
-			// =============================
-			// 🔥 LIMIT KHÔNG VƯỢT VIEWPORT
-			// =============================
 			double maxVisibleRow = (DashboardScroll.VerticalOffset + DashboardScroll.ViewportHeight) / cellHeight;
 
 			row = (int)Math.Min(row, maxVisibleRow - rowSpan);
 			row = Math.Max(0, row);
 
-			// =============================
-			// 🔥 UPDATE POSITION
-			// =============================
 			if (Grid.GetColumn(selectedWidget) != column || Grid.GetRow(selectedWidget) != row)
 			{
 				Grid.SetColumn(selectedWidget, column);
