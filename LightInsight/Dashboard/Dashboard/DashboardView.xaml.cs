@@ -417,15 +417,19 @@ namespace LightInsight.Dashboard.Dashboard
 		    while (GridOverlay.RowDefinitions.Count > targetRows) GridOverlay.RowDefinitions.RemoveAt(GridOverlay.RowDefinitions.Count - 1);
 		}
 
-        private void DashboardGrid_DragOver(object sender, DragEventArgs e) { 
-            if (!editMode || !e.Data.GetDataPresent(typeof(WidgetItem))) { 
-                e.Effects = DragDropEffects.None;
-                return; 
-            } 
-            e.Effects = DragDropEffects.Copy; 
-        }
+		private void DashboardGrid_DragOver(object sender, DragEventArgs e)
+		{
+			if (!editMode || !e.Data.GetDataPresent(typeof(WidgetItem)))
+			{
+				e.Effects = DragDropEffects.None;
+				return;
+			}
 
-        private void Widget_MouseMove(object sender, MouseEventArgs e)
+			e.Effects = DragDropEffects.Copy;
+			e.Handled = true;
+		}
+
+		private void Widget_MouseMove(object sender, MouseEventArgs e)
         {
             if (!editMode || !isDraggingWidget || selectedWidget == null) return;
             Point currentPoint = e.GetPosition(DashboardGrid);
@@ -440,8 +444,8 @@ namespace LightInsight.Dashboard.Dashboard
 
 		private void DashboardGrid_Drop(object sender, DragEventArgs e)
 		{
-			if (!editMode || !e.Data.GetDataPresent(typeof(WidgetItem))) return;
-			WidgetItem widgetItem = e.Data.GetData(typeof(WidgetItem)) as WidgetItem;
+			if (!e.Data.GetDataPresent(typeof(WidgetItem))) return;
+			var widgetItem = e.Data.GetData(typeof(WidgetItem)) as WidgetItem;
 			FrameworkElement newWidget = Activator.CreateInstance(widgetItem.WidgetType) as FrameworkElement;
 			SetupWidget(newWidget); Point pos = e.GetPosition(DashboardGrid);
 			int column = (int)(pos.X / (DashboardGrid.ActualWidth / 12)); int row = (int)(pos.Y / 80);
@@ -650,7 +654,7 @@ namespace LightInsight.Dashboard.Dashboard
 		bool IsWidgetAdded(Type widgetType) { return DashboardGrid.Children.OfType<FrameworkElement>().Any(x => x.GetType() == widgetType); }
 
         private void WidgetLibrary_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { startPoint = e.GetPosition(null); }
-        private void WidgetLibrary_MouseMove(object sender, MouseEventArgs e) { if (e.LeftButton != MouseButtonState.Pressed) return; Point mousePos = e.GetPosition(null); Vector diff = startPoint - mousePos; if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance) { FrameworkElement element = sender as FrameworkElement; WidgetItem widget = element?.DataContext as WidgetItem; if (widget != null) DragDrop.DoDragDrop(element, new DataObject(typeof(WidgetItem), widget), DragDropEffects.Copy); } }
+        private void WidgetLibrary_MouseMove(object sender, MouseEventArgs e) { if (e.LeftButton != MouseButtonState.Pressed) return; Point mousePos = e.GetPosition(null); Vector diff = startPoint - mousePos; if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance) { FrameworkElement element = sender as FrameworkElement; WidgetItem widget = element?.DataContext as WidgetItem; if (widget != null) DragDrop.DoDragDrop(element, widget, DragDropEffects.Copy); } }
         private void WidgetLibrary_Item_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e) { Point mousePos = e.GetPosition(null); if (Math.Abs(startPoint.X - mousePos.X) <= 3 && Math.Abs(startPoint.Y - mousePos.Y) <= 3) { WidgetItem widget = (sender as FrameworkElement)?.DataContext as WidgetItem; if (widget != null) AddWidget_Click(new Button { Tag = widget }, null); } }
         private void DashboardScroll_PreviewMouseWheel(object sender, MouseWheelEventArgs e) { DashboardScroll.ScrollToVerticalOffset(DashboardScroll.VerticalOffset - e.Delta); e.Handled = true; }
         private void DashboardScroll_ScrollChanged(object sender, ScrollChangedEventArgs e) { if (editMode && DashboardScroll.VerticalOffset + DashboardScroll.ViewportHeight >= DashboardScroll.ExtentHeight - 20) EnsureRow(DashboardGrid.RowDefinitions.Count + 5); }
