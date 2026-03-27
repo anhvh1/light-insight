@@ -36,13 +36,14 @@ namespace LightInsight.Dashboard.Camera.Client
         public override string ToString() => Content;
     }
 
-    public partial class CameraListWidget : UserControl, IResizableWidget, IDisposable
-    {
-        private ResourceDictionary _currentThemeDictionary;
-        private object _themeChangedRegistration;
-        public int MinCol => 6;
-        public int MinRow => 4;
-        public Thumb ResizeThumb => this.InternalResizeThumb;
+	public partial class CameraListWidget : UserControl, IResizableWidget, IDisposable
+	{
+		private ResourceDictionary _currentThemeDictionary;
+		private object _themeChangedRegistration;
+		private bool _widgetEditMode;
+		public int MinCol => 6;
+		public int MinRow => 4;
+		public Thumb ResizeThumb => this.InternalResizeThumb;
 
         public event EventHandler DeleteRequested;
         private List<CameraInfo> _allCameras;
@@ -97,33 +98,17 @@ namespace LightInsight.Dashboard.Camera.Client
                 Source = new Uri(uri, UriKind.Relative)
             };
 
-            Resources.MergedDictionaries.Clear();
-            Resources.MergedDictionaries.Add(dict);
-        }
-        public void SetEditMode(bool isEdit)
-        {
-            DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
-            if (InternalResizeThumb != null)
-                InternalResizeThumb.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
+			Resources.MergedDictionaries.Clear();
+			Resources.MergedDictionaries.Add(dict);
+		}
+		public void SetEditMode(bool isEdit)
+		{
+			_widgetEditMode = isEdit;
+			DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
+			if (InternalResizeThumb != null)
+				InternalResizeThumb.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
 
-            var mainBorder = FindName("MainBorder") as Border;
-            if (mainBorder != null)
-            {
-                if (isEdit)
-                {
-                    if (mainBorder.Tag is System.Windows.Media.Brush originalBorderBrush)
-                        mainBorder.BorderBrush = originalBorderBrush;
-                    mainBorder.BorderThickness = new Thickness(1);
-                }
-                else
-                {
-                    if (!(mainBorder.Tag is System.Windows.Media.Brush))
-                        mainBorder.Tag = mainBorder.BorderBrush;
-                    mainBorder.BorderBrush = TryFindResource("CardBorder") as System.Windows.Media.Brush
-                        ?? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(60, 60, 60));
-                    mainBorder.BorderThickness = new Thickness(1);
-                }
-            }
+			DashboardWidgetChrome.SyncMainBorderBrush(this, _widgetEditMode);
             this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
         }
         private void DeleteWidget_Click(object sender, RoutedEventArgs e)
@@ -305,10 +290,11 @@ namespace LightInsight.Dashboard.Camera.Client
                 if (_currentThemeDictionary != null)
                     Resources.MergedDictionaries.Remove(_currentThemeDictionary);
 
-                Resources.MergedDictionaries.Insert(0, newDict);
-                _currentThemeDictionary = newDict;
-            });
-        }
+				Resources.MergedDictionaries.Insert(0, newDict);
+				_currentThemeDictionary = newDict;
+				DashboardWidgetChrome.SyncMainBorderBrush(this, _widgetEditMode);
+			});
+		}
 
     }
 }

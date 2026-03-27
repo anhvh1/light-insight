@@ -37,17 +37,20 @@
                 </Grid.RowDefinitions>
 
                 <!-- HEADER -->
-                <Grid Grid.Row="0" Background="{DynamicResource BgMain}">
+                <Grid Grid.Row="0" Background="{DynamicResource WidgetHeaderBg}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Text="{DynamicResource Alarm_Title_EventTrendChart}"
-                               Foreground="{DynamicResource TextPrimary}"
+                               Foreground="{DynamicResource WidgetHeaderText}"
                                FontSize="14"
                                VerticalAlignment="Center"
                                Margin="10,0"/>
+                    <Border Height="1"
+                            VerticalAlignment="Bottom"
+                            Background="{DynamicResource WidgetBorder}"/>
 
                     <Button x:Name="DeleteButton" 
         Content="X" 

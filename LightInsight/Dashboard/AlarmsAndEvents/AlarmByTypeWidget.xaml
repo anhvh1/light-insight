@@ -36,12 +36,15 @@
                 </Grid.RowDefinitions>
 
                 <!-- HEADER -->
-                <Grid Grid.Row="0" Background="{DynamicResource BgMain}">
+                <Grid Grid.Row="0" Background="{DynamicResource WidgetHeaderBg}">
                     <TextBlock Text="{DynamicResource Alarm_Title_ByType}"
-                               Foreground="{DynamicResource TextPrimary}"
+                               Foreground="{DynamicResource WidgetHeaderText}"
                                FontSize="14"
                                VerticalAlignment="Center"
                                Margin="10,0"/>
+                    <Border Height="1"
+                            VerticalAlignment="Bottom"
+                            Background="{DynamicResource WidgetBorder}"/>
 
                     <Button x:Name="DeleteButton" 
                              Content="X" 
@@ -103,10 +106,20 @@
                                         MouseLeave="Chart_MouseLeave">
 
                         <lvc:CartesianChart.AxisX>
-                            <lvc:Axis x:Name="DailyAxisX" Foreground="{DynamicResource TextPrimary}" FontSize="12">
+                            <lvc:Axis x:Name="DailyAxisX" 
+                                      Foreground="{DynamicResource TextPrimary}" 
+                                      FontSize="12">
+
+                                <lvc:Axis.Resources>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextAlignment" Value="Center"/>
+                                    </Style>
+                                </lvc:Axis.Resources>
+
                                 <lvc:Axis.Separator>
                                     <lvc:Separator Step="1" Stroke="Transparent"/>
                                 </lvc:Axis.Separator>
+
                             </lvc:Axis>
                         </lvc:CartesianChart.AxisX>
 

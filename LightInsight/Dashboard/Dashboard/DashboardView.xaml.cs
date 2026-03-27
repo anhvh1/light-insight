@@ -35,26 +35,81 @@ using System.Security.Principal;
 
 namespace LightInsight.Dashboard.Dashboard
 {
-	/// <summary>
-	/// Interaction logic for DashboardView.xaml
-	/// </summary>
-	public partial class DashboardView : UserControl, INotifyPropertyChanged
-	{
-		private object _languageChangedRegistration;
-		private ResourceDictionary _currentThemeDictionary;
-		private object _themeChangedRegistration;
-		bool editMode = false;
-		private bool _isDirty = false;
-		private Point startPoint;
-		Button currentMenu = null;
-		string currentDashboard = "Default Workspace";
-		bool sidebarCollapsed = false;
-		FrameworkElement selectedWidget = null;
-		bool isDraggingWidget = false;
-		bool isDark = true;
-		string currentFilter = null;
-		//public ObservableCollection<WorkspaceModel> DashboardMenus { get; set; }
-		public event PropertyChangedEventHandler PropertyChanged;
+    /// <summary>
+    /// Interaction logic for DashboardView.xaml
+    /// </summary>
+    public partial class DashboardView : UserControl, INotifyPropertyChanged
+    {
+        private object _languageChangedRegistration;
+        private ResourceDictionary _currentThemeDictionary;
+        private object _themeChangedRegistration;
+        bool editMode = false;
+        private bool _isDirty = false;
+        private Point startPoint;
+        Button currentMenu = null;
+        string currentDashboard = "Default Workspace";
+        private bool _isSidebarCollapsed = false;
+        public bool IsSidebarCollapsed
+        {
+            get => _isSidebarCollapsed;
+            set
+            {
+                _isSidebarCollapsed = value;
+                OnPropertyChanged(nameof(IsSidebarCollapsed));
+            }
+        }
+
+        private CancellationTokenSource _popupCloseCancellation;
+
+        private async void Expander_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (!IsSidebarCollapsed) return;
+
+            // Hủy lệnh đóng đang chờ (nếu có)
+            _popupCloseCancellation?.Cancel();
+            SubMenuPopup.IsOpen = true;
+        }
+
+        private async void Expander_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (!IsSidebarCollapsed) return;
+
+            // Bắt đầu đếm ngược 300ms trước khi đóng
+            _popupCloseCancellation?.Cancel();
+            _popupCloseCancellation = new CancellationTokenSource();
+            var token = _popupCloseCancellation.Token;
+
+            try
+            {
+                await Task.Delay(300, token);
+                if (!token.IsCancellationRequested)
+                {
+                    // Kiểm tra lại lần cuối xem chuột có đang nằm trên Popup không
+                    if (!SubMenuPopup.IsMouseOver && !DashboardExpander.IsMouseOver)
+                    {
+                        SubMenuPopup.IsOpen = false;
+                    }
+                }
+            }
+            catch (TaskCanceledException) { }
+        }
+
+        private void Popup_MouseEnter(object sender, MouseEventArgs e)
+        {
+            _popupCloseCancellation?.Cancel();
+        }
+
+        private void Popup_MouseLeave(object sender, MouseEventArgs e)
+        {
+            Expander_MouseLeave(sender, e);
+        }
+
+        FrameworkElement selectedWidget = null;
+        bool isDraggingWidget = false;
+        bool isDark = true;
+        string currentFilter = null;
+        //public ObservableCollection<WorkspaceModel> DashboardMenus { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
 
 		void OnPropertyChanged(string name)
 		{
@@ -123,6 +178,14 @@ namespace LightInsight.Dashboard.Dashboard
                 new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
             WidgetList.ItemsSource = allWidgets;
             EnsureDashboardFile();
+
+            // Thiết lập Dashboard mặc định ban đầu nếu có danh sách menu
+            if (DashboardMenus != null && DashboardMenus.Any())
+            {
+                currentDashboard = DashboardMenus[0].Name;
+                BreadcrumbText.Text = $"Dashboard > {currentDashboard}";
+            }
+
             // đọc lại dữ liệu widget đang có
             LoadLayout();
 
@@ -407,12 +470,18 @@ namespace LightInsight.Dashboard.Dashboard
 			if (item == null)
 				return;
 
-			OpenDashboard(item);
-			ExitEditMode();
-		}
-		//void OpenDashboard(Button btn)
-		//{
-		//    SelectMenu(btn);
+            OpenDashboard(item);
+            ExitEditMode();
+
+            // Đóng popup nếu đang ở chế độ thu gọn
+            if (IsSidebarCollapsed)
+            {
+                SubMenuPopup.IsOpen = false;
+            }
+        }
+        //void OpenDashboard(Button btn)
+        //{
+        //    SelectMenu(btn);
 
 		//    currentDashboard = btn.Tag.ToString();
 
@@ -522,16 +591,16 @@ namespace LightInsight.Dashboard.Dashboard
 			SaveBtn.Visibility = Visibility.Collapsed;
 			CancelBtn.Visibility = Visibility.Collapsed;
 
-			foreach (var widget in DashboardGrid.Children.OfType<IDashboardWidget>())
-			{
-				widget.SetEditMode(false);
-			}
-		}
-		private void DashboardGrid_DragOver(object sender, DragEventArgs e)
-		{
-			e.Effects = DragDropEffects.Copy;
-			e.Handled = true;
-		}
+            foreach (var widget in DashboardGrid.Children.OfType<IDashboardWidget>())
+            {
+                widget.SetEditMode(false);
+            }
+        }
+        private void DashboardGrid_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effects = DragDropEffects.Copy;
+            e.Handled = false;
+        }
 
 		private void Widget_MouseMove(object sender, MouseEventArgs e)
 		{
@@ -761,13 +830,6 @@ namespace LightInsight.Dashboard.Dashboard
 			// lưu tất cả cell đã dùng
 			HashSet<string> usedCells = new HashSet<string>();
 
-			// nếu không có thì lấy default nếu có rồi thì lấy phần tử đầu tiên
-			if (DashboardMenus.Any())
-			{
-				currentDashboard = DashboardMenus[0].Name;
-				BreadcrumbText.Text = $"Dashboard > {currentDashboard}";
-			}
-
 
 			foreach (var layout in layouts)
 			{
@@ -968,36 +1030,28 @@ namespace LightInsight.Dashboard.Dashboard
 			widget.MouseMove += Widget_MouseMove;
 			widget.MouseLeftButtonUp += Widget_MouseLeftButtonUp;
 
-			if (widget is IDashboardWidget dashboardWidget)
-			{
-				dashboardWidget.DeleteRequested += Widget_DeleteRequested;
-				dashboardWidget.SetEditMode(editMode);
-			}
-		}
-		private void ToggleSidebar_Click(object sender, RoutedEventArgs e)
-		{
-			if (sidebarCollapsed)
-			{
-				SidebarColumn.Width = new GridLength(220);
+            if (widget is IDashboardWidget dashboardWidget)
+            {
+                dashboardWidget.DeleteRequested += Widget_DeleteRequested;
+                dashboardWidget.SetEditMode(editMode);
+            }
+        }
+        private void ToggleSidebar_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsSidebarCollapsed)
+            {
+                SidebarColumn.Width = new GridLength(220);
+            }
+            else
+            {
+                SidebarColumn.Width = new GridLength(40);
+            }
 
-				//OperationsText.Visibility = Visibility.Visible;
-				//AlarmMonitorText.Visibility = Visibility.Visible;
-				DashboardExpander.Header = "Dashboard";
-			}
-			else
-			{
-				SidebarColumn.Width = new GridLength(60);
-
-				//OperationsText.Visibility = Visibility.Collapsed;
-				//AlarmMonitorText.Visibility = Visibility.Collapsed;
-				DashboardExpander.Header = "";
-			}
-
-			sidebarCollapsed = !sidebarCollapsed;
-		}
-		private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
-		{
-			if (!editMode) return;
+            IsSidebarCollapsed = !IsSidebarCollapsed;
+        }
+        private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            if (!editMode) return;
 
 			// 'sender' ở đây chính là cái Thumb
 			Thumb thumb = sender as Thumb;
@@ -1191,11 +1245,26 @@ namespace LightInsight.Dashboard.Dashboard
 					});
 			}
 
-			CreateGrid();
-		}
-		private void DashboardScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
-		{
-			ScrollViewer sv = sender as ScrollViewer;
+            CreateGrid();
+        }
+        private void DashboardScroll_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            ScrollViewer scrollViewer = sender as ScrollViewer;
+
+            if (scrollViewer != null)
+            {
+                scrollViewer.ScrollToVerticalOffset(
+                    scrollViewer.VerticalOffset - e.Delta);
+
+                e.Handled = true; // 🔥 QUAN TRỌNG
+            }
+        }
+        private void DashboardScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            // 🔥 CHẶN nếu không phải edit mode
+            if (!editMode)
+                return;
+            ScrollViewer sv = sender as ScrollViewer;
 
 			if (sv.VerticalOffset + sv.ViewportHeight >= sv.ExtentHeight - 5)
 			{

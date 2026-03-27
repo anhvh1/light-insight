@@ -34,12 +34,15 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0" Background="{DynamicResource BgMain}">
+                <Grid Grid.Row="0" Background="{DynamicResource WidgetHeaderBg}">
                     <TextBlock Text="{DynamicResource Alarm_Title_DailyCount}"
-                               Foreground="{DynamicResource TextPrimary}"
+                               Foreground="{DynamicResource WidgetHeaderText}"
                                FontSize="14"
                                VerticalAlignment="Center"
                                Margin="10,0"/>
+                    <Border Height="1"
+                            VerticalAlignment="Bottom"
+                            Background="{DynamicResource WidgetBorder}"/>
 
                     <Button x:Name="DeleteButton" 
                             Content="X" 
@@ -105,7 +108,7 @@
                         </lvc:CartesianChart.AxisX>
 
                         <lvc:CartesianChart.AxisY>
-                            <lvc:Axis MinValue="0" MaxValue="60" Foreground="{DynamicResource TextPrimary}" FontSize="12">
+                            <lvc:Axis MinValue="0" Foreground="{DynamicResource TextPrimary}" FontSize="12">
                                 <lvc:Axis.Separator>
                                     <lvc:Separator Stroke="#333333" StrokeThickness="1" StrokeDashArray="4" />
                                 </lvc:Axis.Separator>

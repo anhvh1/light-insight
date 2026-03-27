@@ -38,7 +38,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- HEADER -->
-                <Grid Grid.Row="0" Margin="0,0,0,10">
+                <Grid Grid.Row="0" Margin="0,0,0,10" Background="{DynamicResource WidgetHeaderBg}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -46,11 +46,15 @@
 
                     <TextBlock Grid.Column="0"
                                Text="{DynamicResource Recording_Title_StorageUsageByServer}"
-                               Foreground="{DynamicResource TextPrimary}"
+                               Foreground="{DynamicResource WidgetHeaderText}"
                                FontSize="16"
                                FontWeight="SemiBold"
                                VerticalAlignment="Center"
                                TextTrimming="CharacterEllipsis"/>
+                    <Border Grid.ColumnSpan="2"
+                            Height="1"
+                            VerticalAlignment="Bottom"
+                            Background="{DynamicResource WidgetBorder}"/>
 
                     <Button x:Name="DeleteButton" 
         Content="X" 

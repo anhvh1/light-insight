@@ -23,17 +23,12 @@ using System.Threading;
 
 namespace LightInsight.Dashboard.RecordingServer
 {
-    public class ServersOfflineData
-    {
-        public int Count { get; set; }
-        public int TrendPercentage { get; set; }
-        public bool IsTrendUp { get; set; }
-    }
 
     public partial class ServersOfflineCountWidget : UserControl, IResizableWidget
     {
         private ResourceDictionary _currentThemeDictionary;
         private object _themeChangedRegistration;
+        private bool _widgetEditMode;
         public int MinCol => 2;
 
         public int MinRow => 2;
@@ -41,6 +36,7 @@ namespace LightInsight.Dashboard.RecordingServer
         public Thumb ResizeThumb => this.InternalResizeThumb;
 
         public event EventHandler DeleteRequested;
+        private readonly ServerServices _sServices;
 
         public ServersOfflineCountWidget()
         {
@@ -52,7 +48,22 @@ namespace LightInsight.Dashboard.RecordingServer
                 new MessageIdFilter(MessageId.SmartClient.ThemeChangedIndication));
             DeleteButton.Visibility = Visibility.Collapsed;
 
-            LoadData();
+            // Khởi tạo service lắng nghe Milestone
+            _sServices = new ServerServices();
+
+            // Chỉ cập nhật đúng con số Offline lên UI
+            _sServices.StatusUpdated += (online, offline, totalCount) =>
+            {
+                CountText.Text = offline.ToString();
+            };
+
+            // Bắt đầu chạy
+            _sServices.Start();
+
+            // Dọn dẹp memory khi Widget bị tắt
+            this.Unloaded += (s, e) => {
+                _sServices?.Dispose();
+            };
         }
         private void ApplySmartClientLanguage(string name)
         {
@@ -93,59 +104,28 @@ namespace LightInsight.Dashboard.RecordingServer
 
                 Resources.MergedDictionaries.Insert(0, newDict);
                 _currentThemeDictionary = newDict;
+                DashboardWidgetChrome.SyncMainBorderBrush(this, _widgetEditMode);
 
                 //_vm?.SetThemeResources(Resources);
                 //_vm?.RefreshChartTheme();
             });
         }
 
-        private void LoadData()
-        {
-            // FAKE DATA NHƯ ẢNH MẪU
-            var data = new ServersOfflineData
-            {
-                Count = 1,
-                TrendPercentage = 50,
-                IsTrendUp = false // Trend giảm
-            };
-
-            // Gán dữ liệu lên UI
-            CountText.Text = data.Count.ToString();
-
-            // Text hiển thị
-            TrendText.Text = $"{data.TrendPercentage}% vs last period";
-        }
-
         public void SetEditMode(bool isEdit)
         {
+            _widgetEditMode = isEdit;
             DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
             if (InternalResizeThumb != null)
                 InternalResizeThumb.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
 
-            var mainBorder = FindName("MainBorder") as Border;
-            if (mainBorder != null)
-            {
-                if (isEdit)
-                {
-                    if (mainBorder.Tag is System.Windows.Media.Brush originalBorderBrush)
-                        mainBorder.BorderBrush = originalBorderBrush;
-                    mainBorder.BorderThickness = new Thickness(1);
-                }
-                else
-                {
-                    if (!(mainBorder.Tag is System.Windows.Media.Brush))
-                        mainBorder.Tag = mainBorder.BorderBrush;
-                    mainBorder.BorderBrush = TryFindResource("CardBorder") as System.Windows.Media.Brush
-                        ?? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(60, 60, 60));
-                    mainBorder.BorderThickness = new Thickness(1);
-                }
-            }
+            DashboardWidgetChrome.SyncMainBorderBrush(this, _widgetEditMode);
             this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
         }
 
         private void DeleteWidget_Click(object sender, RoutedEventArgs e)
         {
             DeleteRequested?.Invoke(this, EventArgs.Empty);
+            _sServices?.Dispose();
         }
 
         // lấy dữ liệu recording server offline từ server và cập nhật UI

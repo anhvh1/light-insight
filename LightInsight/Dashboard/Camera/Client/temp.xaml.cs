@@ -17,6 +17,7 @@ namespace LightInsight.Dashboard.Camera.Client
 	{
 		private ResourceDictionary _currentThemeDictionary;
 		private object _themeChangedRegistration;
+		private bool _widgetEditMode;
 		public event EventHandler DeleteRequested;
 		// Set minimum size of the Widget on the Dashboard Grid
 		// default size can be set by the Tag attribute of the UserControl
@@ -55,29 +56,13 @@ namespace LightInsight.Dashboard.Camera.Client
 		//      }
 		public void SetEditMode(bool isEdit)
 		{
+			_widgetEditMode = isEdit;
 			// Hiện/Ẩn nút xóa
 			DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
 			if (InternalResizeThumb != null)
 				InternalResizeThumb.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
 
-			var mainBorder = FindName("MainBorder") as Border;
-			if (mainBorder != null)
-			{
-				if (isEdit)
-				{
-					if (mainBorder.Tag is System.Windows.Media.Brush originalBorderBrush)
-						mainBorder.BorderBrush = originalBorderBrush;
-					mainBorder.BorderThickness = new Thickness(1);
-				}
-				else
-				{
-					if (!(mainBorder.Tag is System.Windows.Media.Brush))
-						mainBorder.Tag = mainBorder.BorderBrush;
-					mainBorder.BorderBrush = TryFindResource("CardBorder") as System.Windows.Media.Brush
-						?? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(60, 60, 60));
-					mainBorder.BorderThickness = new Thickness(1);
-				}
-			}
+			DashboardWidgetChrome.SyncMainBorderBrush(this, _widgetEditMode);
             this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
         }
 		private void DeleteWidget_Click(object sender, RoutedEventArgs e)
@@ -108,6 +93,7 @@ namespace LightInsight.Dashboard.Camera.Client
 
 				Resources.MergedDictionaries.Insert(0, newDict);
 				_currentThemeDictionary = newDict;
+				DashboardWidgetChrome.SyncMainBorderBrush(this, _widgetEditMode);
 			});
 		}
 	}

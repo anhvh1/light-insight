@@ -15,17 +15,11 @@ using System.Threading;
 
 namespace LightInsight.Dashboard.AlarmsAndEvents
 {
-    public class DailyCountData
-    {
-        public string Day { get; set; }
-        public int Count { get; set; }
-    }
-
-    // Đổi IDashboardWidget thành IResizableWidget để khớp chuẩn hệ thống
     public partial class AlarmDailyCountWidget : UserControl, IResizableWidget
     {
         private ResourceDictionary _currentThemeDictionary;
         private object _themeChangedRegistration;
+        private bool _widgetEditMode;
         // Khai báo các thuộc tính bắt buộc của IResizableWidget
         public int MinCol => 5;
         public int MinRow => 3;
@@ -72,27 +66,33 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
 
         private void LoadChartData()
         {
-            var rawData = new List<DailyCountData>
+            try
             {
-                new DailyCountData { Day = "Mon", Count = 34 },
-                new DailyCountData { Day = "Tue", Count = 28 },
-                new DailyCountData { Day = "Wed", Count = 45 },
-                new DailyCountData { Day = "Thu", Count = 53 },
-                new DailyCountData { Day = "Fri", Count = 38 },
-                new DailyCountData { Day = "Sat", Count = 15 },
-                new DailyCountData { Day = "Sun", Count = 12 }
-            };
+                // 1. Gọi trực tiếp Service lấy số liệu thống kê 7 ngày từ Milestone
+                // (Đảm bảo bạn đã dán hàm GetWeeklyAlarmCounts vào AlarmServices)
+                List<DailyCountData> rawData = AlarmServices.GetWeeklyAlarmCounts();
 
-            if (rawData != null && rawData.Count > 0)
-            {
                 var values = new ChartValues<int>();
 
-                foreach (var item in rawData)
+                if (rawData != null && rawData.Count > 0)
                 {
-                    values.Add(item.Count);
-                    _xAxisLabels.Add(item.Day);
+                    foreach (var item in rawData)
+                    {
+                        values.Add(item.Count);     // Lấy số lượng báo động
+                        _xAxisLabels.Add(item.Day); // Lấy tên thứ (Mon, Tue...)
+                    }
+                }
+                else
+                {
+                    // Fallback an toàn nếu Server trả về null
+                    for (int i = 0; i < 7; i++)
+                    {
+                        values.Add(0);
+                        _xAxisLabels.Add("N/A");
+                    }
                 }
 
+                // 2. Add cột vào Series Collection để vẽ biểu đồ
                 _chartSeries.Add(new ColumnSeries
                 {
                     Values = values,
@@ -102,10 +102,9 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
                     StrokeThickness = 0
                 });
             }
-            else
+            catch (Exception ex)
             {
-                _chartSeries.Add(new ColumnSeries { Values = new ChartValues<int> { 10, 20, 30 }, Fill = _defaultColor });
-                _xAxisLabels.AddRange(new[] { "Lỗi Data", "Không có", "Dữ liệu" });
+                EnvironmentManager.Instance.Log(false, "LightInsight Widget", "LoadChart UI Error: " + ex.Message);
             }
         }
 
@@ -176,33 +175,18 @@ namespace LightInsight.Dashboard.AlarmsAndEvents
 
                 Resources.MergedDictionaries.Insert(0, newDict);
                 _currentThemeDictionary = newDict;
+                DashboardWidgetChrome.SyncMainBorderBrush(this, _widgetEditMode);
             });
         }
 
         public void SetEditMode(bool isEdit)
         {
+            _widgetEditMode = isEdit;
             DeleteButton.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
             if (InternalResizeThumb != null)
                 InternalResizeThumb.Visibility = isEdit ? Visibility.Visible : Visibility.Collapsed;
 
-            var mainBorder = FindName("MainBorder") as Border;
-            if (mainBorder != null)
-            {
-                if (isEdit)
-                {
-                    if (mainBorder.Tag is System.Windows.Media.Brush originalBorderBrush)
-                        mainBorder.BorderBrush = originalBorderBrush;
-                    mainBorder.BorderThickness = new Thickness(1);
-                }
-                else
-                {
-                    if (!(mainBorder.Tag is System.Windows.Media.Brush))
-                        mainBorder.Tag = mainBorder.BorderBrush;
-                    mainBorder.BorderBrush = TryFindResource("CardBorder") as System.Windows.Media.Brush
-                        ?? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(60, 60, 60));
-                    mainBorder.BorderThickness = new Thickness(1);
-                }
-            }
+            DashboardWidgetChrome.SyncMainBorderBrush(this, _widgetEditMode);
             this.Cursor = isEdit ? Cursors.SizeAll : Cursors.Arrow;
         }
 
