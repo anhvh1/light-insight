@@ -635,7 +635,22 @@ namespace LightInsight.Dashboard.Dashboard
         private void WidgetLibrary_MouseMove(object sender, MouseEventArgs e) { if (e.LeftButton != MouseButtonState.Pressed) return; Point mousePos = e.GetPosition(null); Vector diff = startPoint - mousePos; if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance) { FrameworkElement element = sender as FrameworkElement; WidgetItem widget = element?.DataContext as WidgetItem; if (widget != null) DragDrop.DoDragDrop(element, new DataObject(typeof(WidgetItem), widget), DragDropEffects.Copy); } }
         private void WidgetLibrary_Item_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e) { Point mousePos = e.GetPosition(null); if (Math.Abs(startPoint.X - mousePos.X) <= 3 && Math.Abs(startPoint.Y - mousePos.Y) <= 3) { WidgetItem widget = (sender as FrameworkElement)?.DataContext as WidgetItem; if (widget != null) AddWidget_Click(new Button { Tag = widget }, null); } }
         private void DashboardScroll_PreviewMouseWheel(object sender, MouseWheelEventArgs e) { DashboardScroll.ScrollToVerticalOffset(DashboardScroll.VerticalOffset - e.Delta); e.Handled = true; }
-        private void DashboardScroll_ScrollChanged(object sender, ScrollChangedEventArgs e) { if (editMode && DashboardScroll.VerticalOffset + DashboardScroll.ViewportHeight >= DashboardScroll.ExtentHeight - 20) EnsureRow(DashboardGrid.RowDefinitions.Count + 5); }
+        private void AddMoreRows(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                DashboardGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(80) });
+                GridOverlay.RowDefinitions.Add(new RowDefinition { Height = new GridLength(80) });
+            }
+            CreateGrid();
+        }
+
+        private void DashboardScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            ScrollViewer sv = sender as ScrollViewer;
+            if (sv == null || !editMode) return;
+            if (sv.VerticalOffset + sv.ViewportHeight >= sv.ExtentHeight - 5) AddMoreRows(10);
+        }
     }
 }
 #endregion

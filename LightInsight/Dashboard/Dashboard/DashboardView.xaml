@@ -198,7 +198,7 @@
 
         <!-- ================= DASHBOARD AREA ================= -->
         <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource BgMain}" Margin="5">
-            <ScrollViewer x:Name="DashboardScroll" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer x:Name="DashboardScroll" VerticalScrollBarVisibility="Auto" ScrollChanged="DashboardScroll_ScrollChanged">
                 <Grid>
                     <Grid x:Name="GridOverlay" Visibility="Collapsed" IsHitTestVisible="False">
                         <Grid.ColumnDefinitions>
