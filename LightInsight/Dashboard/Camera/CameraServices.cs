@@ -259,10 +259,9 @@ namespace LightInsight.Dashboard.Camera
                 else
                     unknown++;
             }
+			int total = online + offline;
 
-            int total = uniqueCameras.Count;
-
-            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+			Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
                 StatusUpdated?.Invoke(online, offline, total);
             }));

@@ -417,7 +417,13 @@ namespace LightInsight.Dashboard.Dashboard
 		    while (GridOverlay.RowDefinitions.Count > targetRows) GridOverlay.RowDefinitions.RemoveAt(GridOverlay.RowDefinitions.Count - 1);
 		}
 
-        private void DashboardGrid_DragOver(object sender, DragEventArgs e) { if (!editMode || !e.Data.GetDataPresent(typeof(WidgetItem))) { e.Effects = DragDropEffects.None; return; } e.Effects = DragDropEffects.Copy; }
+        private void DashboardGrid_DragOver(object sender, DragEventArgs e) { 
+            if (!editMode || !e.Data.GetDataPresent(typeof(WidgetItem))) { 
+                e.Effects = DragDropEffects.None;
+                return; 
+            } 
+            e.Effects = DragDropEffects.Copy; 
+        }
 
         private void Widget_MouseMove(object sender, MouseEventArgs e)
         {
