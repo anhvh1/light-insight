@@ -1,7 +1,7 @@
 <UserControl x:Class="LightInsight.Dashboard.Camera.Client.CameraListWidget"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Tag="12x4"
+             Tag="8x4"
              Width="Auto" Height="Auto" 
              HorizontalAlignment="Stretch" 
              VerticalAlignment="Stretch"
@@ -124,9 +124,9 @@
 
                     <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,10">
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                            <RadioButton Content="{DynamicResource Camera_Filter_All8}" Style="{StaticResource TabButtonStyle}" IsChecked="True" Margin="0,0,5,0"/>
-                            <RadioButton Content="{DynamicResource Camera_Filter_Online6}" Style="{StaticResource TabButtonStyle}" Margin="0,0,5,0"/>
-                            <RadioButton Content="{DynamicResource Camera_Filter_Offline2}" Style="{StaticResource TabButtonStyle}"/>
+                            <RadioButton Content="{DynamicResource Camera_Filter_All8}" Style="{StaticResource TabButtonStyle}" IsChecked="True" Tag="All" Checked="Filter_Checked" Margin="0,0,5,0"/>
+                            <RadioButton Content="{DynamicResource Camera_Filter_Online6}" Style="{StaticResource TabButtonStyle}" Tag="Online" Checked="Filter_Checked" Margin="0,0,5,0"/>
+                            <RadioButton Content="{DynamicResource Camera_Filter_Offline2}" Style="{StaticResource TabButtonStyle}" Tag="Offline" Checked="Filter_Checked"/>
                         </StackPanel>
                         <Border DockPanel.Dock="Right" Background="{DynamicResource BgMain}" CornerRadius="4" Width="180" Height="22">
                             <Grid>
@@ -216,14 +216,6 @@
                                 <DataGridTextColumn.HeaderStyle>
                                     <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                                         <Setter Property="Content" Value="{DynamicResource Camera_GridHeader_RECORDING}" />
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
-                            </DataGridTextColumn>
-
-                            <DataGridTextColumn Binding="{Binding Uptime}" Width="70">
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-                                        <Setter Property="Content" Value="{DynamicResource Camera_GridHeader_UPTIME}" />
                                     </Style>
                                 </DataGridTextColumn.HeaderStyle>
                             </DataGridTextColumn>

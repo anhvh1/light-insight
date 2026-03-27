@@ -64,9 +64,9 @@
     <sys:String x:Key="Camera_Label_CamerasOnline">Camera trực tuyến</sys:String>
     <sys:String x:Key="Camera_Label_CamerasOffline">Camera ngoại tuyến</sys:String>
     <sys:String x:Key="Camera_Label_OnlineOffline">Trực tuyến / Ngoại tuyến</sys:String>
-    <sys:String x:Key="Camera_Filter_All8">Tất cả (8)</sys:String>
-    <sys:String x:Key="Camera_Filter_Online6">Trực tuyến (6)</sys:String>
-    <sys:String x:Key="Camera_Filter_Offline2">Ngoại tuyến (2)</sys:String>
+    <sys:String x:Key="Camera_Filter_All8">Tất cả</sys:String>
+    <sys:String x:Key="Camera_Filter_Online6">Trực tuyến</sys:String>
+    <sys:String x:Key="Camera_Filter_Offline2">Ngoại tuyến</sys:String>
     <sys:String x:Key="Camera_GridHeader_ID">ID</sys:String>
     <sys:String x:Key="Camera_GridHeader_NAME">TÊN</sys:String>
     <sys:String x:Key="Camera_GridHeader_STATUS">TRẠNG THÁI</sys:String>
