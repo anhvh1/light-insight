@@ -429,18 +429,87 @@ namespace LightInsight.Dashboard.Dashboard
 			e.Handled = true;
 		}
 
+		//private void Widget_MouseMove(object sender, MouseEventArgs e)
+		//      {
+		//          if (!editMode || !isDraggingWidget || selectedWidget == null) return;
+		//          Point currentPoint = e.GetPosition(DashboardGrid);
+		//          if (Math.Abs(startPoint.X - currentPoint.X) < SystemParameters.MinimumHorizontalDragDistance && Math.Abs(startPoint.Y - currentPoint.Y) < SystemParameters.MinimumVerticalDragDistance) return;
+		//          double cellWidth = DashboardGrid.ActualWidth / 12; double cellHeight = 80;
+		//          int column = (int)Math.Round((currentPoint.X - _clickOffset.X) / cellWidth);
+		//          int row = (int)Math.Round((currentPoint.Y - _clickOffset.Y) / cellHeight);
+		//          int colSpan = Grid.GetColumnSpan(selectedWidget);
+		//          column = Math.Max(0, Math.Min(column, 12 - colSpan)); row = Math.Max(0, row);
+		//          if (Grid.GetColumn(selectedWidget) != column || Grid.GetRow(selectedWidget) != row) { Grid.SetColumn(selectedWidget, column); Grid.SetRow(selectedWidget, row); _isDirty = true; }
+		//      }
+
 		private void Widget_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (!editMode || !isDraggingWidget || selectedWidget == null) return;
-            Point currentPoint = e.GetPosition(DashboardGrid);
-            if (Math.Abs(startPoint.X - currentPoint.X) < SystemParameters.MinimumHorizontalDragDistance && Math.Abs(startPoint.Y - currentPoint.Y) < SystemParameters.MinimumVerticalDragDistance) return;
-            double cellWidth = DashboardGrid.ActualWidth / 12; double cellHeight = 80;
-            int column = (int)Math.Round((currentPoint.X - _clickOffset.X) / cellWidth);
-            int row = (int)Math.Round((currentPoint.Y - _clickOffset.Y) / cellHeight);
-            int colSpan = Grid.GetColumnSpan(selectedWidget);
-            column = Math.Max(0, Math.Min(column, 12 - colSpan)); row = Math.Max(0, row);
-            if (Grid.GetColumn(selectedWidget) != column || Grid.GetRow(selectedWidget) != row) { Grid.SetColumn(selectedWidget, column); Grid.SetRow(selectedWidget, row); _isDirty = true; }
-        }
+		{
+			if (!editMode || !isDraggingWidget || selectedWidget == null) return;
+
+			// 🔥 LẤY POSITION THEO SCROLLVIEWER (FIX BUG NGƯỢC CHIỀU)
+			Point currentPoint = e.GetPosition(DashboardScroll);
+
+			double cellWidth = DashboardGrid.ActualWidth / 12;
+			double cellHeight = 80;
+
+			// position theo grid (để set row/column)
+			Point gridPoint = e.GetPosition(DashboardGrid);
+
+			int column = (int)Math.Round((gridPoint.X - _clickOffset.X) / cellWidth);
+			int row = (int)Math.Round((gridPoint.Y - _clickOffset.Y) / cellHeight);
+
+			int colSpan = Grid.GetColumnSpan(selectedWidget);
+			int rowSpan = Grid.GetRowSpan(selectedWidget);
+
+			// =============================
+			// 🔥 CLAMP COLUMN
+			// =============================
+			column = Math.Max(0, Math.Min(column, 12 - colSpan));
+
+			// =============================
+			// 🔥 AUTO SCROLL (MƯỢT)
+			// =============================
+			double threshold = 60;
+
+			// kéo xuống
+			if (currentPoint.Y > DashboardScroll.ViewportHeight - threshold)
+			{
+				double speed = (currentPoint.Y - (DashboardScroll.ViewportHeight - threshold)) / 5;
+				DashboardScroll.ScrollToVerticalOffset(DashboardScroll.VerticalOffset + speed);
+			}
+			// kéo lên
+			else if (currentPoint.Y < threshold)
+			{
+				double speed = (threshold - currentPoint.Y) / 5;
+				DashboardScroll.ScrollToVerticalOffset(DashboardScroll.VerticalOffset - speed);
+			}
+
+			// =============================
+			// 🔥 AUTO ADD ROW
+			// =============================
+			if (row + rowSpan >= DashboardGrid.RowDefinitions.Count - 2)
+			{
+				EnsureRow(DashboardGrid.RowDefinitions.Count + 5);
+			}
+
+			// =============================
+			// 🔥 LIMIT KHÔNG VƯỢT VIEWPORT
+			// =============================
+			double maxVisibleRow = (DashboardScroll.VerticalOffset + DashboardScroll.ViewportHeight) / cellHeight;
+
+			row = (int)Math.Min(row, maxVisibleRow - rowSpan);
+			row = Math.Max(0, row);
+
+			// =============================
+			// 🔥 UPDATE POSITION
+			// =============================
+			if (Grid.GetColumn(selectedWidget) != column || Grid.GetRow(selectedWidget) != row)
+			{
+				Grid.SetColumn(selectedWidget, column);
+				Grid.SetRow(selectedWidget, row);
+				_isDirty = true;
+			}
+		}
 
 		private void DashboardGrid_Drop(object sender, DragEventArgs e)
 		{
@@ -658,6 +727,76 @@ namespace LightInsight.Dashboard.Dashboard
         private void WidgetLibrary_Item_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e) { Point mousePos = e.GetPosition(null); if (Math.Abs(startPoint.X - mousePos.X) <= 3 && Math.Abs(startPoint.Y - mousePos.Y) <= 3) { WidgetItem widget = (sender as FrameworkElement)?.DataContext as WidgetItem; if (widget != null) AddWidget_Click(new Button { Tag = widget }, null); } }
         private void DashboardScroll_PreviewMouseWheel(object sender, MouseWheelEventArgs e) { DashboardScroll.ScrollToVerticalOffset(DashboardScroll.VerticalOffset - e.Delta); e.Handled = true; }
         private void DashboardScroll_ScrollChanged(object sender, ScrollChangedEventArgs e) { if (editMode && DashboardScroll.VerticalOffset + DashboardScroll.ViewportHeight >= DashboardScroll.ExtentHeight - 20) EnsureRow(DashboardGrid.RowDefinitions.Count + 5); }
-    }
+		Popup _currentPopup;
+		bool _isHoveringPopup = false;
+
+		private void ItemBorder_MouseEnter(object sender, MouseEventArgs e)
+		{
+			if (!IsSidebarCollapsed) return;
+
+			var border = sender as FrameworkElement;
+			var popup = border.Tag as Popup;
+
+			if (popup == null) return;
+
+			// 🔥 FIX QUAN TRỌNG: đóng popup cũ ngay lập tức
+			if (_currentPopup != null && _currentPopup != popup)
+			{
+				_currentPopup.IsOpen = false;
+			}
+
+			popup.IsOpen = true;
+			_currentPopup = popup;
+		}
+
+
+		public static T FindChild<T>(DependencyObject parent) where T : DependencyObject
+		{
+			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+			{
+				var child = VisualTreeHelper.GetChild(parent, i);
+
+				if (child is T t)
+					return t;
+
+				var result = FindChild<T>(child);
+				if (result != null)
+					return result;
+			}
+			return null;
+		}
+
+		private async void Popup_MouseLeave(object sender, MouseEventArgs e)
+		{
+			_isHoveringPopup = false;
+
+			await Task.Delay(200);
+
+			if (!_isHoveringPopup && _currentPopup != null)
+			{
+				_currentPopup.IsOpen = false;
+				_currentPopup = null;
+			}
+		}
+
+		private void Popup_MouseEnter(object sender, MouseEventArgs e)
+		{
+			_isHoveringPopup = true;
+		}
+
+		private async void ItemBorder_MouseLeave(object sender, MouseEventArgs e)
+		{
+			var popup = (sender as FrameworkElement)?.Tag as Popup;
+
+			await Task.Delay(150);
+
+			// chỉ đóng nếu vẫn là popup hiện tại
+			if (!_isHoveringPopup && popup == _currentPopup)
+			{
+				popup.IsOpen = false;
+				_currentPopup = null;
+			}
+		}
+	}
 }
 #endregion
