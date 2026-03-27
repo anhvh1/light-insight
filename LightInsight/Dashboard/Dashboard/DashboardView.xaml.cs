@@ -461,15 +461,27 @@ namespace LightInsight.Dashboard.Dashboard
             if (!editMode) return;
             Thumb thumb = sender as Thumb;
             FrameworkElement widget = FindParentWidget(thumb);
-            if (widget != null)
-            {
-                double cellWidth = DashboardGrid.ActualWidth / 12; double cellHeight = 80;
-                int targetColSpan = (int)Math.Max(1, Math.Round((widget.ActualWidth + e.HorizontalChange) / cellWidth));
-                int targetRowSpan = (int)Math.Max(1, Math.Round((widget.ActualHeight + e.VerticalChange) / cellHeight));
-                Grid.SetColumnSpan(widget, targetColSpan); Grid.SetRowSpan(widget, targetRowSpan);
-                SmartCascadePush(widget); _isDirty = true;
-            }
-        }
+			if (widget is IResizableWidget resizable)
+			{
+				double cellWidth = DashboardGrid.ActualWidth / 12;
+				double cellHeight = 80;
+
+				int currentColSpan = Grid.GetColumnSpan(widget);
+				int currentRowSpan = Grid.GetRowSpan(widget);
+
+				int deltaCol = (int)Math.Round(e.HorizontalChange / cellWidth);
+				int deltaRow = (int)Math.Round(e.VerticalChange / cellHeight);
+
+				int targetColSpan = Math.Max(resizable.MinCol, currentColSpan + deltaCol);
+				int targetRowSpan = Math.Max(resizable.MinRow, currentRowSpan + deltaRow);
+
+				Grid.SetColumnSpan(widget, targetColSpan);
+				Grid.SetRowSpan(widget, targetRowSpan);
+
+				SmartCascadePush(widget);
+				_isDirty = true;
+			}
+		}
 
         private FrameworkElement FindParentWidget(DependencyObject child)
         {
